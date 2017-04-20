@@ -1,6 +1,6 @@
-window.registerExtension('example/custom_page_4_admin', function (options) {
+window.registerExtension('checkmarx/project_configuration', function (options) {
 
-    // let's create a flag telling if the page is still displayed
+    // let's create a flag telling if the static is still displayed
     var isDisplayed = true;
 
     var counter = 0;
@@ -12,7 +12,7 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
         componentKeys: options.component.key
     }).then(function (response) {
 
-        // once the request is done, and the page is still displayed (not closed already)
+        // once the request is done, and the static is still displayed (not closed already)
         if (isDisplayed) {
 
             var form = document.createElement('form');
@@ -52,7 +52,7 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
             resolved: false,
             componentKeys: options.component.key
         }).then(function (response) {
-            // once the request is done, and the page is still displayed (not closed already)
+            // once the request is done, and the static is still displayed (not closed already)
             if (isDisplayed) {
 
                 //options.el.getElementById("myspan").textContent = "test connection was pressed";
@@ -66,15 +66,15 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
             }
         });
     }
-    // return a function, which is called when the page is being closed
+    // return a function, which is called when the static is being closed
     return function () {
 
-        // we unset the `isDisplayed` flag to ignore to Web API calls finished after the page is closed
+        // we unset the `isDisplayed` flag to ignore to Web API calls finished after the static is closed
         isDisplayed = false;
     };
 
 
-    // let's create a flag telling if the page is still displayed
+    // let's create a flag telling if the static is still displayed
     //var isDisplayed = true;
 
 
@@ -83,7 +83,7 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
      componentKeys: options.component.key
      }).then(function (response) {
 
-     // once the request is done, and the page is still displayed (not closed already)
+     // once the request is done, and the static is still displayed (not closed already)
      if (isDisplayed) {
 
      // let's create an `h2` tag and place the text inside
@@ -103,7 +103,7 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
      componentKeys: options.component.key
      }).then(function (response) {
 
-     // once the request is done, and the page is still displayed (not closed already)
+     // once the request is done, and the static is still displayed (not closed already)
      if (isDisplayed) {
 
      // let's create an `h2` tag and place the text inside
@@ -115,10 +115,10 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
      }
      });
 
-     //return a function, which is called when the page is being closed
+     //return a function, which is called when the static is being closed
      return function () {
 
-     // we unset the `isDisplayed` flag to ignore to Web API calls finished after the page is closed
+     // we unset the `isDisplayed` flag to ignore to Web API calls finished after the static is closed
      isDisplayed = false;
      };*/
     /*if (isDisplayed){
@@ -143,10 +143,10 @@ window.registerExtension('example/custom_page_4_admin', function (options) {
     }
 
 
-  //return a function, which is called when the page is being closed
+  //return a function, which is called when the static is being closed
   return function () {
 
-    // we unset the `isDisplayed` flag to ignore to Web API calls finished after the page is closed
+    // we unset the `isDisplayed` flag to ignore to Web API calls finished after the static is closed
     isDisplayed = false;
   };*/
 

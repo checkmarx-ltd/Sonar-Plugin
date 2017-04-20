@@ -1,6 +1,6 @@
-window.registerExtension('example/custom_page_4_project', function (options) {
+window.registerExtension('checkmarx/cx_report', function (options) {
  
-  // let's create a flag telling if the page is still displayed
+  // let's create a flag telling if the static is still displayed
   var isDisplayed = true;
  
   // then do a Web API call to the /api/issues/search to get the number of issues
@@ -11,7 +11,7 @@ window.registerExtension('example/custom_page_4_project', function (options) {
     componentKeys: options.component.key
   }).then(function (response) {*/
  
-    // once the request is done, and the page is still displayed (not closed already)
+    // once the request is done, and the static is still displayed (not closed already)
     if (isDisplayed) {
  
       // let's create an `h2` tag and place the text inside
@@ -64,10 +64,10 @@ window.registerExtension('example/custom_page_4_project', function (options) {
     }
   /*});*/
  
-  // return a function, which is called when the page is being closed
+  // return a function, which is called when the static is being closed
   return function () {
  
-    // we unset the `isDisplayed` flag to ignore to Web API calls finished after the page is closed
+    // we unset the `isDisplayed` flag to ignore to Web API calls finished after the static is closed
     isDisplayed = false;
   };
 });

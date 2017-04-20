@@ -49,7 +49,7 @@
         <version>1.16</version>
         <extensions>true</extensions>
         <configuration>
-          <pluginKey>example</pluginKey>
+          <pluginKey>checkmarx</pluginKey>
           <pluginClass>com.checkmarx.sonar.CheckmarxPlugin</pluginClass>
         </configuration>
       </plugin>

@@ -41,10 +41,6 @@ public class CxRestServiceForSonar implements WebService {
 
         // TODO: 13/04/2017 get projects
 
-        //// TODO: 13/04/2017 get teams
-
-        // TODO: 13/04/2017 get presets
-
         // TODO: 13/04/2017 here? save config data in propreties
         // important to apply changes
         controller.done();

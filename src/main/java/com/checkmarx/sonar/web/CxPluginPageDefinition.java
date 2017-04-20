@@ -10,15 +10,16 @@ public class CxPluginPageDefinition implements PageDefinition {
   @Override
   public void define(Context context) {
     context
-      .addPage(Page.builder("example/custom_page_4_project")
-        .setName("Custom Project Page")
-        .setScope(Scope.COMPONENT).build())
-      .addPage(Page.builder("example/custom_page_4_admin")
-        .setName("Custom Admin Page")
-        .setScope(Scope.COMPONENT)
-        .setAdmin(Boolean.TRUE).build())
-      .addPage(Page.builder("example/custom_page_global")
-        .setName("Custom Global Page")
-        .setScope(Scope.GLOBAL).build());
+      .addPage(Page.builder("checkmarx/global_configuration")
+              .setName("Checkmarx")
+              .setScope(Scope.GLOBAL)
+              .setAdmin(Boolean.TRUE).build())
+      .addPage(Page.builder("checkmarx/project_configuration")
+              .setName("Checkmarx")
+              .setScope(Scope.COMPONENT)
+              .setAdmin(Boolean.TRUE).build())
+      .addPage(Page.builder("checkmarx/cx_report")
+        .setName("Checkmarx Report")
+        .setScope(Scope.COMPONENT).build());
   }
 }
