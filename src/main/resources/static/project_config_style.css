@@ -1,0 +1,144 @@
+#h1Connecting{
+    font-size: 40px;
+
+    margin-top: 20px;
+    margin-left: 40px
+}
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+
+.spinner {
+    position: relative;
+    vertical-align: middle;
+    border: 2px solid #4b9fd5;
+    border-radius: 50%;
+    animation: spin .75s infinite linear;
+}
+
+.spinner:after,.spinner:before {
+    left: -2px;
+    top: -2px;
+    display: none;
+    position: absolute;
+    content: "";
+    width: inherit;
+    height: inherit;
+    border: inherit;
+    border-radius: inherit
+}
+
+.spinner,.spinner:after,.spinner:before {
+    display: inline-block;
+    box-sizing: border-box;
+    border-color: transparent;
+    border-top-color: #4b9fd5;
+    animation-duration: 1.2s
+}
+
+.spinner:before {
+    transform: rotate(120deg)
+}
+
+.spinner:after {
+    transform: rotate(240deg)
+}
+
+.spinner-margin {
+    margin: 10px
+}
+
+#loadingSpinner{
+    width: 150px;
+    height: 150px;
+
+    margin-top: 40px;
+    margin-bottom: 120px;
+    margin-right: 120px;
+    margin-left: 60px
+}
+
+#testConBtnSpanSpinner, #saveBtnSpanSpinner{
+    width: 15px;
+    height: 15px;
+    margin-left: 10px
+}
+
+
+/*
+   variables addressed one by one because sonar does not get rid of css after living the page
+*/
+
+.header img {
+    float: left;
+    width: 36px;
+    height: 36px;
+
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    position: relative;
+    top: 15px;
+    left: 5px;
+
+    font-weight: bold;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+p{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 15px;
+    margin-left: 20px;
+}
+
+.cxDescription{
+    color: 	#A9A9A9;
+    font-size: smaller;
+}
+
+#testConParagraph{
+    margin-top: 15px;
+}
+
+label{
+    display: inline-block;
+    width: 70px;
+    text-align: left;
+ }
+
+#projectForm label{
+    width: 120px;
+}
+
+#serverUrlErr, #usernameErr, #passwordErr, #testConBtnErr, #projectFormErr, #saveBtnErr{
+    font-weight: bold;
+    color:#FF0000;
+    margin-left: 10px;
+}
+
+#testConBtnSuccess,#saveBtnSuccess{
+    font-weight: bold;
+    color:#4682B4;
+    margin-left: 0;
+}
+
+#testConBtnSpan, #saveBtnSpan{
+    margin-left: 0;
+    margin-right: 0;
+}
+
+
+#testConP{
+    margin-top: 15px;
+}
+
+#projectForm{
+    margin-top: 20px;
+}

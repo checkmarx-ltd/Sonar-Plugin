@@ -10,14 +10,22 @@ import org.sonar.api.server.ws.WebService;
  * Date: 12/04/2017.
  */
 
-public class CxRestServiceForSonar implements WebService {
+public class CxReportRestEndPoint implements WebService {
 
-    //todo voletile seesion id  here
+    //// TODO: 20/04/2017  USE CREDENTIALS FROM HANDLER
+
+    //todo credentials property handler here
+    //todo report\result properties handler here
 
     @Override
    public void define(Context context) {
          NewController controller = context.createController("api/hello");
          controller.setDescription("Web service example");
+
+       /* controller.createAction("show")
+                .setDescription("Entry point")
+                .setInternal(true)
+                .setHandler(new CxRequestHandler());*/
 
          // create the URL /api/hello/show
          controller.createAction("show")
@@ -37,11 +45,12 @@ public class CxRestServiceForSonar implements WebService {
               });
                  // .createParam("key").setDescription("Example key").setRequired(false);
 
-        // TODO: 13/04/2017 test connection
 
-        // TODO: 13/04/2017 get projects
+        //should be on a different servlet - it doesn't use soap service and it's properties manager (report)
+        // should be separate as well
+        //TODO GET report\results (has not been established yest if json will be separated or one)
 
-        // TODO: 13/04/2017 here? save config data in propreties
+        //todo dont forget to log out
         // important to apply changes
         controller.done();
        }

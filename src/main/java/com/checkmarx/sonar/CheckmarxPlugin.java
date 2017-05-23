@@ -19,10 +19,18 @@
  */
 package com.checkmarx.sonar;
 
+import com.checkmarx.sonar.measures.ComputeSizeAverage;
+import com.checkmarx.sonar.measures.ComputeSizeRating;
+import com.checkmarx.sonar.measures.ExampleMetrics;
+import com.checkmarx.sonar.measures.SetSizeOnFilesSensor;
+import com.checkmarx.sonar.rest.CxConfigRestEndPoint;
+import com.checkmarx.sonar.rest.CxReportRestEndPoint;
+import com.checkmarx.sonar.sensor.MySensor;
+import com.checkmarx.sonar.settings.CxProperties;
+import com.checkmarx.sonar.settings.HelloWorldProperties;
+import com.checkmarx.sonar.settings.SayHelloFromScanner;
 import com.checkmarx.sonar.web.CxPluginPageDefinition;
 import org.sonar.api.Plugin;
-
-import com.checkmarx.sonar.rest.CxRestServiceForSonar;
 
 /**
  * This class is the entry point for all extensions. It is referenced in pom.xml.
@@ -33,29 +41,24 @@ public class CheckmarxPlugin implements Plugin {
   public void define(Context context) {
 
     // tutorial on measures
-  /*  context
-      .addExtensions(ExampleMetrics.class, SetSizeOnFilesSensor.class, ComputeSizeAverage.class, ComputeSizeRating.class);*/
+    context
+      .addExtensions(ExampleMetrics.class, SetSizeOnFilesSensor.class, ComputeSizeAverage.class, ComputeSizeRating.class);
 
     // tutorial on settings
-    /*context
+    context
       .addExtensions(HelloWorldProperties.getProperties())
-      .addExtension(SayHelloFromScanner.class);*/
+      .addExtension(SayHelloFromScanner.class);
+
+    context.addExtensions(CxProperties.getProperties()).addExtension(MySensor.class);
 
     // tutorial on sensor
     //context.addExtensions(JavaRulesDefinition.class, CreateIssuesOnJavaFilesSensor.class);
     //context.addExtensions(FooLintRulesDefinition.class, FooLintIssuesLoaderSensor.class);
 
-    context.addExtension(CxRestServiceForSonar.class);
+    context.addExtension(CxReportRestEndPoint.class);
 
-    // tutorial on web extensions
     context.addExtension(CxPluginPageDefinition.class);
 
-   /* context.addExtensions(asList(
-      PropertyDefinition.builder("sonar.foo.file.suffixes")
-        .name("Suffixes FooLint")
-        .description("Suffixes supported by FooLint")
-        .category("FooLint")
-        .defaultValue("")
-        .build()));*/
+    context.addExtension(CxConfigRestEndPoint.class);
   }
 }

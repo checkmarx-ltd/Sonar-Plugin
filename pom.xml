@@ -7,13 +7,14 @@
   <packaging>sonar-plugin</packaging>
   <version>8.4.x-SNAPSHOT</version>
 
-<name>Example Plugin for SonarQube</name>
-  <description>Example of Plugin for SonarQube: Foo Language, FooLint, Custom Metrics and MeasureComputers</description>
+<name>Checkmarx plugin</name>
+  <description>Checkmarx plugin</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sonar.apiVersion>6.3</sonar.apiVersion>
     <jdk.min.version>1.8</jdk.min.version>
+    <slf4j.version>1.7.5</slf4j.version>
   </properties>
 
   <repositories>
@@ -39,6 +40,25 @@
       <version>2.6</version>
     </dependency>
 
+    <!-- Logger -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <!-- mapping between objects and jsons-->
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>2.22.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20080701</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -46,7 +66,7 @@
       <plugin>
         <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
         <artifactId>sonar-packaging-maven-plugin</artifactId>
-        <version>1.16</version>
+        <version>1.17</version>
         <extensions>true</extensions>
         <configuration>
           <pluginKey>checkmarx</pluginKey>
@@ -71,6 +91,46 @@
           <execution>
             <goals>
               <goal>native2ascii</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${basedir}/target/generated/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>1.12</version>
+        <configuration>
+          <wsdlDirectory>${basedir}/src/main/resources/wsdl</wsdlDirectory>
+          <packageName>com.raps.code.generate.ws</packageName>
+          <keep>true</keep>
+          <sourceDestDir>${basedir}/target/generated/src/main/java</sourceDestDir>
+          <sei/>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>wsimport</goal>
             </goals>
           </execution>
         </executions>

@@ -20,6 +20,7 @@
 package com.checkmarx.sonar.settings;
 
 import org.sonar.api.config.PropertyDefinition;
+import org.sonar.api.resources.Qualifiers;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import static java.util.Arrays.asList;
 
 public class HelloWorldProperties {
 
-  public static final String HELLO_KEY = "sonar.example.hello";
+  public static final String HELLO_KEY = "sonar.example.hello.secured";
   public static final String CATEGORY = "Properties Example";
 
   private HelloWorldProperties() {
@@ -41,6 +42,7 @@ public class HelloWorldProperties {
         .description("Say Hello")
         .defaultValue(String.valueOf(false))
         .category(CATEGORY)
+              .onlyOnQualifiers(Qualifiers.PROJECT)
         .build());
   }
 
