@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 
 public class ExampleMetrics implements Metrics {
 
-  private static String DOMAIN = "Custom";
+  public static String DOMAIN = "Custom";
 
   public static final Metric<Integer> FILENAME_SIZE = new Metric.Builder("filename_size", "Filename Size", Metric.ValueType.INT)
     .setDescription("Number of characters of file names")

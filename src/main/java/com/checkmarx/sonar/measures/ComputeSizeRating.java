@@ -19,11 +19,11 @@
  */
 package com.checkmarx.sonar.measures;
 
-import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE;
-import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE_RATING;
-
 import org.sonar.api.ce.measure.Measure;
 import org.sonar.api.ce.measure.MeasureComputer;
+
+import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE;
+import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE_RATING;
 
 /**
  * Rating is computed from value of metric {@link ExampleMetrics#FILENAME_SIZE}.
@@ -54,4 +54,5 @@ public class ComputeSizeRating implements MeasureComputer {
       context.addMeasure(FILENAME_SIZE_RATING.key(), rating);
     }
   }
+
 }

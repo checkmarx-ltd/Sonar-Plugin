@@ -19,13 +19,13 @@
  */
 package com.checkmarx.sonar.measures;
 
-import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE;
-
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
+
+import static com.checkmarx.sonar.measures.ExampleMetrics.FILENAME_SIZE;
 
 /**
  * Scanner feeds raw measures on files but must not aggregate values to directories and project.
@@ -50,4 +50,5 @@ public class SetSizeOnFilesSensor implements Sensor {
         .save();
     }
   }
+
 }

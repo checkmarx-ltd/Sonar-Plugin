@@ -19,10 +19,7 @@
  */
 package com.checkmarx.sonar;
 
-import com.checkmarx.sonar.measures.ComputeSizeAverage;
-import com.checkmarx.sonar.measures.ComputeSizeRating;
-import com.checkmarx.sonar.measures.ExampleMetrics;
-import com.checkmarx.sonar.measures.SetSizeOnFilesSensor;
+import com.checkmarx.sonar.measures.*;
 import com.checkmarx.sonar.rest.CxConfigRestEndPoint;
 import com.checkmarx.sonar.rest.CxReportRestEndPoint;
 import com.checkmarx.sonar.sensor.MySensor;
@@ -43,6 +40,9 @@ public class CheckmarxPlugin implements Plugin {
     // tutorial on measures
     context
       .addExtensions(ExampleMetrics.class, SetSizeOnFilesSensor.class, ComputeSizeAverage.class, ComputeSizeRating.class);
+
+    context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, SastSensor.class, OsaMetrics.class, ComputeOsaMeasures.class, OsaSensor.class);
+
 
     // tutorial on settings
     context
