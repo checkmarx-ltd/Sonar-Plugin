@@ -11,6 +11,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     var staticUrl = window.baseUrl +'/static/checkmarx';
 
+    var configurationPage;
+    
     if (isDisplayed) {
 
         loadCssFile();
@@ -69,6 +71,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             selectedProjectInSonarDb = "";
         }
         return new Promise(function () {
+
+            var div = document.createElement('div');
+            div.className = "configurationDiv";
+            div.id = "configurationDivId";
+            configurationPage = div;
+            options.el.appendChild(configurationPage);
             createHeadline();
             createCredentialsForms();
             createTestConnectionButton();
@@ -90,7 +98,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         div.appendChild(h1);
         var br = document.createElement("br");
         div.appendChild(br);
-        options.el.appendChild(div);
+        configurationPage.appendChild(div);
     }
 
 
@@ -123,7 +131,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var errSpan = createErrSpan(id);
         paragraph.appendChild(input);
         paragraph.appendChild(errSpan);
-        options.el.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);
     }
 
     function createUrlDescription() {
@@ -152,7 +160,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         paragraph.appendChild(spanSpinner);
         paragraph.appendChild(spanErr);
         paragraph.appendChild(spanSuccess);
-        options.el.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);
     }
 
     function testConnection() {
@@ -209,7 +217,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var errSpan = createErrSpan(form.id);
         paragraph.appendChild(form);
         paragraph.appendChild(errSpan);
-        options.el.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);
     }
 
 
@@ -256,7 +264,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         paragraph.appendChild(spanSpinner);
         paragraph.appendChild(spanErr);
         paragraph.appendChild(spanSuccess);
-        options.el.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);
     }
 
     function save() {
