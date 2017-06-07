@@ -138,7 +138,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var urlParagraph = document.getElementById('serverUrlP');
         var div = document.createElement('div');
         div.className = 'cxDescription';
-        div.textContent = 'Syntax: http(s)://server-name(:port)';
+        div.textContent = 'Syntax: http(s)://server-name or server-ip(:port)';
         urlParagraph.appendChild(div);
     }
     
