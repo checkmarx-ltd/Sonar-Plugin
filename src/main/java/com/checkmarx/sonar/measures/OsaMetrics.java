@@ -48,8 +48,17 @@ public class OsaMetrics implements Metrics {
             .create();
 
 
+    public static final Metric<String> OSA_SCAN_DETAILS = new Metric.Builder(OSA_BASE_KEY +".details", "Checkmarx OSA scan details", Metric.ValueType.STRING)
+            .setDescription("Additional scan details")
+            .setQualitative(true)
+            //.setHidden(true)
+            .setDomain(CX_OSA_DOMAIN)
+            .create();
+
+
+
     @Override
     public List<Metric> getMetrics() {
-        return asList(OSA_HIGH_VULNERABILITIES, OSA_MEDIUM_VULNERABILITIES, OSA_LOW_VULNERABILITIES, OSA_TOTAL_VULNERABILITIES);
+        return asList(OSA_HIGH_VULNERABILITIES, OSA_MEDIUM_VULNERABILITIES, OSA_LOW_VULNERABILITIES, OSA_TOTAL_VULNERABILITIES, OSA_SCAN_DETAILS);
     }
 }

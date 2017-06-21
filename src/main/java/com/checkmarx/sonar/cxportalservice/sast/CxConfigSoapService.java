@@ -1,0 +1,46 @@
+package com.checkmarx.sonar.cxportalservice.sast;
+
+import com.checkmarx.soap.client.CxWSResponseProjectsDisplayData;
+import com.checkmarx.soap.client.ProjectDisplayData;
+import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import org.sonar.api.utils.log.Loggers;
+
+import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Created by: zoharby.
+ * Date: 20/04/2017.
+ */
+public class CxConfigSoapService extends CxSoapService {
+
+    public CxConfigSoapService() {
+        super();
+        logger = Loggers.get(CxConfigSoapService.class);
+    }
+
+    public List<ProjectDisplayData> getProjectsDisplayData(String sessionId) throws ConnectionException {
+        logger.info("Extracting projects list from Checkmarx server.");
+        if(webServiceSoap == null || sessionId == null || sessionId.equals("")){
+            throw new ConnectionException("User is not logged in.");
+        }
+
+        String errMsg = "Failed to retrieve projects display data from server, check the server and retry.\n Error: ";
+        CxWSResponseProjectsDisplayData projectsDisplayData;
+        try {
+            projectsDisplayData = webServiceSoap.getProjectsDisplayData(sessionId);
+            if (!projectsDisplayData.isIsSuccesfull()) {
+                throw logErrorAndCreateConnectionException(errMsg + projectsDisplayData.getErrorMessage());
+            }
+            if (projectsDisplayData.getProjectList() != null){
+                return Arrays.asList(projectsDisplayData.getProjectList().getProjectDisplayData());
+            }
+        } catch (javax.xml.ws.WebServiceException | RemoteException e) {
+            throw logErrorAndCreateConnectionException(errMsg + e.getMessage(), e);
+        }
+
+        return new LinkedList<>();
+    }
+}

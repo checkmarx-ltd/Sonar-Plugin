@@ -19,46 +19,23 @@
  */
 package com.checkmarx.sonar;
 
-import com.checkmarx.sonar.measures.*;
-import com.checkmarx.sonar.rest.CxConfigRestEndPoint;
-import com.checkmarx.sonar.rest.CxReportRestEndPoint;
-import com.checkmarx.sonar.sensor.MySensor;
+import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
+import com.checkmarx.sonar.measures.ComputeSastMeasures;
+import com.checkmarx.sonar.measures.OsaMetrics;
+import com.checkmarx.sonar.measures.SastMetrics;
+import com.checkmarx.sonar.sensor.CheckmarxSensor;
 import com.checkmarx.sonar.settings.CxProperties;
-import com.checkmarx.sonar.settings.HelloWorldProperties;
-import com.checkmarx.sonar.settings.SayHelloFromScanner;
+import com.checkmarx.sonar.web.CxConfigRestEndPoint;
 import com.checkmarx.sonar.web.CxPluginPageDefinition;
 import org.sonar.api.Plugin;
 
-/**
- * This class is the entry point for all extensions. It is referenced in pom.xml.
- */
 public class CheckmarxPlugin implements Plugin {
 
   @Override
   public void define(Context context) {
 
-    // tutorial on measures
-    context
-      .addExtensions(ExampleMetrics.class, SetSizeOnFilesSensor.class, ComputeSizeAverage.class, ComputeSizeRating.class);
+    context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CxConfigSoapService.class, CheckmarxSensor.class,
+                    OsaMetrics.class, CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class);
 
-    context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, SastSensor.class, OsaMetrics.class, ComputeOsaMeasures.class, OsaSensor.class);
-
-
-    // tutorial on settings
-    context
-      .addExtensions(HelloWorldProperties.getProperties())
-      .addExtension(SayHelloFromScanner.class);
-
-    context.addExtensions(CxProperties.getProperties()).addExtension(MySensor.class);
-
-    // tutorial on sensor
-    //context.addExtensions(JavaRulesDefinition.class, CreateIssuesOnJavaFilesSensor.class);
-    //context.addExtensions(FooLintRulesDefinition.class, FooLintIssuesLoaderSensor.class);
-
-    context.addExtension(CxReportRestEndPoint.class);
-
-    context.addExtension(CxPluginPageDefinition.class);
-
-    context.addExtension(CxConfigRestEndPoint.class);
   }
 }

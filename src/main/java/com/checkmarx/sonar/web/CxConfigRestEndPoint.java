@@ -1,18 +1,18 @@
-package com.checkmarx.sonar.rest;
+package com.checkmarx.sonar.web;
 
-import com.checkmarx.sonar.cxservice.CxConfigSoapService;
-import com.checkmarx.sonar.cxservice.dto.CxFullCredentials;
-import com.checkmarx.sonar.cxservice.exception.ConnectionException;
+import com.checkmarx.soap.client.ProjectDisplayData;
+import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
+import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.raps.code.generate.ws.ProjectDisplayData;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ public class CxConfigRestEndPoint implements WebService {
 
     private CxConfigSoapService cxConfigSoapService = new CxConfigSoapService();
 
-    private Logger logger = LoggerFactory.getLogger(CxConfigRestEndPoint.class);
+    private Logger logger = Loggers.get(CxConfigRestEndPoint.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -65,7 +65,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .endObject()
                                     .close();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            logger.error("Login failed due to Exception: " + e.getMessage());
                             response.newJsonWriter()
                                     .beginObject()
                                     .prop("isSuccessful", false)
@@ -122,7 +122,7 @@ public class CxConfigRestEndPoint implements WebService {
                 .setHandler(new RequestHandler() {
                     @Override
                     public void handle(Request request, Response response) {
-
+                        logger.info("Logging out of Checkmarx.");
                         try {
                             String sessionId = request.getParam("sessionId").getValue();
                             validateSessionId(sessionId);
@@ -135,6 +135,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .close();
 
                         } catch (IOException e) {
+                            logger.error("Logging out of Checkmarx failed due to Exception: " + e.getMessage());
                             response.newJsonWriter()
                                     .beginObject()
                                     .prop("isSuccessful", false)
@@ -154,13 +155,13 @@ public class CxConfigRestEndPoint implements WebService {
         if(cxFullCredentials == null){
             throw new IOException("No credentials provided");
         }
-        if(cxFullCredentials.getServerUrl() == null || cxFullCredentials.getServerUrl().equals("")){
+        if(cxFullCredentials.getCxServerUrl() == null || cxFullCredentials.getCxServerUrl().equals("")){
             throw new IOException("Checkmarx server URL was not provided.");
         }
-        if(cxFullCredentials.getUsername() == null || cxFullCredentials.getUsername().equals("")){
+        if(cxFullCredentials.getCxUsername() == null || cxFullCredentials.getCxUsername().equals("")){
             throw new IOException("Checkmarx server username was not provided.");
         }
-        if(cxFullCredentials.getPassword() == null || cxFullCredentials.getPassword().equals("")){
+        if(cxFullCredentials.getCxPassword() == null || cxFullCredentials.getCxPassword().equals("")){
             throw new IOException("Checkmarx server password was not provided.");
         }
     }

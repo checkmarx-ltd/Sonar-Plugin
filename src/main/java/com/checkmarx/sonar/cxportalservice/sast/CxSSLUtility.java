@@ -1,4 +1,4 @@
-package com.checkmarx.sonar.cxservice;
+package com.checkmarx.sonar.cxportalservice.sast;
 
 
 import javax.net.ssl.*;
@@ -6,13 +6,12 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
 /**
  * Created by denis on 23/3/14.
  */
 public class CxSSLUtility {
-    private static final Logger logger = Logger.getLogger(String.valueOf(CxSSLUtility.class));
+    //private static final Logger logger = Logger.getLogger(String.valueOf(CxSSLUtility.class));
 
     public static void disableSSLCertificateVerification()
     {

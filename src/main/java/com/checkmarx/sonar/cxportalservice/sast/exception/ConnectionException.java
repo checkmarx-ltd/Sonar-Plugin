@@ -1,4 +1,4 @@
-package com.checkmarx.sonar.cxservice.exception;
+package com.checkmarx.sonar.cxportalservice.sast.exception;
 
 import java.io.IOException;
 

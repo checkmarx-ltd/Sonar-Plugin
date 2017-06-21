@@ -1,0 +1,86 @@
+package com.checkmarx.sonar.sensor;
+
+import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
+import com.checkmarx.sonar.cxportalservice.sast.CxResultsSoapService;
+import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.sensor.dto.SastScanData;
+import com.checkmarx.sonar.sensor.execution.OsaStageExecutor;
+import com.checkmarx.sonar.sensor.execution.SastStageExecutor;
+import com.checkmarx.sonar.settings.CxProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.SensorDescriptor;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
+
+/**
+ * Created by: Zoharby.
+ * Date: 24/05/2017.
+ */
+public class CheckmarxSensor implements Sensor {
+
+    private Logger logger = Loggers.get(CheckmarxSensor.class);
+
+    private ObjectMapper mapper = new ObjectMapper();
+
+    private CxResultsSoapService cxResultsSoapService = new CxResultsSoapService();
+    private CxConfigSoapService cxConfigSoapService = new CxConfigSoapService();
+    private SastStageExecutor sastStageExecutor = new SastStageExecutor();
+
+    @Override
+    public void describe(SensorDescriptor descriptor) {
+        descriptor.name("Compute size of file names");
+    }
+
+    @Override
+    public void execute(SensorContext context) {
+        logger.info("Getting Checkmarx configuration data from sonar Database.");
+
+        String cancelMsg = "NOTE: Checkmarx scan is canceled;\n";
+
+        CxFullCredentials cxFullCredentials = null;
+        String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
+        String cxProject = context.settings().getString(CxProperties.CXPROJECT_KEY);
+        if(cxCredentialsJson == null || cxProject == null){
+            logErrorAndNotifyContext(cancelMsg + "Error while retrieving Checkmarx settings from sonar Database.\n", context);
+            return;
+        }
+        if("".equals(cxCredentialsJson) || "".equals(cxProject)){
+            logErrorAndNotifyContext(cancelMsg + "Checkmarx settings were not configured.\n Can be configured by admin at: "+
+                                                                                "Project Page > Administration > Checkmarx\n", context);
+            return;
+        }
+        try {
+            cxFullCredentials = mapper.readValue(cxCredentialsJson, CxFullCredentials.class);
+        } catch (Exception e) {
+            logErrorAndNotifyContext(cancelMsg + "Error while parsing credentials: "+e.getMessage(), context);
+            return;
+        }
+
+        try {
+            cxConfigSoapService.login(cxFullCredentials);
+        } catch (ConnectionException e) {
+            logErrorAndNotifyContext(cancelMsg + "Login to Checkmarx failed: "+ e.getMessage(), context);
+            return;
+        }
+
+        try {
+            SastScanData downloadedData = cxResultsSoapService.getQueriesOfLastScanForProject(cxFullCredentials, cxProject);
+            sastStageExecutor.execute(context, downloadedData);
+
+            if (downloadedData.getProjectDisplayData().getTotalOsaScans() != 0) {
+                OsaStageExecutor osaScanExecutor = new OsaStageExecutor();
+                osaScanExecutor.execute(context, cxFullCredentials, (downloadedData.getProjectDisplayData().getProjectID()));
+            }
+        }catch (ConnectionException e){
+            logErrorAndNotifyContext(cancelMsg + "Error retrieving scan data from server: "+e.getMessage(), context);
+        }
+    }
+
+    private void logErrorAndNotifyContext(String massage, SensorContext context){
+        logger.error(massage);
+        context.newAnalysisError().message(massage).save();
+    }
+}
