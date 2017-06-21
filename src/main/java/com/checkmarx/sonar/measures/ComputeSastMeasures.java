@@ -3,6 +3,7 @@ package com.checkmarx.sonar.measures;
 import org.sonar.api.ce.measure.Component;
 import org.sonar.api.ce.measure.Measure;
 import org.sonar.api.ce.measure.MeasureComputer;
+import org.sonar.api.measures.Metric;
 
 import static com.checkmarx.sonar.measures.SastMetrics.*;
 
@@ -25,44 +26,13 @@ public class ComputeSastMeasures implements MeasureComputer {
 
     @Override
     public void compute(MeasureComputerContext context) {
-        // measure is already defined on files by {@link SetSizeOnFilesSensor}
-        // in scanner stack
         if (context.getComponent().getType() != Component.Type.FILE) {
-            int sumHigh = 0;
-            int sumMedium = 0;
-            int sumLow = 0;
-            int sumNewHigh = 0;
-            int sumNewMedium = 0;
-            int sumNewLow = 0;
-
-
-            //todo one method to rule them all
-
-            for (Measure child : context.getChildrenMeasures(SAST_HIGH_VULNERABILITIES.key())) {
-                sumHigh += child.getIntValue();
-            }
-
-            for (Measure child : context.getChildrenMeasures(SAST_MEDIUM_VULNERABILITIES.key())) {
-                sumMedium += child.getIntValue();
-            }
-
-            for (Measure child : context.getChildrenMeasures(SAST_LOW_VULNERABILITIES.key())) {
-                sumLow += child.getIntValue();
-            }
-
-
-            for (Measure child : context.getChildrenMeasures(SAST_NEW_HIGH_VULNERABILITIES.key())) {
-                sumNewHigh += child.getIntValue();
-            }
-
-            for (Measure child : context.getChildrenMeasures(SAST_NEW_MEDIUM_VULNERABILITIES.key())) {
-                sumNewMedium += child.getIntValue();
-            }
-
-            for (Measure child : context.getChildrenMeasures(SAST_NEW_LOW_VULNERABILITIES.key())) {
-                sumNewLow += child.getIntValue();
-            }
-
+            int sumHigh = sumMetric(SAST_HIGH_VULNERABILITIES, context);
+            int sumMedium = sumMetric(SAST_MEDIUM_VULNERABILITIES, context);
+            int sumLow = sumMetric(SAST_LOW_VULNERABILITIES, context);
+            int sumNewHigh = sumMetric(SAST_NEW_HIGH_VULNERABILITIES, context);
+            int sumNewMedium = sumMetric(SAST_NEW_MEDIUM_VULNERABILITIES, context);
+            int sumNewLow = sumMetric(SAST_NEW_LOW_VULNERABILITIES, context);
 
             context.addMeasure(SAST_HIGH_VULNERABILITIES.key(), sumHigh);
             context.addMeasure(SAST_MEDIUM_VULNERABILITIES.key(), sumMedium);
@@ -73,9 +43,15 @@ public class ComputeSastMeasures implements MeasureComputer {
             context.addMeasure(SAST_NEW_LOW_VULNERABILITIES.key(), sumNewLow);
             context.addMeasure(SAST_TOTAL_NEW_VULNERABILITIES.key(), sumNewHigh + sumNewMedium + sumNewLow);
         }
-
     }
 
+    private int sumMetric(Metric<Integer> integerMetric, MeasureComputerContext context){
+        int toRet = 0;
+        for (Measure child : context.getChildrenMeasures(integerMetric.key())) {
+            toRet += child.getIntValue();
+        }
+        return toRet;
+    }
 
 }
 
