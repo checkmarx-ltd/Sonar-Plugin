@@ -13,7 +13,6 @@ import static com.checkmarx.sonar.measures.SastMetrics.*;
  */
 public class ComputeSastMeasures implements MeasureComputer {
 
-
     @Override
     public MeasureComputerDefinition define(MeasureComputerDefinitionContext def) {
         return def.newDefinitionBuilder()
