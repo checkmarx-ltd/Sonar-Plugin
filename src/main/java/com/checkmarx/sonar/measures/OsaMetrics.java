@@ -51,7 +51,7 @@ public class OsaMetrics implements Metrics {
     public static final Metric<String> OSA_SCAN_DETAILS = new Metric.Builder(OSA_BASE_KEY +".details", "Checkmarx OSA scan details", Metric.ValueType.STRING)
             .setDescription("Additional scan details")
             .setQualitative(true)
-            //.setHidden(true)
+            .setHidden(true)
             .setDomain(CX_OSA_DOMAIN)
             .create();
 
