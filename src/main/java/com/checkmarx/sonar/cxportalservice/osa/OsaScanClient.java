@@ -71,8 +71,7 @@ public class OsaScanClient implements Closeable {
     }
 
 
-    //returns the last finished scan, even if it failed todo ask liran
-    public OsaScan getLastOsaScan(long projectId){
+    public OsaLatestScansData getLastOsaScan(long projectId){
         logger.info("Sending request to get last osa scan.");
         Invocation invocation = getOsaScansInvocation(String.valueOf(projectId));
         Response response = invokeRequest(invocation);
@@ -82,10 +81,20 @@ public class OsaScanClient implements Closeable {
         CollectionType responseType = mapper.getTypeFactory().constructCollectionType(List.class, OsaScan.class);
         try {
             List<OsaScan> osaScanList = mapper.readValue(response.readEntity(String.class), responseType);
+            Boolean isLastFinishedScanSucceed = null;
+            String scanErrMsg = null;
+
             for (OsaScan osaScan: osaScanList){
+                if (isScanFailed(osaScan)) {
+                    isLastFinishedScanSucceed = Boolean.FALSE;
+                    scanErrMsg = osaScan.getState().getFailureReason();
+                }
                 //avoid from returning running scans
-                if(isScanHaveDataToReturn(osaScan)){
-                    return osaScan;
+                if(isScanSucceeded(osaScan)){
+                    if(isLastFinishedScanSucceed == null){
+                        isLastFinishedScanSucceed = Boolean.TRUE;
+                    }
+                    return new OsaLatestScansData(isLastFinishedScanSucceed, scanErrMsg, osaScan);
                 }
             }
         } catch (IOException e) {
@@ -197,23 +206,15 @@ public class OsaScanClient implements Closeable {
         }
     }
 
-    private boolean isScanHaveDataToReturn(OsaScan OsaScan) {
-        ScanStatus scanStatus = ScanStatus.fromId(OsaScan.getState().getId());
-        if(scanStatus == null){
-            return false;
-        }
-        switch (scanStatus) {
-            case NotStarted:
-                return false;
-            case InProgress:
-                return false;
-            case Finished:
-                return true;
-            case Failed:
-                return true;
-            default:
-                return false;
-        }
+
+    private boolean isScanFailed(OsaScan osaScan){
+        ScanStatus scanStatus = ScanStatus.fromId(osaScan.getState().getId());
+        return scanStatus == ScanStatus.Failed;
+    }
+
+    private boolean isScanSucceeded(OsaScan osaScan) {
+        ScanStatus scanStatus = ScanStatus.fromId(osaScan.getState().getId());
+        return scanStatus != null && scanStatus == ScanStatus.Finished;
     }
 
     private void validateResponse(Response response, Response.Status expectedStatus, String message) throws WebApplicationException {

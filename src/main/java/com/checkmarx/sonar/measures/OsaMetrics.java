@@ -55,10 +55,16 @@ public class OsaMetrics implements Metrics {
             .setDomain(CX_OSA_DOMAIN)
             .create();
 
+    public static final Metric<String> OSA_LAST_SCAN_STATUS = new Metric.Builder(OSA_BASE_KEY +".status", "Last Osa scan status", Metric.ValueType.STRING)
+            .setDescription("Last Osa scan status")
+            .setQualitative(true)
+            .setDomain(CX_OSA_DOMAIN)
+            .create();
+
 
 
     @Override
     public List<Metric> getMetrics() {
-        return asList(OSA_HIGH_VULNERABILITIES, OSA_MEDIUM_VULNERABILITIES, OSA_LOW_VULNERABILITIES, OSA_TOTAL_VULNERABILITIES, OSA_SCAN_DETAILS);
+        return asList(OSA_HIGH_VULNERABILITIES, OSA_MEDIUM_VULNERABILITIES, OSA_LOW_VULNERABILITIES, OSA_TOTAL_VULNERABILITIES, OSA_SCAN_DETAILS, OSA_LAST_SCAN_STATUS);
     }
 }

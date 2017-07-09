@@ -1,10 +1,7 @@
 package com.checkmarx.sonar.sensor.execution;
 
 import com.checkmarx.sonar.cxportalservice.osa.OsaScanClient;
-import com.checkmarx.sonar.cxportalservice.osa.model.CVE;
-import com.checkmarx.sonar.cxportalservice.osa.model.GetOpenSourceSummaryResponse;
-import com.checkmarx.sonar.cxportalservice.osa.model.Library;
-import com.checkmarx.sonar.cxportalservice.osa.model.OsaScan;
+import com.checkmarx.sonar.cxportalservice.osa.model.*;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.OsaReportData;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,12 +34,14 @@ public class OsaStageExecutor {
     public void execute(SensorContext context, CxFullCredentials cxFullCredentials, long projectId){
         logger.info("Extracting Checkmarx Osa results.");
 
-        GetOpenSourceSummaryResponse openSourceSummaryResponse = null;
+        OsaLatestScansData osaLatestScansData = null;
         OsaScan lastOsaScan = null;
+        GetOpenSourceSummaryResponse openSourceSummaryResponse = null;
 
         try {
             osaScanClient = new OsaScanClient(cxFullCredentials);
-            lastOsaScan = osaScanClient.getLastOsaScan(projectId);
+            osaLatestScansData = osaScanClient.getLastOsaScan(projectId);
+            lastOsaScan = osaLatestScansData.getLastSuccessfulOsaScan();
             openSourceSummaryResponse = osaScanClient.getOpenSourceSummary(String.valueOf(lastOsaScan.getId()));
         }catch (Exception e){
             String errMsg = "Error while extracting Checkmarx OSA results from server: "+e.getMessage() +"\n Checkmarx Osa measures and report will not be presented.";
@@ -51,6 +50,7 @@ public class OsaStageExecutor {
             return;
         }
         try {
+            addScanStatusToMeasure(context, osaLatestScansData.isLastScanSuccessful());
             addVulnerabilitiesToMetrics(context, openSourceSummaryResponse);
         }catch (Exception e){
             String errMsg = "Error while Checkmarx OSA results to Sonar database: "+e.getMessage() +"\n Checkmarx Osa measures and report will not be presented.";
@@ -60,7 +60,7 @@ public class OsaStageExecutor {
         }
 
         try {
-            String osaDetailsJson = createOsaDetailsJson(lastOsaScan, openSourceSummaryResponse);
+            String osaDetailsJson = createOsaDetailsJson(osaLatestScansData, openSourceSummaryResponse);
             addReportDataToMeasure(context, osaDetailsJson);
         }catch (Exception e){
             String errMsg = "Error while saving Checkmarx OSA results to Sonar database: "+e.getMessage() +"\n Checkmarx report will not be presented.";
@@ -82,7 +82,9 @@ public class OsaStageExecutor {
         context.<Integer> newMeasure().forMetric(metric).on(context.module()).withValue(value).save();
     }
 
-    private String createOsaDetailsJson(OsaScan lastOsaScan, GetOpenSourceSummaryResponse openSourceSummaryResponse){
+    private String createOsaDetailsJson(OsaLatestScansData lastOsaScanData, GetOpenSourceSummaryResponse openSourceSummaryResponse){
+
+        OsaScan lastOsaScan = lastOsaScanData.getLastSuccessfulOsaScan();
 
         List<CVE> cves = getCompleteCves(lastOsaScan);
 
@@ -100,6 +102,8 @@ public class OsaStageExecutor {
         osaReportData.setEndAnalyzeTime(scanEnd);
         osaReportData.setAllCves(cves);
         osaReportData.setFiles(openSourceSummaryResponse.getTotalLibreries());
+        osaReportData.setFailureMsg(lastOsaScanData.getFailureMsg());
+
         try {
             return mapper.writeValueAsString(osaReportData);
         } catch (JsonProcessingException e) {
@@ -156,5 +160,9 @@ public class OsaStageExecutor {
 
     private void addReportDataToMeasure(SensorContext context, String osaDetailsJson){
         context.<String> newMeasure().on(context.module()).forMetric(OSA_SCAN_DETAILS).withValue( "\""+osaDetailsJson+"\"").save();
+    }
+
+    private void addScanStatusToMeasure(SensorContext context, Boolean isSuccess){
+        context.<String> newMeasure().on(context.module()).forMetric(OSA_LAST_SCAN_STATUS).withValue(LastOsaScanStatus.fromBoolean(isSuccess).getPresentationValue()).save();
     }
 }

@@ -32,6 +32,8 @@ public class OsaReportData {
     @JsonProperty("lowVulnerabilityCves")
     private List<CVE> lowVulnerabilityCves;
 
+    @JsonProperty("failureMsg")
+    private String failureMsg;
 
     public String getStartAnalyzeTime() {
         return startAnalyzeTime;
@@ -79,6 +81,14 @@ public class OsaReportData {
 
     public void setLowVulnerabilityCves(List<CVE> lowVulnerabilityCves) {
         this.lowVulnerabilityCves = lowVulnerabilityCves;
+    }
+
+    public String getFailureMsg() {
+        return failureMsg;
+    }
+
+    public void setFailureMsg(String failureMsg) {
+        this.failureMsg = failureMsg;
     }
 
     public void setAllCves(List<CVE> cveList){
