@@ -40,6 +40,27 @@ public class CheckmarxSensor implements Sensor {
 
         String cancelMsg = "NOTE: Checkmarx scan is canceled;\n";
 
+        //todo this is experiment
+       /* ActiveRules myRules = context.activeRules();
+
+        ActiveRule rule = myRules.findByInternalKey("fortify-ruby","API Abuse/ADF Faces Bad Practices/unsecure Attribute");
+
+        Iterable<InputFile> mainfiles = context.fileSystem().inputFiles(context.fileSystem().predicates().hasType(InputFile.Type.MAIN));
+        InputFile inputFile = null;
+        for (InputFile file: mainfiles){
+            if(file.isFile()){
+                inputFile = file;
+                break;
+            }
+        }
+
+        if(inputFile != null) {
+            DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
+            //InputComponent inputComponent = defaultIssueLocation.on(inputFile).inputComponent();
+
+            context.newIssue().forRule(rule.ruleKey()).at(defaultIssueLocation.on(inputFile)).save();
+        }*/
+
         CxFullCredentials cxFullCredentials = null;
         String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
         String cxProject = context.settings().getString(CxProperties.CXPROJECT_KEY);

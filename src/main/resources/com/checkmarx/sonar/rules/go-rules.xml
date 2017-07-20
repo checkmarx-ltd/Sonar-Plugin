@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><rules><rule><key>checkmarx_4667</key><name>Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
+&lt;li&gt;Start and stop system services&lt;/li&gt;
+&lt;li&gt;Complete server takeover&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious, system-level commands engineered by an attacker, which would be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
+&lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified format, rather than rejecting bad patterns (blacklist). Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all OS commands to use a separate, dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4679</key><name>Denial_Of_Service_Resource_Exhaustion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Denial-of-Service (DoS)&amp;nbsp;will result in&amp;nbsp;inaccessibility to some, if not all, facets of an application.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Computing resources are limited by server specifications, be it memory, storage, CPU, bandwidth and more. Failure to ensure that these resources are properly generated, managed and released may result in a system failing in unexpected ways, which may result in Denial-of-Service.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Practice caution when handling system resources, from pointers in memory to files in the file system, to prevent potential abuse of available resources.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Memory Leak Example&lt;/h4&gt;&lt;pre&gt;// Memory leak
+while (true) {
+    [...]
+	int * q = new int; // Heap memory allocated
+	[...] // q pointer is never released here
+}&lt;/pre&gt;&lt;h4&gt;Memory Leak - Resolved&lt;/h4&gt;&lt;pre&gt;// No memory leak
+while (true) {
+    [...]
+	int * q = new int;
+	[...]
+	delete q;
+    [...]
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Reading Large File into Object without Size Restriction&lt;/h4&gt;&lt;pre&gt;//Code will exhaust Java heap space, resulting in an OutOfMemoryError
+InputStream fileStream = new FileInputStream(file_to_read);
+BufferedReader buffReader = new BufferedReader(new InputStreamReader(fileStream));
+String line = buffReader.readLine();
+String newLine = System.getProperty("line.separator");
+StringBuilder sb = new StringBuilder();
+while(line != null)
+{
+	sb.append(line).append(newLine);
+	line = buffReader.readLine();
+}&lt;/pre&gt;&lt;h4&gt;Verifying File Size Before Reading Its Contents Into Memory&lt;/h4&gt;&lt;pre&gt;if (file_to_read.length() &gt; MAX_FILE_SIZE )
+{
+	throw new IOException("File size is too big!");
+}
+InputStream fileStream = new FileInputStream(file_to_read);
+BufferedReader buffReader = new BufferedReader(new InputStreamReader(fileStream));
+String line = buffReader.readLine();
+String newLine = System.getProperty("line.separator");
+StringBuilder sb = new StringBuilder();
+while(line != null)
+{
+	sb.append(line).append(newLine);
+	line = buffReader.readLine();
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4688</key><name>CGI_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&lt;span id="docs-internal-guid-c71b5d0e-9d84-dd53-9c94-64e8de600bd5"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap;"&gt;Special crafted HTTP requests might retrieve system information and exploit the system through CGI (Common Gateway Interface).&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p dir="ltr" style="line-height: 1.7142866666666667; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span style="font-family: Arial; color: #000000; background-color: #ffffff; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"&gt;The CGI specification provides opportunities to read files, acquire shell access, and corrupt file systems on server machines and their attached hosts. &amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+&lt;p dir="ltr" style="line-height: 1.7142866666666667; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span style="font-family: Arial; color: #000000; background-color: #ffffff; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"&gt;Means of gaining access include: exploiting assumptions of the script, exploiting weaknesses in the server environment, and exploiting weaknesses in other programs and system calls. &amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+&lt;p dir="ltr" style="line-height: 1.7142866666666667; margin-top: 0pt; margin-bottom: 0pt;"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p dir="ltr" style="line-height: 1.7142866666666667; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span style="font-family: Arial; color: #000000; background-color: #ffffff; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"&gt;The primary weakness in CGI scripts is insufficient input validation.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p dir="ltr" style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span style="font-family: Arial; color: #000000; background-color: #ffffff; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"&gt;Refrain from binding user input to system variables if not necessary.&lt;/span&gt;&lt;/p&gt;
+&lt;p dir="ltr" style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span id="docs-internal-guid-c71b5d0e-9d95-efa3-1ca7-894d4af475fb"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap;"&gt;Validate and encode all user input.&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Bad - The script blindly prints out the submitted comment&lt;/h4&gt;&lt;pre&gt;#!/usr/bin/perl
+use CGI;
+
+my $cgi = CGI-&gt;new();
+my $text = $cgi-&gt;param('comment');
+
+print $cgi-&gt;header();
+print "You entered $text";&lt;/pre&gt;&lt;h4&gt;Good - The comment is being encoded before printed out&lt;/h4&gt;&lt;pre&gt;#!/usr/bin/perl
+use CGI;
+use HTML::Entities;
+
+my $cgi = CGI-&gt;new();
+my $text = $cgi-&gt;param('comment');
+
+print $cgi-&gt;header();
+print "You entered ", HTML::Entities::encode($text);&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4693</key><name>Stored_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from the application&amp;#8217;s database. The data is embedded directly in the page's HTML, causing the browser to display it as part of the web page. This data may have originated in input from another user. If the data includes HTML fragments or Javascript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary database data without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Validate all dynamic data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in output. Encoding should be context-sensitive. For example:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;HTML encoding for HTML content&lt;/li&gt;
+&lt;li&gt;HTML attribute encoding for data output to attribute values&lt;/li&gt;
+&lt;li&gt;Javascript encoding for server-generated Javascript.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Consider using either the ESAPI encoding library, or its built-in functions. For earlier versions of ASP.NET, consider using the AntiXSS library.&lt;/li&gt;
+&lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
+&lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
+&lt;/ol&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
+	public static void XSSExample(Statement stmt) throws SQLException {
+		Label label = new Label();
+		ResultSet rs;
+		rs = stmt.executeQuery("SELECT * FROM Customers WHERE UserName = Mickey");
+		String lastNames = "";
+		while (rs.next()) {
+			lastNames += rs.getString("Lname") + ", ";
+		}
+		label.setText("Mickey last names are: " + lastNames + " ");
+	}
+}&lt;/pre&gt;&lt;h4&gt;The outputed string is encoded to hard-coded string before it is displayed in the label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS_Fix {
+	public static void XSSExample(Statement stmt) throws SQLException {
+		Label label = new Label();
+		ResultSet rs;
+		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
+		sanitize.put("A", "Cohen");
+		sanitize.put("B", "Smith");
+		sanitize.put("C", "Bond");
+		rs = stmt.executeQuery("SELECT * FROM Customers WHERE UserName = Mickey");
+		String lastNames = "";
+		while (rs.next()) {
+			lastNames += sanitize.get(rs.getString("Lname")) + ", ";
+		}
+		label.setText("Mickey last names are: " + lastNames + " ");
+	}
+}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
+{
+        public string foo(Label lblOutput, SqlConnection connection, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar();
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The outputed string is Html encoded before it is displayed in the label
+      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
+{
+        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar()
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
+        }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4666</key><name>Insufficient_Bcrypt_Cost</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+&lt;p&gt;Modern hash functions usually have a cost (or similar) parameter the user can set to determine how much computational power should be used in hashing the password. A higher value means a slower computation, but also makes it slower to attack, as each attempt will take longer to perform.&lt;/p&gt;
+&lt;p&gt;Setting the bcrypt cost parameter with too low a value will result in significant reduction of the resulting hash's security.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;Setting too low a cost value may significantly reduce the security of the password hash.&lt;/p&gt;
+&lt;p&gt;The cost parameter for the bcrypt function is too low.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Choosing an appropriate cost parameter depends on the underlying hashing algorithm in place and what the purpose of the key derivation function is. The most common purpose is authenticating interactive logins, so the threshold values on the cost parameters for this query have been set accordingly.&lt;/p&gt;
+&lt;p&gt;Bcrypt's cost parameter should be set at the default value (10) or higher. Reducing this number will reduce the computational effort required for computing hash from the password, weakening the resulting hash, making it easier for an attacker to crack it.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Safe bcrypt cost parameter&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/bcrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := bcrypt.GenerateFromPassword([]byte(password),10) //10 is the default cost
+            fmt.Printf("Hash: %s\n",bs)
+    }
+}&lt;/pre&gt;&lt;h4&gt;Unsafe bcrypt cost parameter&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/bcrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := bcrypt.GenerateFromPassword([]byte(password),1) //1 is lower than MinCost, so cost will default to MinCost: 4
+            fmt.Printf("Hash: %s\n",bs)
+    }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4707</key><name>Reflected_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use social engineering to cause a user to send the website engineered input, rewriting web pages and inserting malicious scripts. The attacker can then pretend to be the original website, which would enable the attacker to steal the user's password, request the user&amp;#8217;s credit card information, provide false information, or run malware. From the victim&amp;#8217;s point of view, this is the original website, and the victim would blame the site for incurred damage.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from previous user input. The user input is embedded directly in the page's HTML, causing the browser to display it as part of the web page. If the input includes HTML fragments or JavaScript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary user input without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Fully encode all dynamic data before embedding it in output.&lt;/li&gt;
+&lt;li&gt;Encoding should be context-sensitive. For example:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;HTML encoding for HTML content&lt;/li&gt;
+&lt;li&gt;HTML Attribute encoding for data output to attribute values&lt;/li&gt;
+&lt;li&gt;JavaScript encoding for server-generated JavaScript.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Consider using either the ESAPI encoding library, or the built-in platform functions. For earlier versions of ASP.NET, consider using the AntiXSS library.&lt;/li&gt;
+&lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
+&lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
+	public static void XSSExample(TextArea name) {	
+		Label label = new Label();		
+		label.setText("Hello " + name.getText());	
+	}
+}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
+	public static void XSSExample(TextArea name) {
+		Label label = new Label();		
+		switch (name) {
+		case "Joan":
+			label.setText("Hello Joan");	
+			break;
+		case "Jim":
+			label.setText("Hello Jim");	
+			break;
+		case "James":
+			label.setText("Hello James");	
+			break;
+		default:
+			System.out.println("Wrong Input");
+		}
+	}
+}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
+{
+        public static void foo(HttpRequest Request, HttpResponse Response)
+        {
+                string Referer = Request.QueryString["Referer"];
+                Response.BinaryWrite(Referer);
+        }
+}&lt;/pre&gt;&lt;h4&gt;Good - The "Referer" field string is HTML encoded before use&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClientsFixed
+{
+        public static void foo(HttpRequest Request, HttpResponse Response, AntiXss.AntiXssEncoder encoder)
+        {
+                string Referer = Request.QueryString["Referer"];
+                Response.BinaryWrite(encoder.HtmlEncode(Referer, true));
+        }
+}&lt;/pre&gt;&lt;h4&gt;Bad - User input is written to a TextBox displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSSpecificClients
+{
+        public void foo(TextBox tb)
+        {
+                string input = Console.ReadLine();
+                tb.Text = input;
+        }
+}&lt;/pre&gt;&lt;h4&gt;Good - The user input is HTML encoded before being displayed on the screen&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSSpecificClientsFixed
+{
+        public void foo(TextBox tb, AntiXssEncoder encode)
+        {
+                string input = Console.ReadLine();
+                tb.Text = encode.HtmlEncode(input);
+        }
+}&lt;/pre&gt;&lt;h4&gt;Bad - The application uses the "filename" field string from an HttpRequest construct an HttpResponse&lt;/h4&gt;&lt;pre&gt;public class UTF7XSS
+{
+        public void foo(HttpRequest Request, HttpResponse Response
+        {
+                Response.Charset("UTF-7");
+                string filename = Request.QueryString["filename"];
+                Response.BinaryWrite(AntiXss.HtmlEncode(filename));
+        }
+}&lt;/pre&gt;&lt;h4&gt;Good - The "filename" string is converted to an int and using a switch case the new "filename" string is constructed&lt;/h4&gt;&lt;pre&gt;public class UTF7XSSFixed
+{
+        public static void foo(HttpRequest Request, HttpResponse Response)
+        {
+                Response.Charset("UTF-7");
+                string filename = Request.QueryString["fileNum"];
+                int fileNum = Convert.ToInt32(filename);
+                
+                switch(fileNum)
+                {
+                        case 1:
+                                filename = "File1.txt";
+                                break;
+                        default:
+                                filename = "File2.txt";
+                                break;
+                }
+                
+                Response.BinaryWrite(AntiXss.HtmlEncode(filename));
+        }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4685</key><name>Overly_Permissive_Cross_Origin_Resource_Sharing_Policy</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A Cross-Origin Resource Sharing (CORS) header,&amp;nbsp;"Access-Control-Allow-Origin", that is overly permissive may allow scripts from other web-sites to access, and often manipulate, resources on the affected web-application. These resources may include page contents, tokens and more, allowing potential Cross-Site Reference Forgery (CSRF) or Cross-Site Scripting (XSS) attacks, performing actions on a user's behalf such as changing their password, or allow breach of user privacy.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Modern browsers, by default, disallow resource sharing between different domains from accessing one another's DOM contents, cookie jars and other resources, specifically to prevent malicious web-applications from attacking legitimate web-applications and their users as part of the Same-Origin Policy (SOP). For example - website A cannot retrieve contents of website B by default, as that is a breach of the SOP. The Cross-Origin Resource Sharing (CORS) policy, defined by specific headers, allows loosening this strict default behavior to enable cross-site communications. However, when used incorrectly, CORS may enable&amp;nbsp;unintended and potentially malicious behavior by allowing an overly broad trust of web-applications that may submit requests and retrieve responses from the web-application.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Where not explicitly required, do not set any CORS headers. Where required, consider business needs for setting these headers, and opt for the most restrictive configuration possible, such as white-listing trusted, secure and allowed domains access, while&amp;nbsp;utilizing other CORS headers to strictly provide required and expected functionality.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;PHP&lt;/h3&gt;&lt;h4&gt;Wildcard Access-Control-Allow-Origin&lt;/h4&gt;&lt;pre&gt;&lt;?php
+	header(‘Access-Control-Allow-Origin: * ’);
+?&gt;&lt;/pre&gt;&lt;h4&gt;Access-Control-Allow-Origin Being Set for a Trusted Domain&lt;/h4&gt;&lt;pre&gt;&lt;?php
+  	//assuming https://www.example.com is a trusted domain
+	header(‘Access-Control-Allow-Origin: https://www.example.com ’);
+?&gt;&lt;/pre&gt;&lt;h4&gt;Dynamically Determine Access-Control-Allow-Origin from Origin Header&lt;/h4&gt;&lt;pre&gt;&lt;?php
+   header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
+?&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4737</key><name>SSRF</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker can abuse this flaw to make arbitrary requests, originating from the application server. This can be exploited to&amp;#160;scan internal services; proxy attacks into a protected network; bypass network controls; download unauthorized files; access internal services and management interfaces; and possibly control the contents of requests and even steal server credentials. &amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application accepts a URL (or other data) from the user, and uses this to make a request to another remote server.&lt;/div&gt;
+&lt;div&gt;However, the attacker can inject an arbitrary URL into the request, causing the application to connect to any server the attacker wants. Thus, the attacker can abuse the application to gain access to services she would not otherwise be able to access, and cause the request to ostensibly originate from the application server.&amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Do not connect to arbitrary services based on user input.&lt;/li&gt;
+&lt;li&gt;If possible, the application should have the user's browser retrieve the desired information directly.&amp;#160;&lt;/li&gt;
+&lt;li&gt;If it is necessary for the&amp;#160;application to proxy the request on the server, explicitly whitelist the allowed target URLs, and do not include any sensitive server information.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Retrieve and Display Contents of URL&lt;/h4&gt;&lt;pre&gt;def do_GET(self):
+    location = urllib.parse.urlparse(self.path)
+    query = location.query
+    
+    url = urllib.parse.parse_qs(query)['url']
+    
+    response = urllib.request.urlopen(url)
+    if response.status == 200:
+        data = response.read()
+        
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html')
+        self.send_header('Content-Length', str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    &lt;/pre&gt;&lt;h4&gt;Validate and Redirect User's Browser Instead&lt;/h4&gt;&lt;pre&gt;def do_GET(self):
+    location = urllib.parse.urlparse(self.path)
+    query = location.query
+    
+    url = urllib.parse.parse_qs(query)['url']
+    
+    if url.startswith('/') or url.startswith("https://" + location.netloc + "/"):
+        self.send_response(302)
+        self.send_header('Location', url)
+        self.end_headers()
+        &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4755</key><name>Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
+&lt;ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Stealing sensitive files, such as configuration or system files&lt;/li&gt;
+&lt;li&gt;Overwriting files such as program binaries, configuration files, or system files&lt;/li&gt;
+&lt;li&gt;Deleting critical files, causing a denial of service (DoS).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses user input in the file path for accessing files on the application server&amp;#8217;s local disk. This enables an attacker to arbitrarily determine the file path.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Ideally, avoid depending on user input for file selection.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Accept user input only for the filename, not for the path and folders.&lt;/li&gt;
+&lt;li&gt;Ensure that file path is fully canonicalized.&lt;/li&gt;
+&lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
+&lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
+    public static void main(String[] args) {
+        Scanner userInputScanner = new Scanner(System.in);
+        System.out.print("\nEnter file name: ");
+        String name = userInputScanner.nextLine();
+        String path = "c:\files\file" + name;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}&lt;/pre&gt;&lt;h4&gt;Potentially hazardous characters are removed from the user input before use&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal_Fixed {
+    public static void main(String[] args) {
+        Scanner userInputScanner = new Scanner(System.in);
+        System.out.print("\nEnter file name: ");
+        String name = userInputScanner.nextLine();
+        name = name.replace("/", "").replace("..", "");
+        String path = "c:\files\file" + name;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text;
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+Potentially hazardous characters are removed from the user input before use
+      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4650</key><name>Insecure_Credential_Storage_Mechanism</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;Not using a standardized, publicly known solution for credential storage that has been under scrutiny by the security researcher community, will reduce the security of the credential storage used to access the application.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;The application is not storing credentials via a known secure mechanism.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Other means of credential storage are unsafe to use because they have either not been subject to cryptanalysis by security researchers or they have been broken or weakened.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Scrypt as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}
+&lt;/pre&gt;&lt;h4&gt;SHA-1 as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "crypto/sha1"
+	"io"
+)
+
+
+func main() {
+    password := "correcthorsebatterystaple"
+    e := sha1.New()
+    io.WriteString(e, password)
+    fmt.Printf("Hash: %x\n",e.Sum(nil))
+}
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4670</key><name>Insecure_Scrypt_Parameters</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+&lt;p&gt;Modern hash functions usually have a cost (or similar) parameter the user can set to determine how much computational power should be used in hashing the password. A higher value means a slower computation, but also makes it slower to attack, as each attempt will take longer to perform.&lt;/p&gt;
+&lt;p&gt;Although scrypt has been designed specifically to thwart brute-force and other fast attacks, having the wrong input parameters defined may result in significant weakening of the algorithm's output.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;Setting too low a cost value may significantly reduce the security of the password hash.&lt;/p&gt;
+&lt;p&gt;The parameters N, r and p are not set with secure values.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Choosing an appropriate cost parameter depends on the underlying hashing algorithm in place and what the purpose of the key derivation function is. The most common purpose is authenticating interactive logins, so the threshold values on the cost parameters for this query have been set accordingly.&lt;/p&gt;
+&lt;p&gt;In scrypt, these parameters are N, r and p. N and r define the CPU/memory cost parameter, and p is the parallelization parameter. N and r define how hard it is to perform one attempt, and p defines how many processors should be used to perform the calculation. The currently defined set of values determined as secure are N &amp;gt;= 2^15, r &amp;gt;= 8 and p &amp;gt;= 2.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Secure Scrypt parameters&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}
+&lt;/pre&gt;&lt;h4&gt;Insecure Scrypt Parameters&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 4096, 8, 1, 32)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4744</key><name>Insufficient_Output_Length</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+&lt;p&gt;In this instance, the key derivation function's output length is too low. This can cause collisions where different passwords will hash to the same value, causing successful authentication where it should not happen.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;The output length of the key derivation function is too low.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Using these functions, however, is not enough to guarantee a secure credential storage mechanism. In order to avoid collisions, the safe length of the key derivation function's output should be 32 bytes or higher.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Sufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32) //32 bytes is enough as output length
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;h4&gt;Insufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 2) //2 bytes is not enough for output length!
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4675</key><name>Scrypt_Weak_Salt_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;Using a weak pseudo-random number generator's value&amp;nbsp;or a static value for the scrypt salt&amp;nbsp;will result in significant reduction of the resulting hash's security.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;The salt&amp;nbsp;parameter for the credential storage&amp;nbsp;function is not secure.&lt;/span&gt;&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&lt;span style="box-sizing: border-box;"&gt;Salts are used to prevent an attacker from creating a rainbow-table and performing a lookup of hashes instead of a brute-force attack on a user's password hash. Having a unique and unpredictable salt per password will also prevent attackers from knowing which users share the same password. Best&amp;nbsp;&lt;/span&gt;&lt;span style="box-sizing: border-box;"&gt;practices include the u&lt;/span&gt;&lt;span style="box-sizing: border-box;"&gt;se of a Cryptographically-Secure Pseudo-Random Number Generator (CSPRNG) to get the salt value.&amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Static salt for scrypt credential storage&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "bufio"
+        "os"
+        "encoding/hex"
+)
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    const s = "55c38412bbd305ecda277a8e81b219fd7e58300e1f42c305a62813858ac8abe2"
+    salt,_ := hex.DecodeString(s)
+    fmt.Printf("Salt: %x\n",salt)
+    bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
+    fmt.Printf("Hash: %x\n",bs)
+}&lt;/pre&gt;&lt;h4&gt;Using a CSPRNG to provide a random salt for scrypt&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4665</key><name>PBKDF2_Insufficient_Iteration_Count</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+&lt;p&gt;Modern hash functions usually have a cost (or similar) parameter the user can set to determine how much computational power should be used in hashing the password. A higher value means a slower computation, but also makes it slower to attack, as each attempt will take longer to perform.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;Setting the PBKDF2 iteration&amp;nbsp;parameter too low will result in significant reduction of the resulting hash's security.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;Setting too low a cost value may significantly reduce the security of the password hash.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;The iteration parameter for the PBKDF2&amp;nbsp;function is too low.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Choosing an appropriate cost parameter depends on the underlying hashing algorithm in place and what the purpose of the key derivation function is. The most common purpose is authenticating interactive logins, so the threshold values on the cost parameters for this query have been set accordingly.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;PBKDF2's iteration&amp;nbsp;parameter should be set at a minimum&amp;nbsp;value of 10.000 or higher. Lowering this number will reduce the computational effort required for computing hash from the password, weakening the resulting hash, making it easier for an attacker to crack it.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Safe PBKDF2 Iteration Count&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/pbkdf2"
+        "crypto/rand"
+        "crypto/sha256"
+        "bufio"
+        "os"
+)
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs := pbkdf2.Key([]byte(password), salt, 10000, sha256.Size, sha256.New)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;h4&gt;Unsafe PBKDF2 Iteration Count&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/pbkdf2"
+        "crypto/rand"
+        "crypto/sha256"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs := pbkdf2.Key([]byte(password), salt, 1, sha256.Size, sha256.New)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4671</key><name>PBKDF2_Weak_Salt_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;Using a weak pseudo-random number generator's value&amp;nbsp;or a static value for the PBKDF2 salt&amp;nbsp;will result in significant reduction of the resulting hash's security.&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;&lt;span style="color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;The salt&amp;nbsp;parameter for the credential storage&amp;nbsp;function is not secure.&lt;/span&gt;&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p style="box-sizing: border-box; margin: 0px 0px 10px; display: inline; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;&lt;span style="box-sizing: border-box;"&gt;Salts are used to prevent an attacker from creating a rainbow-table and performing a lookup of hashes instead of a brute-force attack on a user's password hash. Having a unique and unpredictable salt per password will also prevent attackers from knowing which users share the same password. Best&amp;nbsp;&lt;/span&gt;&lt;span style="box-sizing: border-box;"&gt;practices include the u&lt;/span&gt;&lt;span style="box-sizing: border-box;"&gt;se of a Cryptographically-Secure Pseudo-Random Number Generator (CSPRNG) to get the salt value.&amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Use of a static salt with PBKDF2&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/pbkdf2"
+        "crypto/sha256"
+        "bufio"
+        "os"
+        "encoding/hex"
+)
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    const s = "55c38412bbd305ecda277a8e81b219fd7e58300e1f42c305a62813858ac8abe2" //static salt string
+    salt,_ := hex.DecodeString(s)
+    fmt.Printf("Salt: %x\n",salt)
+    bs := pbkdf2.Key([]byte(password), salt, 10000, sha256.Size, sha256.New)
+    fmt.Printf("Hash: %x\n",bs)  //same password will always hash to the same value due to the static salt
+}&lt;/pre&gt;&lt;h4&gt;Use of CSPRNG-provided entropy for PBKDF2 salt&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/pbkdf2"
+        "crypto/rand"
+        "crypto/sha256"
+        "bufio"
+        "os"
+)
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt) //read some bytes from crypto/rand
+    if result == 32{ //make sure we got 32 bytes of entropy
+            fmt.Printf("Salt: %x\n",salt)
+            bs := pbkdf2.Key([]byte(password), salt, 1, sha256.Size, sha256.New)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4758</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule></rules>

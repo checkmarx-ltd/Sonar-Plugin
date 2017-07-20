@@ -20,6 +20,7 @@
 package com.checkmarx.sonar;
 
 import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
+import com.checkmarx.sonar.cxrules.CxRulesDefinition;
 import com.checkmarx.sonar.measures.ComputeSastMeasures;
 import com.checkmarx.sonar.measures.OsaMetrics;
 import com.checkmarx.sonar.measures.SastMetrics;
@@ -35,7 +36,7 @@ public class CheckmarxPlugin implements Plugin {
   public void define(Context context) {
 
     context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CxConfigSoapService.class, CheckmarxSensor.class,
-                    OsaMetrics.class, CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class);
+                    OsaMetrics.class, CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class, CxRulesDefinition.class);
 
   }
 }
