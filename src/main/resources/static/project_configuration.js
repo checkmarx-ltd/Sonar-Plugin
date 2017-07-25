@@ -80,6 +80,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             createHeadline();
             createCredentialsForms();
             createTestConnectionButton();
+            creatLineSeparator();
             createProjectOptionsForm();
             createSaveButton();
         })
@@ -180,6 +181,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }
     }
 
+
     function cleanUpAndUpdateUI(response) {
         try {
             projectsIn = JSON.parse(response.projects);
@@ -201,6 +203,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         })
     }
 
+    function creatLineSeparator() {
+        var hr = document.createElement('hr');
+        hr.id = 'separator';
+        configurationPage.appendChild(hr);
+    }
 
     /**********Projects Drop Down List*******************************/
 

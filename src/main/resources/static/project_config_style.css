@@ -1,8 +1,8 @@
 #h1Connecting{
     font-size: 40px;
 
-    margin-top: 20px;
-    margin-left: 40px
+    margin-top: 80px;
+    margin-left: 400px
 }
 
 @keyframes spinner {
@@ -52,11 +52,8 @@
 #loadingSpinner{
     width: 150px;
     height: 150px;
-
-    margin-top: 40px;
-    margin-bottom: 120px;
-    margin-right: 120px;
-    margin-left: 60px
+    margin-top: 50px;
+    margin-left: 400px;
 }
 
 #testConBtnSpanSpinner, #saveBtnSpanSpinner{
@@ -80,6 +77,7 @@
     height: 24px;
     vertical-align: middle;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .header h1 {
@@ -88,7 +86,7 @@
     vertical-align: middle;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
     height: 24px;
     padding: 0 6px;
     WIDTH: 75%;
@@ -109,13 +107,13 @@ p{
 .cxDescription{
     left: 25%;
     position: relative;
-    padding: 8px 0;
+    margin-top: 6px;
     color: 	#A9A9A9;
     font-size: smaller;
 }
 
 #testConParagraph{
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 label{
@@ -143,6 +141,14 @@ label{
     width: 130px;
 }
 
+#separator{
+    margin: 24px;
+}
+
+#testConBtn,#saveBtn{
+    width: 120px;
+}
+
 #testConBtnSuccess,#saveBtnSuccess{
     font-weight: bold;
     color:#4682B4;
@@ -162,4 +168,8 @@ label{
 
 #projectForm{
     margin-top: 20px;
+}
+
+#projectForm label{
+    margin-bottom: 8px;
 }
