@@ -1,8 +1,8 @@
 package com.checkmarx.sonar.web;
 
 import com.checkmarx.soap.client.ProjectDisplayData;
-import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.cxportalservice.sast.sastnew.CxConfigSoapService;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;

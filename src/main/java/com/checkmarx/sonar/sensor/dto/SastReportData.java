@@ -1,11 +1,8 @@
 package com.checkmarx.sonar.sensor.dto;
 
-import com.checkmarx.soap.client.CxWSQueryVulnerabilityData;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by: Zoharby.
@@ -92,7 +89,7 @@ public class SastReportData {
         this.lowVulnerabilityQueries = lowVulnerabilityQueries;
     }
 
-    public void setAllQueries(Map<CxWSQueryVulnerabilityData, Integer> queriesSummery){
+    /*public void setAllQueries(Map<CxWSQueryVulnerabilityData, Integer> queriesSummery){
         List<QueryData> high = new LinkedList<>();
         List<QueryData> low = new LinkedList<>();
         List<QueryData> medium = new LinkedList<>();
@@ -115,5 +112,5 @@ public class SastReportData {
         setHighVulnerabilityQueries(high);
         setMediumVulnerabilityQueries(medium);
         setLowVulnerabilityQueries(low);
-    }
+    }*/
 }

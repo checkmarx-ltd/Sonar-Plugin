@@ -19,7 +19,7 @@
  */
 package com.checkmarx.sonar;
 
-import com.checkmarx.sonar.cxportalservice.sast.CxConfigSoapService;
+import com.checkmarx.sonar.cxportalservice.sast.sastnew.CxConfigSoapService;
 import com.checkmarx.sonar.cxrules.CxRulesDefinition;
 import com.checkmarx.sonar.measures.ComputeSastMeasures;
 import com.checkmarx.sonar.measures.OsaMetrics;

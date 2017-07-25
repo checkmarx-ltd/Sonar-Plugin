@@ -149,8 +149,8 @@
                 </dependencies>
                 <configuration>
                     <urls>
-                        <url>http://10.31.2.117/Cxwebinterface/Sonar/CxSonarWebService.asmx?wsdl</url>
-                    <!--<url>http://10.31.2.117/cxwebinterface/Portal/CxWebService.asmx?wsdl</url>-->
+                        <!--<url>http://10.31.2.117/Cxwebinterface/Sonar/CxSonarWebService.asmx?wsdl</url>-->
+                    <url>http://10.31.2.117/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>
                     <url>http://10.31.2.117/Cxwebinterface/CxWSResolver.asmx?wsdl</url>
                     </urls>
 

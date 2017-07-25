@@ -1,12 +1,5 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.checkmarx.soap.client.CompareStatusType;
-import com.checkmarx.soap.client.CxDateTime;
-import com.checkmarx.soap.client.CxWSSingleResultData;
-import com.checkmarx.sonar.sensor.dto.SastReportData;
-import com.checkmarx.sonar.sensor.dto.SastScanData;
-import com.checkmarx.sonar.sensor.dto.SastSeverity;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
@@ -26,12 +19,12 @@ public class SastStageExecutor {
     private ObjectMapper mapper = new ObjectMapper();
     private Logger logger = Loggers.get(SastStageExecutor.class);
 
-    public void execute(SensorContext context, SastScanData sastScanData){
-        collectVulnerabilitiesAndSaveToMetrics(context, sastScanData);
-        collectReportDataAndSaveToMeasure(context, sastScanData);
+    public void execute(SensorContext context/*, SastScanData sastScanData*/){
+        collectVulnerabilitiesAndSaveToMetrics(context/*, sastScanData*/);
+        //collectReportDataAndSaveToMeasure(context, sastScanData);
     }
 
-    private void collectVulnerabilitiesAndSaveToMetrics(SensorContext context, SastScanData sastScanData){
+    private void collectVulnerabilitiesAndSaveToMetrics(SensorContext context/*, SastScanData sastScanData*/){
         FileSystem fs = context.fileSystem();
         Iterable<InputFile> mainfiles = fs.inputFiles(fs.predicates().hasType(InputFile.Type.MAIN));
 
@@ -47,7 +40,7 @@ public class SastStageExecutor {
                 int lowVulnerabilities = 0;
                 int newLowVulnerabilities = 0;
 
-                for (CxWSSingleResultData result : sastScanData.getResults()) {
+           /*     for (CxWSSingleResultData result : sastScanData.getResults()) {
                     String resultFilePath = (result.getSourceFolder() + "/" + result.getSourceFile()).replace("\\", "/");
 
                     boolean isNew = result.getResultStatus().getValue().equals(CompareStatusType._New);
@@ -79,7 +72,7 @@ public class SastStageExecutor {
                                 }
                         }
                     }
-                }
+                }*/
               try {
                   addSumVulnerabilitiesMetrics(context, file, new FileMetricsSummery(highVulnerabilities, mediumVulnerabilities, lowVulnerabilities));
                   addNewVulnerabilitiesMetrics(context, file, new FileMetricsSummery(newHighVulnerabilities, newMediumVulnerabilities, newLowVulnerabilities));
@@ -142,7 +135,7 @@ public class SastStageExecutor {
         context.<Integer> newMeasure().forMetric(metric).on(inputFile).withValue(value).save();
     }
 
-    private void collectReportDataAndSaveToMeasure(SensorContext context, SastScanData sastScanData){
+  /*  private void collectReportDataAndSaveToMeasure(SensorContext context, SastScanData sastScanData){
         try {
             String scanDetails = createScanDetailsJson(sastScanData);
             context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue("\"" + scanDetails + "\"").save();
@@ -160,18 +153,19 @@ public class SastStageExecutor {
 
     private SastReportData createReportData(SastScanData sastScanData){
         SastReportData reportData = new SastReportData();
-        reportData.setNumOfCodeLines(sastScanData.getScanDisplayData().getLOC());
+       /* reportData.setNumOfCodeLines(sastScanData.getScanDisplayData().getLOC());
         reportData.setNumOfFiles(sastScanData.getScanSummary().getFilesCount());
         reportData.setAllQueries(sastScanData.getQueriesSummery());
         reportData.setScanStart(formatToDisplayDate(sastScanData.getScanDisplayData().getQueuedDateTime()));
-        reportData.setScanFinish(formatToDisplayDate(sastScanData.getScanDisplayData().getFinishedDateTime()));
-        return reportData;
+        reportData.setScanFinish(formatToDisplayDate(sastScanData.getScanDisplayData().getFinishedDateTime()));*/
+  /*      return reportData;
     }
 
     //from objects to form: "26/2/17 12:17"
-    private String formatToDisplayDate(CxDateTime time) {
-        return time.getDay()+"/"+(time.getMonth() < 10 ? "0"+time.getMonth() : time.getMonth())+"/"+String.valueOf(time.getYear()).substring(2)+" "
-                                                                 +time.getHour()+":"+ (time.getMinute() < 10 ? "0"+time.getMinute() : time.getMinute());
+    private String formatToDisplayDate(/*CxDateTime time) {
+      //  return time.getDay()+"/"+(time.getMonth() < 10 ? "0"+time.getMonth() : time.getMonth())+"/"+String.valueOf(time.getYear()).substring(2)+" "
+        //                                                         +time.getHour()+":"+ (time.getMinute() < 10 ? "0"+time.getMinute() : time.getMinute());
+      /*  return "";
     }
-
+*/
 }

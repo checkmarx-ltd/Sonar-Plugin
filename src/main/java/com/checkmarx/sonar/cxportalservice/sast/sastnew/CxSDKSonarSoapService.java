@@ -1,11 +1,12 @@
-package com.checkmarx.sonar.cxportalservice.sast;
+package com.checkmarx.sonar.cxportalservice.sast.sastnew;
 
 import com.checkmarx.soap.client.Credentials;
-import com.checkmarx.soap.client.CxSonarWebServiceLocator;
-import com.checkmarx.soap.client.CxSonarWebServiceSoap_PortType;
+import com.checkmarx.soap.client.CxSDKWebServiceLocator;
+import com.checkmarx.soap.client.CxSDKWebServiceSoap_PortType;
 import com.checkmarx.soap.client.CxWSResponseLoginData;
-import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.cxportalservice.sast.CxSSLUtility;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.dto.CxFullCredentials;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import sun.net.www.protocol.http.HttpURLConnection;
@@ -20,20 +21,23 @@ import java.rmi.RemoteException;
  * Created by: zoharby.
  * Date: 20/04/2017.
  */
-abstract class CxSoapService {
+abstract class CxSDKSonarSoapService {
 
-    private static final String SONAR_WS_WEB_ADDRESS =  "%s/Cxwebinterface/Sonar/CxSonarWebService.asmx";
+    private static final String SONAR_WS_WEB_ADDRESS =  "%s/cxwebinterface/sdk/CxSDKWebService.asmx";
     private final static int LCID = 1033; // English
 
-    CxSonarWebServiceSoap_PortType webServiceSoap;
+    CxSDKWebServiceSoap_PortType webServiceSoap;
+
+
     private volatile String currServerUrl;
 
-    protected Logger logger = Loggers.get(CxSoapService.class);
+    protected Logger logger = Loggers.get(CxSDKSonarSoapService.class);
 
-    CxSoapService() {
+    public CxSDKSonarSoapService() {
     }
 
     public String login(CxFullCredentials cxFullCredentials) throws ConnectionException {
+
         if( webServiceSoap == null || !cxFullCredentials.getCxServerUrl().equals(currServerUrl) ){
             currServerUrl = cxFullCredentials.getCxServerUrl();
             connect(currServerUrl);
@@ -54,10 +58,10 @@ abstract class CxSoapService {
 
         try {
             logger.info("Locating Checkmarx web service");
-            CxSonarWebServiceLocator cxSonarWebServiceLocator = new CxSonarWebServiceLocator();
-            cxSonarWebServiceLocator.setCxSonarWebServiceSoap12EndpointAddress(String.format(SONAR_WS_WEB_ADDRESS, serverUrl));
-            cxSonarWebServiceLocator.setCxSonarWebServiceSoapEndpointAddress(String.format(SONAR_WS_WEB_ADDRESS, serverUrl));
-            webServiceSoap = cxSonarWebServiceLocator.getCxSonarWebServiceSoap();
+            CxSDKWebServiceLocator cxSdkWebServiceLocator = new CxSDKWebServiceLocator();
+            cxSdkWebServiceLocator.setCxSDKWebServiceSoap12EndpointAddress(String.format(SONAR_WS_WEB_ADDRESS, serverUrl));
+            cxSdkWebServiceLocator.setCxSDKWebServiceSoapEndpointAddress(String.format(SONAR_WS_WEB_ADDRESS, serverUrl));
+            webServiceSoap = cxSdkWebServiceLocator.getCxSDKWebServiceSoap();
         } catch (Exception e) {
             throw logErrorAndCreateConnectionException("Locating Checkmarx web service failed: "+ e.getLocalizedMessage(), e);
         }
@@ -67,6 +71,9 @@ abstract class CxSoapService {
         }
     }
 
+
+
+    //TODO UNITE THE REDANDENT PARST WITH OLS SOAP SERVICE\ MAKE ONESOPA SERVICE (EXPOSING SDK FOR CONFIGURATION, LESS SECURED)
     private String authenticate(CxFullCredentials cxFullCredentials) throws ConnectionException {
         logger.info("Authenticating Checkmarx client");
         String sessionId = null;

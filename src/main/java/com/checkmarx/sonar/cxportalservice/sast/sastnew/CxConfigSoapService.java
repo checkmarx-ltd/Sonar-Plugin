@@ -1,4 +1,4 @@
-package com.checkmarx.sonar.cxportalservice.sast;
+package com.checkmarx.sonar.cxportalservice.sast.sastnew;
 
 import com.checkmarx.soap.client.CxWSResponseProjectsDisplayData;
 import com.checkmarx.soap.client.ProjectDisplayData;
@@ -14,7 +14,7 @@ import java.util.List;
  * Created by: zoharby.
  * Date: 20/04/2017.
  */
-public class CxConfigSoapService extends CxSoapService {
+public class CxConfigSoapService extends CxSDKSonarSoapService {
 
     public CxConfigSoapService() {
         super();
