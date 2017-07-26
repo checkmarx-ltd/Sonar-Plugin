@@ -29,20 +29,20 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
     private String sessionId;
 
 
-   public AllSastResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException {
+    public AllSastResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException {
 
-       sessionId = login(cxFullCredentials);
+        sessionId = login(cxFullCredentials);
 
-       ProjectDisplayData projectDisplayData = getProjectDisplayData(cxProjectName);
-       ProjectScannedDisplayData projectScannedDisplayData = getLastScanForProject(cxProjectName, projectDisplayData.getProjectID());
+        ProjectDisplayData projectDisplayData = getProjectDisplayData(cxProjectName);
+        ProjectScannedDisplayData projectScannedDisplayData = getLastScanForProject(cxProjectName, projectDisplayData.getProjectID());
 
-       CxWSCreateReportResponse reportResponse = generateScanReport(projectScannedDisplayData.getLastScanID(), CxWSReportType.XML);
-       CxXMLResults cxXMLResults = getScanReport(reportResponse.getID());
+        CxWSCreateReportResponse reportResponse = generateScanReport(projectScannedDisplayData.getLastScanID(), CxWSReportType.XML);
+        CxXMLResults cxXMLResults = getScanReport(reportResponse.getID());
 
-       ScanResults scanResults = genScanResponse(projectScannedDisplayData, cxXMLResults);
+        ScanResults scanResults = genScanResponse(projectScannedDisplayData, cxXMLResults);
 
-       return new AllSastResults(cxXMLResults, scanResults);
-   }
+        return new AllSastResults(cxXMLResults, scanResults);
+    }
 
 
     public CxWSCreateReportResponse generateScanReport(long scanId, CxWSReportType reportType) throws ConnectionException, RemoteException {
@@ -100,15 +100,15 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
             Thread.sleep(5L * 1000);
 
         }
-            CxWSResponseScanResults cxWSResponseScanResults = webServiceSoap.getScanReport(sessionId, reportId);
-            if (!cxWSResponseScanResults.isIsSuccesfull()) {
-                String message = "Error retrieving scan report: " + cxWSResponseScanResults.getErrorMessage();
-                logger.error(message);
-                throw new ConnectionException(message);
-            }
+        CxWSResponseScanResults cxWSResponseScanResults = webServiceSoap.getScanReport(sessionId, reportId);
+        if (!cxWSResponseScanResults.isIsSuccesfull()) {
+            String message = "Error retrieving scan report: " + cxWSResponseScanResults.getErrorMessage();
+            logger.error(message);
+            throw new ConnectionException(message);
+        }
 
-            // Save results on disk
-            return convertToXMLResult(cxWSResponseScanResults.getScanResults());
+        // Save results on disk
+        return convertToXMLResult(cxWSResponseScanResults.getScanResults());
     }
 
     private ProjectDisplayData getProjectDisplayData(String cxProjectName) throws ConnectionException {
@@ -141,10 +141,10 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         final String projectName = components[0];
         final String groupName = components[1];
         ProjectDisplayData projectDisplayData = null;
-        for (ProjectDisplayData d : projectsDisplayData) {
-            if (projectName.equals(d.getProjectName()) &&
-                    (groupName == null || groupName.equals(d.getGroup()))) {
-                projectDisplayData = d;
+        for (ProjectDisplayData prjData : projectsDisplayData) {
+            logger.debug("Project details: " + prjData.toString());
+            if (projectName.equals(prjData.getProjectName()) && (groupName == null || groupName.equals(prjData.getGroup()))) {
+                projectDisplayData = prjData;
                 break;
             }
         }

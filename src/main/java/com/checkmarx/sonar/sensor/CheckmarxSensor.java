@@ -63,7 +63,7 @@ public class CheckmarxSensor implements Sensor {
             context.newIssue().forRule(rule.ruleKey()).at(defaultIssueLocation.on(inputFile)).save();
         }*/
 
-        CxFullCredentials cxFullCredentials = null;
+        CxFullCredentials cxFullCredentials;
         String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
         String cxProject = context.settings().getString(CxProperties.CXPROJECT_KEY);
         if (cxCredentialsJson == null || cxProject == null) {
