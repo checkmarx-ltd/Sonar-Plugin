@@ -3,7 +3,6 @@ package com.checkmarx.sonar.cxrules;
 import com.checkmarx.sonar.logger.CxLogger;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinitionXmlLoader;
-import org.sonar.api.utils.log.Loggers;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
