@@ -25,11 +25,13 @@ public enum CXProgrammingLanguage {
     private String name;
     private String sonarName;
     private int languageId;
+    private String sonarRuleRepository;
 
     CXProgrammingLanguage(String name, String sonarName, int languageId) {
         this.name = name;
         this.sonarName = sonarName;
         this.languageId = languageId;
+        this.sonarRuleRepository = CxSonarConstants.RULES_REPOSITORY_PREFIX + this.name.toLowerCase();
     }
 
     public String getName() {
@@ -44,9 +46,13 @@ public enum CXProgrammingLanguage {
         return languageId;
     }
 
-    public static CXProgrammingLanguage fromLanguageId(int languageId) {
+    public String getSonarRuleRepository() {
+        return sonarRuleRepository;
+    }
+
+    public static CXProgrammingLanguage fromLanguageName(String languageName) {
         for (CXProgrammingLanguage language : CXProgrammingLanguage.values()) {
-            if (language.getLanguageId() == languageId) {
+            if (language.getName().toLowerCase().equals(languageName.toLowerCase())) {
                 return language;
             }
         }

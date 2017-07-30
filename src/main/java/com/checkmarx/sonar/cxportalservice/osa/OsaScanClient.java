@@ -2,12 +2,11 @@ package com.checkmarx.sonar.cxportalservice.osa;
 
 import com.checkmarx.sonar.cxportalservice.osa.model.*;
 import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.logger.CxLogger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -43,7 +42,7 @@ public class OsaScanClient implements Closeable {
 
     private static final int ITEMS_PER_PAGE = 10;
 
-    private Logger logger = Loggers.get(OsaScanClient.class);
+    private CxLogger logger = new CxLogger(OsaScanClient.class);
 
     private AuthenticationRequest authenticationRequest;
     private Client client;
@@ -133,7 +132,7 @@ public class OsaScanClient implements Closeable {
                     break;
                 }
             } catch (IOException e) {
-                logger.error("failed to parse Libraries: "+e.getMessage(), e);
+                logger.error("failed to parse Libraries: "+e.getMessage());
                 lastListSize = 0;
             }
             ++currentPage;
@@ -160,7 +159,7 @@ public class OsaScanClient implements Closeable {
                     break;
                 }
             } catch (IOException e) {
-                logger.error("failed to parse CVE's", e);
+                logger.error("failed to parse CVE's");
                 lastListSize = 0;
             }
             ++currentPage;

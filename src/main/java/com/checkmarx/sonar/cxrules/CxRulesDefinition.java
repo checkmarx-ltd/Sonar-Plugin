@@ -1,8 +1,8 @@
 package com.checkmarx.sonar.cxrules;
 
+import com.checkmarx.sonar.logger.CxLogger;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinitionXmlLoader;
-import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
 import java.io.InputStream;
@@ -14,14 +14,14 @@ import java.nio.charset.StandardCharsets;
  */
 public class CxRulesDefinition implements RulesDefinition {
 
-    private Logger logger = Loggers.get(CxRulesDefinition.class);
+    private CxLogger logger = new CxLogger(CxRulesDefinition.class);
 
     @Override
     public void define(Context context) {
 
         for (CXProgrammingLanguage language : CXProgrammingLanguage.values()) {
             logger.info("Creating rule repository for: " + language.getName() + " language.");
-            NewRepository repository = context.createRepository("checkmarx.rules." + language.getName().toLowerCase(), language.getSonarName()).setName("Checkmarx");
+            NewRepository repository = context.createRepository(CxSonarConstants.RULES_REPOSITORY_PREFIX + language.getName().toLowerCase(), language.getSonarName()).setName("Checkmarx");
             try {
                 InputStream rulesXml = this.getClass().getResourceAsStream(getLanguageRulesPath(language));
                 if (rulesXml != null) {

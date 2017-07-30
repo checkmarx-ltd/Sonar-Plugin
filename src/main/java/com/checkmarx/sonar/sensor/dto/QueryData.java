@@ -10,14 +10,11 @@ public class QueryData {
 
     @JsonProperty("name")
     private String name;
-    @JsonProperty("severity")
-    private int severity;
     @JsonProperty("numberOfOccurrences")
     private int numberOfOccurrences;
 
-    public QueryData(String name, int severity, int numberOfOccurrences) {
+    public QueryData(String name, int numberOfOccurrences) {
         this.name = name;
-        this.severity = severity;
         this.numberOfOccurrences = numberOfOccurrences;
     }
 
@@ -27,14 +24,6 @@ public class QueryData {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(int severity) {
-        this.severity = severity;
     }
 
     public int getNumberOfOccurrences() {

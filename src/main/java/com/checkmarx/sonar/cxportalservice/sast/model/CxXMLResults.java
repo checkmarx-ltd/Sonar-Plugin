@@ -1,5 +1,5 @@
 
-package com.checkmarx.sonar.cxportalservice.sast.sastnew.model;
+package com.checkmarx.sonar.cxportalservice.sast.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -171,9 +171,9 @@ public class CxXMLResults
     @XmlAttribute(name = "ScanTime")
     protected String scanTime;
     @XmlAttribute(name = "LinesOfCodeScanned")
-    protected String linesOfCodeScanned;
+    protected long linesOfCodeScanned;
     @XmlAttribute(name = "FilesScanned")
-    protected String filesScanned;
+    protected long filesScanned;
     @XmlAttribute(name = "ReportCreationTime")
     protected String reportCreationTime;
     @XmlAttribute(name = "Team")
@@ -466,7 +466,7 @@ public class CxXMLResults
      *     {@link String }
      *     
      */
-    public String getLinesOfCodeScanned() {
+    public long getLinesOfCodeScanned() {
         return linesOfCodeScanned;
     }
 
@@ -478,7 +478,7 @@ public class CxXMLResults
      *     {@link String }
      *     
      */
-    public void setLinesOfCodeScanned(String value) {
+    public void setLinesOfCodeScanned(long value) {
         this.linesOfCodeScanned = value;
     }
 
@@ -490,7 +490,7 @@ public class CxXMLResults
      *     {@link String }
      *     
      */
-    public String getFilesScanned() {
+    public long getFilesScanned() {
         return filesScanned;
     }
 
@@ -502,7 +502,7 @@ public class CxXMLResults
      *     {@link String }
      *     
      */
-    public void setFilesScanned(String value) {
+    public void setFilesScanned(long value) {
         this.filesScanned = value;
     }
 
@@ -815,7 +815,7 @@ public class CxXMLResults
         @XmlSchemaType(name = "dateTime")
         protected String languageChangeDate;
         @XmlAttribute(name = "SeverityIndex")
-        protected String severityIndex;
+        protected int severityIndex;
         @XmlAttribute(name = "QueryPath")
         protected String queryPath;
         @XmlAttribute(name = "QueryVersionCode")
@@ -1074,7 +1074,7 @@ public class CxXMLResults
          *     {@link String }
          *     
          */
-        public String getSeverityIndex() {
+        public int getSeverityIndex() {
             return severityIndex;
         }
 
@@ -1086,7 +1086,7 @@ public class CxXMLResults
          *     {@link String }
          *     
          */
-        public void setSeverityIndex(String value) {
+        public void setSeverityIndex(int value) {
             this.severityIndex = value;
         }
 

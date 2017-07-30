@@ -1,5 +1,7 @@
-package com.checkmarx.sonar.cxportalservice.sast;
+package com.checkmarx.sonar.cxportalservice.sast.services;
 
+
+import com.checkmarx.sonar.logger.CxLogger;
 
 import javax.net.ssl.*;
 import java.security.KeyManagementException;
@@ -11,7 +13,8 @@ import java.security.cert.X509Certificate;
  * Created by denis on 23/3/14.
  */
 public class CxSSLUtility {
-    //private static final Logger logger = Logger.getLogger(String.valueOf(CxSSLUtility.class));
+
+    private static final CxLogger logger = new CxLogger(CxSSLUtility.class);
 
     public static void disableSSLCertificateVerification()
     {
@@ -52,9 +55,7 @@ public class CxSSLUtility {
             context.init(null, trustManagers, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
         } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            // In case of exception, do not install fake trust manager
-            //TODO
-            //logger.warning("Failed to disable SSL/TLS certificate validation",e);
+             logger.warn("Failed to disable SSL/TLS certificate validation: " + e.getMessage());
         }
     }
 }

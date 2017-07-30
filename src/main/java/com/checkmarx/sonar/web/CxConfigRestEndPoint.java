@@ -2,8 +2,9 @@ package com.checkmarx.sonar.web;
 
 import com.checkmarx.soap.client.ProjectDisplayData;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
-import com.checkmarx.sonar.cxportalservice.sast.sastnew.CxConfigSoapService;
+import com.checkmarx.sonar.cxportalservice.sast.services.CxConfigSoapService;
 import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.logger.CxLogger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,8 +12,6 @@ import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -27,7 +26,7 @@ public class CxConfigRestEndPoint implements WebService {
 
     private CxConfigSoapService cxConfigSoapService = new CxConfigSoapService();
 
-    private Logger logger = Loggers.get(CxConfigRestEndPoint.class);
+    private CxLogger logger = new CxLogger(CxConfigRestEndPoint.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 

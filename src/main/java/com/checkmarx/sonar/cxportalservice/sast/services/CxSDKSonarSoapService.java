@@ -1,14 +1,12 @@
-package com.checkmarx.sonar.cxportalservice.sast.sastnew;
+package com.checkmarx.sonar.cxportalservice.sast.services;
 
 import com.checkmarx.soap.client.Credentials;
 import com.checkmarx.soap.client.CxSDKWebServiceLocator;
 import com.checkmarx.soap.client.CxSDKWebServiceSoap_PortType;
 import com.checkmarx.soap.client.CxWSResponseLoginData;
-import com.checkmarx.sonar.cxportalservice.sast.CxSSLUtility;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import com.checkmarx.sonar.logger.CxLogger;
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.IOException;
@@ -28,10 +26,9 @@ abstract class CxSDKSonarSoapService {
 
     CxSDKWebServiceSoap_PortType webServiceSoap;
 
-
     private volatile String currServerUrl;
 
-    protected Logger logger = Loggers.get(CxSDKSonarSoapService.class);
+    protected CxLogger logger = new CxLogger(CxSDKSonarSoapService.class);
 
     public CxSDKSonarSoapService() {
     }
@@ -71,9 +68,6 @@ abstract class CxSDKSonarSoapService {
         }
     }
 
-
-
-    //TODO UNITE THE REDANDENT PARST WITH OLS SOAP SERVICE\ MAKE ONESOPA SERVICE (EXPOSING SDK FOR CONFIGURATION, LESS SECURED)
     private String authenticate(CxFullCredentials cxFullCredentials) throws ConnectionException {
         logger.info("Authenticating Checkmarx client");
         String sessionId = null;

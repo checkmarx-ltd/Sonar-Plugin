@@ -1,13 +1,11 @@
-package com.checkmarx.sonar.cxportalservice.sast.sastnew;
+package com.checkmarx.sonar.cxportalservice.sast.services;
 
 import com.checkmarx.soap.client.*;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
-import com.checkmarx.sonar.cxportalservice.sast.sastnew.model.AllSastResults;
-import com.checkmarx.sonar.cxportalservice.sast.sastnew.model.CxXMLResults;
-import com.checkmarx.sonar.cxportalservice.sast.sastnew.model.ScanResults;
+import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.logger.CxLogger;
 import org.apache.commons.lang.StringUtils;
-import org.sonar.api.internal.apachecommons.io.IOUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,24 +26,23 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
 
     private String sessionId;
 
+    public CxSastResultsService() {
+        super();
+        logger = new CxLogger(CxSastResultsService.class);
+    }
 
-    public AllSastResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException {
-
+    public CxXMLResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException {
         sessionId = login(cxFullCredentials);
 
         ProjectDisplayData projectDisplayData = getProjectDisplayData(cxProjectName);
         ProjectScannedDisplayData projectScannedDisplayData = getLastScanForProject(cxProjectName, projectDisplayData.getProjectID());
 
         CxWSCreateReportResponse reportResponse = generateScanReport(projectScannedDisplayData.getLastScanID(), CxWSReportType.XML);
-        CxXMLResults cxXMLResults = getScanReport(reportResponse.getID());
 
-        ScanResults scanResults = genScanResponse(projectScannedDisplayData, cxXMLResults);
-
-        return new AllSastResults(cxXMLResults, scanResults);
+        return getScanReport(reportResponse.getID());
     }
 
-
-    public CxWSCreateReportResponse generateScanReport(long scanId, CxWSReportType reportType) throws ConnectionException, RemoteException {
+    private CxWSCreateReportResponse generateScanReport(long scanId, CxWSReportType reportType) throws ConnectionException, RemoteException {
         assert sessionId != null : "Trying to retrieve scan report before login";
 
         CxWSReportRequest cxWSReportRequest = new CxWSReportRequest();
@@ -72,34 +69,49 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         return cxWSCreateReportResponse;
     }
 
-    private CxXMLResults getScanReport(long reportId) throws IOException,
-            InterruptedException, JAXBException {
+    private CxXMLResults getScanReport(long reportId) throws IOException, InterruptedException, JAXBException {
+        int failed = 0;
         // Wait for the report to become ready
-
-        String previousMessage = "";
-        while (true) {
+        while (true ) {
             CxWSReportStatusResponse cxWSReportStatusResponse = webServiceSoap.getScanReportStatus(sessionId, reportId);
-            if (!cxWSReportStatusResponse.isIsSuccesfull()) {
-                String message = "Error retrieving scan report status: " + cxWSReportStatusResponse.getErrorMessage();
+
+            if (cxWSReportStatusResponse == null) {
+                String message = "Error retrieving scan report status: Web method getScanReportStatus returned null";
                 logger.error(message);
-                throw new ConnectionException(message);
-            }
-            if (cxWSReportStatusResponse.isIsFailed()) {
-                String message = "Failed to create scan report";
-                logger.error("Web method getScanReportStatus returned status response with isFailed field set to true");
-                logger.error(message);
-                throw new ConnectionException(message);
+               ++failed;
+                if(failed > 3) {
+                   throw new ConnectionException(message);
+               }
+            }else {
+
+                if (!cxWSReportStatusResponse.isIsSuccesfull()) {
+                    String message = "Error retrieving scan report status: " + cxWSReportStatusResponse.getErrorMessage();
+                    logger.error(message);
+                    ++failed;
+                    if (failed > 3) {
+                        throw new ConnectionException(message);
+                    }
+                }
+
+                if (cxWSReportStatusResponse.isIsFailed()) {
+                    String message = "Failed to create scan report";
+                    logger.error("Web method getScanReportStatus returned status response with isFailed field set to true");
+                    logger.error(message);
+                    if (failed > 3) {
+                        throw new ConnectionException(message);
+                    }
+                }
+
+                if (cxWSReportStatusResponse.isIsReady()) {
+                    logger.info("Scan report generated on Checkmarx server");
+                    break;
+                }
             }
 
-            if (cxWSReportStatusResponse.isIsReady()) {
-                logger.info("Scan report generated on Checkmarx server");
-                break;
-            }
-
-            //previousMessage = cleanLogger(previousMessage, reportType.toString().toUpperCase() + " Report generation in progress");
             Thread.sleep(5L * 1000);
-
         }
+
+        logger.info("Retrieving Scan report from Checkmarx server");
         CxWSResponseScanResults cxWSResponseScanResults = webServiceSoap.getScanReport(sessionId, reportId);
         if (!cxWSResponseScanResults.isIsSuccesfull()) {
             String message = "Error retrieving scan report: " + cxWSResponseScanResults.getErrorMessage();
@@ -107,7 +119,13 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
             throw new ConnectionException(message);
         }
 
-        // Save results on disk
+        if ((cxWSResponseScanResults.getScanResults() == null) || (cxWSResponseScanResults.getScanResults().length == 0)) {
+            String message = "Error: scan report returned Empty";
+            logger.error(message);
+            throw new ConnectionException(message);
+        }
+
+        logger.info("Parsing checkmarx Scan report.");
         return convertToXMLResult(cxWSResponseScanResults.getScanResults());
     }
 
@@ -198,49 +216,19 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         if (project == null) {
             String message = "Project \"" + projectName + "\" was not found on Checkmarx server. This may be because the project contains no scans.";
             logger.warn(message);
-            /*if (logger.isDebugEnabled()) {
-                logger.debug("Following projects were found on server:");
-                for (ProjectScannedDisplayData p : projects) {
-                    logger.debug("name: \"" + p.getProjectName() + "\", id: " + p.getProjectID());
-                }
-            }*/
             throw new ConnectionException(message);
         }
 
         return project;
     }
 
-
     private CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {
-
-        CxXMLResults reportObj = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cxReport);
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(CxXMLResults.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        JAXBContext jaxbContext = JAXBContext.newInstance(CxXMLResults.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            reportObj = (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
-
-        } finally {
-            IOUtils.closeQuietly(byteArrayInputStream);
-        }
-        return reportObj;
+        return (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
     }
 
-
-    public static ScanResults genScanResponse(ProjectScannedDisplayData scanDisplayData, CxXMLResults cxXMLResults) {
-        ScanResults ret = new ScanResults();
-        ret.setProjectId(scanDisplayData.getProjectID());
-        ret.setScanID(scanDisplayData.getLastScanID());
-        ret.setHighSeverityResults(scanDisplayData.getHighVulnerabilities());
-        ret.setMediumSeverityResults(scanDisplayData.getMediumVulnerabilities());
-        ret.setLowSeverityResults(scanDisplayData.getLowVulnerabilities());
-        ret.setInfoSeverityResults(scanDisplayData.getInfoVulnerabilities());
-        ret.setRiskLevelScore(scanDisplayData.getRiskLevelScore());
-
-        ret.setScanDetailedReport(cxXMLResults);
-
-        return ret;
-    }
 }
 

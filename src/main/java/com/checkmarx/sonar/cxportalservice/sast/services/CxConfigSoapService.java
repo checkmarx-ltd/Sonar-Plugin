@@ -1,9 +1,9 @@
-package com.checkmarx.sonar.cxportalservice.sast.sastnew;
+package com.checkmarx.sonar.cxportalservice.sast.services;
 
 import com.checkmarx.soap.client.CxWSResponseProjectsDisplayData;
 import com.checkmarx.soap.client.ProjectDisplayData;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
-import org.sonar.api.utils.log.Loggers;
+import com.checkmarx.sonar.logger.CxLogger;
 
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class CxConfigSoapService extends CxSDKSonarSoapService {
 
     public CxConfigSoapService() {
         super();
-        logger = Loggers.get(CxConfigSoapService.class);
+        logger = new CxLogger(CxConfigSoapService.class);
     }
 
     public List<ProjectDisplayData> getProjectsDisplayData(String sessionId) throws ConnectionException {
