@@ -1,9 +1,16 @@
 #h1Connecting{
     font-size: 40px;
-
     margin-top: 80px;
-    margin-left: 400px
+    margin-left: 670px;
 }
+
+#loadingSpinner{
+    width: 150px;
+    height: 150px;
+    margin-top: 50px;
+    margin-left: 690px;
+}
+
 
 @keyframes spinner {
     to {transform: rotate(360deg);}
@@ -47,13 +54,6 @@
 
 .spinner-margin {
     margin: 10px
-}
-
-#loadingSpinner{
-    width: 150px;
-    height: 150px;
-    margin-top: 50px;
-    margin-left: 400px;
 }
 
 #testConBtnSpanSpinner, #saveBtnSpanSpinner{
