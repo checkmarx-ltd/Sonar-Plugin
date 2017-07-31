@@ -81,7 +81,7 @@ public class SastMetrics implements Metrics {
     public static final Metric<String> SAST_SCAN_DETAILS = new Metric.Builder(SAST_BASE_KEY +".details", "Checkmarx sast scan details", Metric.ValueType.STRING)
             .setDescription("Additional scan details")
             .setQualitative(true)
-            .setHidden(false)
+            .setHidden(true)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
