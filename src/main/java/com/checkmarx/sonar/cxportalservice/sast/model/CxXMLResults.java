@@ -1808,7 +1808,7 @@ public class CxXMLResults
                     @XmlElement(name = "FileName", required = true)
                     protected String fileName;
                     @XmlElement(name = "Line")
-                    protected String line;
+                    protected int line;
                     @XmlElement(name = "Column")
                     protected String column;
                     @XmlElement(name = "NodeId")
@@ -1850,7 +1850,7 @@ public class CxXMLResults
                      * Gets the value of the line property.
                      * 
                      */
-                    public String getLine() {
+                    public int getLine() {
                         return line;
                     }
 
@@ -1858,7 +1858,7 @@ public class CxXMLResults
                      * Sets the value of the line property.
                      * 
                      */
-                    public void setLine(String value) {
+                    public void setLine(int value) {
                         this.line = value;
                     }
 

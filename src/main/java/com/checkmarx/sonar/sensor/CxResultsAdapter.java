@@ -66,7 +66,7 @@ public class CxResultsAdapter {
         List<CxXMLResults.Query.Result.Path.PathNode> nodes = result.getPath().getPathNode();
         for (int i = (nodes.size() - 1) ; i > -1 ; --i){
             CxXMLResults.Query.Result.Path.PathNode currNode = nodes.get(i);
-            if(currNode.getFileName() != null && currNode.getLine() != null){
+            if(currNode.getFileName() != null && currNode.getLine() != 0){
                 return currNode;
             }
         }

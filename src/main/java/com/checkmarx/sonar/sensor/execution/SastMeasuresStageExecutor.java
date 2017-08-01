@@ -61,9 +61,12 @@ public class SastMeasuresStageExecutor {
                         }
 
                         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
-                        context.newIssue().forRule(rule.ruleKey()).at(defaultIssueLocation.on(file)
-                                .at(file.selectLine(Integer.parseInt(result.getNodeToMarkOnFile().getLine())))
-                                .message("Checkmarx Vulnerability : " + result.getQuery().getName())).save();
+                        context.newIssue()
+                                .forRule(rule.ruleKey())
+                                .at(defaultIssueLocation.on(file)
+                                .at(file.selectLine(result.getNodeToMarkOnFile().getLine()))
+                                .message("Checkmarx Vulnerability : " + result.getQuery().getName()))
+                                .save();
 
                         updateCurrFileVulnerabilities(result);
                     }
