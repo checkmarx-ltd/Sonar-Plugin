@@ -873,7 +873,19 @@ void copyStringToBuffer(char* inputString)
 &lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Using an invalidated registry entry to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;RegQueryValueEx(hkey, "APPHOME", 0, 0, (BYTE*)home, &amp;size);
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using the application configuration property to load a native library, allowing an attacker to load a library or an executable and potentially execute arbitrary code:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
+Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);&lt;/pre&gt;&lt;h4&gt;Validating the configuration property before loading a native library:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
+if ( isValidHomePath(lib) )
+{
+    Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);
+} 
+else
+{ 
+    Console.WriteLine("Action denied.");
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Loading a library from the default Java library path, without validating it:&lt;/h4&gt;&lt;pre&gt;System.loadLibrary("crypto.so");&lt;/pre&gt;&lt;h4&gt;Using an invalidated system property to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;String property = System.getProperty("java.library.path");
+System.loadLibrary(property);&lt;/pre&gt;&lt;h4&gt;Loading the library from its absolute path using System.load:&lt;/h4&gt;&lt;pre&gt;String path = "/path/to/lib/";
+String lib = "crypto.so";
+System.load(path + lib);&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Using an invalidated registry entry to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;RegQueryValueEx(hkey, "APPHOME", 0, 0, (BYTE*)home, &amp;size);
 char* lib=(char*)malloc(strlen(home)+strlen(INITLIB));
 if (lib) {
     strcpy(lib,home);
@@ -887,18 +899,6 @@ if (lib) {
     strcpy(lib,home);
     strcat(lib,INITCMD);
     LoadLibrary(lib);
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Loading a library from the default Java library path, without validating it:&lt;/h4&gt;&lt;pre&gt;System.loadLibrary("crypto.so");&lt;/pre&gt;&lt;h4&gt;Using an invalidated system property to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;String property = System.getProperty("java.library.path");
-System.loadLibrary(property);&lt;/pre&gt;&lt;h4&gt;Loading the library from its absolute path using System.load:&lt;/h4&gt;&lt;pre&gt;String path = "/path/to/lib/";
-String lib = "crypto.so";
-System.load(path + lib);&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using the application configuration property to load a native library, allowing an attacker to load a library or an executable and potentially execute arbitrary code:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
-Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);&lt;/pre&gt;&lt;h4&gt;Validating the configuration property before loading a native library:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
-if ( isValidHomePath(lib) )
-{
-    Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);
-} 
-else
-{ 
-    Console.WriteLine("Action denied.");
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_280</key><name>Heuristic_Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
 &lt;/div&gt;            
@@ -1753,7 +1753,11 @@ void copyStringToBuffer(char* inputString)
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -1774,11 +1778,7 @@ withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
     SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
 })
     
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_324</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_324</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker&amp;#160;finds the user passwords in memory, these can be reused to easily impersonate the user to the system.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;String variables are immutable - in other words, once a string variable is assigned, its value cannot be changed or removed. Thus, these strings may remain&amp;#160;around in memory, possibly in multiple locations, for an indefinite period of time until the garbage collector happens to remove it. Sensitive data, such as passwords, will remain exposed in memory as plaintext with no control over their lifetime.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
@@ -1809,7 +1809,32 @@ NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
+class Heap_Inspection 
+{
+  private string password;
+	
+  void setPassword()
+  {	
+	password = System.console().readLine("Enter your password: ");
+  }
+}
+&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
+{
+  private SealedObject password;
+	
+  void setPassword()
+  {	
+	byte[] sKey = getKeyFromConfig();
+	Cipher c = Cipher.getInstance("AES");
+	c.init(Cipher.ENCRYPT_MODE, sKey);
+
+	char[] input = System.console().readPassword("Enter your password: ");
+	password = new SealedObject(Arrays.asList(input), c);
+  }
+}
+
+&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
 
 #include &lt;stdio.h&gt;
 
@@ -1888,31 +1913,6 @@ int main()
 			break;
 	}
 }
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
-class Heap_Inspection 
-{
-  private string password;
-	
-  void setPassword()
-  {	
-	password = System.console().readLine("Enter your password: ");
-  }
-}
-&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
-{
-  private SealedObject password;
-	
-  void setPassword()
-  {	
-	byte[] sKey = getKeyFromConfig();
-	Cipher c = Cipher.getInstance("AES");
-	c.init(Cipher.ENCRYPT_MODE, sKey);
-
-	char[] input = System.console().readPassword("Enter your password: ");
-	password = new SealedObject(Arrays.asList(input), c);
-  }
-}
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_322</key><name>Use_of_Hard_coded_Cryptographic_Key</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Static, unchangeable encryption keys in the source code can be stolen by an attacker with access to the source code or the application binaries. Once the attacker has the encryption key, this can be used to gain access to any encrypted secret data, thus violating the confidentiality of the data. Furthermore, it would be impossible to replace the encryption key once stolen. Note that if this is&amp;#160;a product that can be installed numerous times, the encryption key will always be the same, allowing an attacker to break all instances at the same cost.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application code uses an encryption key to encrypt and decrypt sensitive data. While it is important to create this encryption key randomly and keep it secret, the application has a single, static key embedded in plain text in the source code.&amp;#160;&lt;/div&gt;
 &lt;div&gt;An attacker could gain access to the source code - whether in the source control system, developer workstations, or the server filesystem or product binaries themselves. Once the attacker has gained access to the source code, it is trivial to retrieve the plain text encryption key and use it to decrypt the sensitive data that the application was protecting.&amp;#160;&lt;/div&gt;      
@@ -2420,14 +2420,11 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;p&gt;&amp;nbsp;- Avoid implementing special "test code", "debugging-time" functionality, or "secret" interfaces or parameters in the application code itself.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Define and implement a standard and automatic build / deployment process, using dedicated CI / CD tools, that can automatically configure the deployed application, exclude all temporary code, and include only intended application code.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Ruby&lt;/h3&gt;&lt;h4&gt;Internal Test Method&lt;/h4&gt;&lt;pre&gt;class AppClass
-	def run_app
-      # Run the app
-    end
-  	def test_app
-      # Test and debug the app
-    end
-end&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Main in Servlet&lt;/h4&gt;&lt;pre&gt;public class AppServlet extends HttpServlet { 
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Debug Configuration&lt;/h4&gt;&lt;pre&gt;&lt;configuration&gt;
+	&lt;system.web&gt;
+    	&lt;compilation debug="false" /&gt;
+    &lt;/system.web&gt;
+&lt;/configuration&gt;&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Main in Servlet&lt;/h4&gt;&lt;pre&gt;public class AppServlet extends HttpServlet { 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
       				throws ServletException, IOException {
       	// handle request
@@ -2438,11 +2435,14 @@ end&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Main in Servlet&lt;/h4&gt;&lt;
       	// initialize app for debugging and testing
       	MODE = "DEBUGGING";
     }
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Debug Configuration&lt;/h4&gt;&lt;pre&gt;&lt;configuration&gt;
-	&lt;system.web&gt;
-    	&lt;compilation debug="false" /&gt;
-    &lt;/system.web&gt;
-&lt;/configuration&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_1214</key><name>Unchecked_Return_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A program that does not check function return values could cause the application to enter an undefined state. This could lead to unexpected behavior and unintended consequences, including inconsistent data, system crashes or other error-based exploits.&amp;nbsp;&lt;/p&gt;
+}&lt;/pre&gt;&lt;h3&gt;Ruby&lt;/h3&gt;&lt;h4&gt;Internal Test Method&lt;/h4&gt;&lt;pre&gt;class AppClass
+	def run_app
+      # Run the app
+    end
+  	def test_app
+      # Test and debug the app
+    end
+end&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_1214</key><name>Unchecked_Return_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A program that does not check function return values could cause the application to enter an undefined state. This could lead to unexpected behavior and unintended consequences, including inconsistent data, system crashes or other error-based exploits.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application calls a system function, but does not receive or check the result of this funciton. These functions often return error codes in the result, or share other status codes with it's caller. The application simply ignores this result value, losing this vital information.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&amp;nbsp;- Always check the result of any called function that returns a value, and verify the result is an expected value.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Ensure the calling function responds to all possible return values.&amp;nbsp;&lt;/p&gt;
@@ -2465,40 +2465,40 @@ strncpy(buff, source, size);
 buff[size] = '\0';&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_288</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application opens a network socket, for listening to incoming network connections. However, the application uses user input to define the socket, enabling an attacker to control it.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Don&amp;#8217;t allow a user to define parameters of network sockets.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import socket
-import sys
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application opens a network socket using a port number inputed by the user
+      &lt;/h4&gt;&lt;pre&gt;
 
-userInput = stdin.readline()
+class ResourceInjection
+{
+            public void foo(TextBox textBox1)
+        {
+                        long address = Convert.ToInt32(textBox1.Text);
+            IPEndPoint endpoint = new IPEndPoint(address, port);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
 
-HOST = userInput 
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
-import sys
 
-HOST = ''   # Symbolic name, meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
+
+      &lt;/pre&gt;&lt;h4&gt;
+The application opens a hard-coded port number and does receive it from the user
+      &lt;/h4&gt;&lt;pre&gt;
+
+class ResourceInjection
+{
+            public void foo(TextBox textBox1, long address)
+        {
+            IPEndPoint endpoint = new IPEndPoint(address, 15551);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
 	public static void main(String[] args) {
 		Scanner userInputScanner = new Scanner(System.in);
 		System.out.print("\nEnter port number: ");
@@ -2535,40 +2535,40 @@ print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The a
 			System.err.println("Caught Exception: " + e.getMessage());
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application opens a network socket using a port number inputed by the user
-      &lt;/h4&gt;&lt;pre&gt;
+}&lt;/pre&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import socket
+import sys
 
-class ResourceInjection
-{
-            public void foo(TextBox textBox1)
-        {
-                        long address = Convert.ToInt32(textBox1.Text);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
+userInput = stdin.readline()
 
+HOST = userInput 
+PORT = 8888 # Arbitrary non-privileged port
+	 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print 'Socket created'
+	 
+#Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error as msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
+import sys
 
-
-      &lt;/pre&gt;&lt;h4&gt;
-The application opens a hard-coded port number and does receive it from the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1, long address)
-        {
-            IPEndPoint endpoint = new IPEndPoint(address, 15551);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_301</key><name>Deprecated_CRT_Functions_VS2005</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
+HOST = ''   # Symbolic name, meaning all available interfaces
+PORT = 8888 # Arbitrary non-privileged port
+	 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print 'Socket created'
+	 
+#Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error as msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+print 'Socket bind complete'&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_301</key><name>Deprecated_CRT_Functions_VS2005</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
 &lt;div&gt;Note that the actual&amp;#160;risk involved depends on the specifics of any known vulnerabilities in older versions.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application references code elements that have been declared as deprecated. This could include functions, methods, properties, modules, or obsolete&amp;#160;library versions that are out of date. It is likely that the code that references the obsolete element was developed before it was declared as obsolete, and in the meantime the referenced code was updated.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
@@ -3279,27 +3279,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt
 &lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Always catch exceptions explicitly.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-try
-{
-// Database access or other potentially dangerous function
-}
-catch (SQLException ex)
-{
-// Handle exception
-}
-catch (Exception ex)
-{
-// Default handler for unexpected exceptions
-}
-
-
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Always catch exceptions explicitly.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -3318,6 +3298,26 @@ catch (Exception ex)
 // Default handler for unexpected exceptions
 }
 
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Always catch exceptions explicitly.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+try
+{
+// Database access or other potentially dangerous function
+}
+catch (SQLException ex)
+{
+// Handle exception
+}
+catch (Exception ex)
+{
+// Default handler for unexpected exceptions
+}
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_323</key><name>Hardcoded_password_in_Connection_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded database passwords expose the application to password leakage, and the database to unauthorized access. If an attacker gains access to the source code (or can decompile the application binaries), she will be able to steal the embedded passwords, and use them to directly access the database. This would enable the attacker to steal secret information, modify sensitive records, or delete important data.&amp;nbsp;&lt;/div&gt;
@@ -3724,26 +3724,7 @@ Potential Mitigations, White Box Definitions&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;
 &lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Always use a secure password protection scheme to store passwords, such as bcrypt:
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-String hashed = BCrypt.hashpw(password, BCrypt.gensalt(12));
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-
-For password verification, use the matching function:
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-bool isValid = BCrypt.checkpw(candidate, hashed);
-
-
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Always use a secure password protection scheme to store passwords, such as bcrypt:
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -3762,6 +3743,25 @@ For password verification, use the matching function:
 
 bool isValid = BCrypt.CheckPassword(candidate, hashed);
 
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Always use a secure password protection scheme to store passwords, such as bcrypt:
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+String hashed = BCrypt.hashpw(password, BCrypt.gensalt(12));
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+
+For password verification, use the matching function:
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+bool isValid = BCrypt.checkpw(candidate, hashed);
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_321</key><name>Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
@@ -3788,7 +3788,29 @@ bool isValid = BCrypt.CheckPassword(candidate, hashed);
 &lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
 &lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text;
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+Potentially hazardous characters are removed from the user input before use
+      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
     public static void main(String[] args) {
         Scanner userInputScanner = new Scanner(System.in);
         System.out.print("\nEnter file name: ");
@@ -3813,28 +3835,6 @@ bool isValid = BCrypt.CheckPassword(candidate, hashed);
             e.printStackTrace();
         }
     }
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text;
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters are removed from the user input before use
-      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_1213</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -3907,7 +3907,29 @@ class PrivacyViolationFixed
 &lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
 &lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text;
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+Potentially hazardous characters are removed from the user input before use
+      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
     public static void main(String[] args) {
         Scanner userInputScanner = new Scanner(System.in);
         System.out.print("\nEnter file name: ");
@@ -3932,28 +3954,6 @@ class PrivacyViolationFixed
             e.printStackTrace();
         }
     }
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text;
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters are removed from the user input before use
-      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_1563</key><name>Unreleased_Resource_Leak</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Resource Locking Problems&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -6097,26 +6097,7 @@ Access Control&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px so
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application creates an SQL query using string obtained from the user
       &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
 {
@@ -6142,6 +6123,25 @@ class SqlInjectionFixed
                 connection.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = " + user;
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = ?";
+		PreparedStatement stmt = con.createStatement(query);
+		stmt.setString(1, user);
+		ResultSet rs = stmt.executeQuery(query);
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3092</key><name>Open_SSL_HeartBleed</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -6459,7 +6459,23 @@ Buffer Overflow')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+
+
+NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
+
+
+&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
 Ensure you encode any special delimiter characters before writing to a log file.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -6474,22 +6490,6 @@ Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
 print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
-&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
-
-
-NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
-
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_315</key><name>Information_Exposure_Through_an_Error_Message</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Exposed details about the application&amp;#8217;s environment, users, or associated data (for example, stack trace) could enable an attacker to find another flaw and help the attacker to mount an attack.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application generates an error message including raw exceptions, either by not being handled, by explicit returning of the object, or by configuration. Exception details may include sensitive information that could leak out of the exception to the users.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -6502,7 +6502,7 @@ NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@
 &lt;li&gt;Configure a global handler to prevent unhandled errors from leaving the application.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -6519,7 +6519,8 @@ Response.Write("Error occurred.");
 }
 
 
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -6534,7 +6535,6 @@ catch (SqlException ex)
 LogException(ex);
 Response.Write("Error occurred.");
 }
-
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_331</key><name>Use_of_Uninitialized_Pointer</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
@@ -7686,7 +7686,30 @@ Locking&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using data obtained from a database
+      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName"); 
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The data obtained from the database is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName");
+                string userName = DS[0]["UserName"].ToString().Replace("'", "");
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
 	public static void sql(Connection con, String sqlStm) {
 		try {
 			Statement stmt = con.createStatement();
@@ -7711,29 +7734,6 @@ Locking&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_307</key><name>Insecure_Temporary_File</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Insecure Temporary File&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -7872,7 +7872,30 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using data obtained from a database
+      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName"); 
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The data obtained from the database is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName");
+                string userName = DS[0]["UserName"].ToString().Replace("'", "");
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
 	public static void sql(Connection con, String sqlStm) {
 		try {
 			Statement stmt = con.createStatement();
@@ -7897,29 +7920,6 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_330</key><name>Use_After_Free</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Use After Free&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -8207,44 +8207,7 @@ Relationships&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/di
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Do not allow the user to dynamically provide the name of the queried table, and if possible completely avoid using dynamic table names. 5. Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Using Parameterized Queries:
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-String custId = request.getParameter("customerId");
-Pattern custPattern = Pattern.compile("^\d{6}$");
-if ( !custPattern.matcher( custId ).matches() )
-throw new ValidationException("Invalid customer Id.");
-String query = "SELECT accountBalance FROM customers WHERE customerId = ?";
-PreparedStatement pstmt = connection.prepareStatement( query );
-pstmt.setString( 1, custId );
-ResultSet results = pstmt.executeQuery( );
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-
-Using Stored Procedures:
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-String custId = request.getParameter("customerId");
-Pattern custPattern = Pattern.compile("^\d{6}$");
-if ( !custPattern.matcher( custId ).matches() )
-throw new ValidationException("Invalid customer Id.");
-try {
-CallableStatement cs = conn.prepareCall("{call getAccountBalance(?)}");
-cs.setString(1, custname);
-ResultSet results = cs.executeQuery();
-}
-catch (SQLException se) {
-// … logging and error handling
-}
-
-
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Using Parameterized Queries:
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -8280,6 +8243,43 @@ catch (SqlException se) {
 // … logging and error handling
 }
 
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Using Parameterized Queries:
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+String custId = request.getParameter("customerId");
+Pattern custPattern = Pattern.compile("^\d{6}$");
+if ( !custPattern.matcher( custId ).matches() )
+throw new ValidationException("Invalid customer Id.");
+String query = "SELECT accountBalance FROM customers WHERE customerId = ?";
+PreparedStatement pstmt = connection.prepareStatement( query );
+pstmt.setString( 1, custId );
+ResultSet results = pstmt.executeQuery( );
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+
+Using Stored Procedures:
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+String custId = request.getParameter("customerId");
+Pattern custPattern = Pattern.compile("^\d{6}$");
+if ( !custPattern.matcher( custId ).matches() )
+throw new ValidationException("Invalid customer Id.");
+try {
+CallableStatement cs = conn.prepareCall("{call getAccountBalance(?)}");
+cs.setString(1, custname);
+ResultSet results = cs.executeQuery();
+}
+catch (SQLException se) {
+// … logging and error handling
+}
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_1256</key><name>Dead_Code</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
@@ -8373,26 +8373,7 @@ Other Notes&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application creates an SQL query using string obtained from the user
       &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
 {
@@ -8418,6 +8399,25 @@ class SqlInjectionFixed
                 connection.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = " + user;
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = ?";
+		PreparedStatement stmt = con.createStatement(query);
+		stmt.setString(1, user);
+		ResultSet rs = stmt.executeQuery(query);
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3895</key><name>Incorrect_Permission_Assignment_For_Critical_Resources</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Incorrect Permission Assignment for Critical Resource&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -8702,33 +8702,7 @@ Assignment for Critical Resource&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="bo
 &lt;/ul&gt;
 &lt;li&gt;Ideally, avoid dynamically building connection strings. If it is necessary to dynamically build a connection string, try not to include user input. In any case use platform-provided utlities, such as .NET&amp;#8217;s SqlConnectionStringBuilder, or at least encode the validated input as appropriate for your platform.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import cx_Oracle
-print 'Insert your ID: '
-userInput = stdin.readline()
-connection = cx_Oracle.connect(userInput + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h4&gt;The user inputed file number is turned to a string of that number before use&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import cx_Oracle
-print 'Insert your ID: '
-userInput = stdin.readline()
-connection = cx_Oracle.connect(str(int(userInput)) + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjection {
-	public static void main(String[] args) throws SQLException {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter url name: ");
-		String connURL = userInputScanner.nextLine();
-		Connection con = DriverManager.getConnection(connURL, "username", "password");
-	}
-}&lt;/pre&gt;&lt;h4&gt;The user input is translated to a predefined connection string&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjectionFixed {
-	public static void main(String[] args) throws SQLException {
-		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
-		sanitize.put("DB_url_1", "DB_url_1");
-		sanitize.put("DB_url_2", "DB_url_2");
-		sanitize.put("DB_url_3", "DB_url_3");
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter url name: ");
-		String connURL = userInputScanner.nextLine();
-		Connection con = DriverManager.getConnection(sanitize.get(connURL), "username", "password");
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application constructs a connection string using input from the user
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -8758,7 +8732,33 @@ The user input is first checked for malicious characters before adding to the co
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_226</key><name>String_Termination_Error</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjection {
+	public static void main(String[] args) throws SQLException {
+		Scanner userInputScanner = new Scanner(System.in);
+		System.out.print("\nEnter url name: ");
+		String connURL = userInputScanner.nextLine();
+		Connection con = DriverManager.getConnection(connURL, "username", "password");
+	}
+}&lt;/pre&gt;&lt;h4&gt;The user input is translated to a predefined connection string&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjectionFixed {
+	public static void main(String[] args) throws SQLException {
+		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
+		sanitize.put("DB_url_1", "DB_url_1");
+		sanitize.put("DB_url_2", "DB_url_2");
+		sanitize.put("DB_url_3", "DB_url_3");
+		Scanner userInputScanner = new Scanner(System.in);
+		System.out.print("\nEnter url name: ");
+		String connURL = userInputScanner.nextLine();
+		Connection con = DriverManager.getConnection(sanitize.get(connURL), "username", "password");
+	}
+}&lt;/pre&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import cx_Oracle
+print 'Insert your ID: '
+userInput = stdin.readline()
+connection = cx_Oracle.connect(userInput + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h4&gt;The user inputed file number is turned to a string of that number before use&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import cx_Oracle
+print 'Insert your ID: '
+userInput = stdin.readline()
+connection = cx_Oracle.connect(str(int(userInput)) + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_226</key><name>String_Termination_Error</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Null Termination&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -9709,7 +9709,19 @@ void copyStringToBuffer(char* inputString)
 &lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Using an invalidated registry entry to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;RegQueryValueEx(hkey, "APPHOME", 0, 0, (BYTE*)home, &amp;size);
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using the application configuration property to load a native library, allowing an attacker to load a library or an executable and potentially execute arbitrary code:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
+Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);&lt;/pre&gt;&lt;h4&gt;Validating the configuration property before loading a native library:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
+if ( isValidHomePath(lib) )
+{
+    Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);
+} 
+else
+{ 
+    Console.WriteLine("Action denied.");
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Loading a library from the default Java library path, without validating it:&lt;/h4&gt;&lt;pre&gt;System.loadLibrary("crypto.so");&lt;/pre&gt;&lt;h4&gt;Using an invalidated system property to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;String property = System.getProperty("java.library.path");
+System.loadLibrary(property);&lt;/pre&gt;&lt;h4&gt;Loading the library from its absolute path using System.load:&lt;/h4&gt;&lt;pre&gt;String path = "/path/to/lib/";
+String lib = "crypto.so";
+System.load(path + lib);&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Using an invalidated registry entry to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;RegQueryValueEx(hkey, "APPHOME", 0, 0, (BYTE*)home, &amp;size);
 char* lib=(char*)malloc(strlen(home)+strlen(INITLIB));
 if (lib) {
     strcpy(lib,home);
@@ -9723,18 +9735,6 @@ if (lib) {
     strcpy(lib,home);
     strcat(lib,INITCMD);
     LoadLibrary(lib);
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Loading a library from the default Java library path, without validating it:&lt;/h4&gt;&lt;pre&gt;System.loadLibrary("crypto.so");&lt;/pre&gt;&lt;h4&gt;Using an invalidated system property to determine the directory in which it is installed and loads a library file, allowing an attacker to load an arbitrary library:&lt;/h4&gt;&lt;pre&gt;String property = System.getProperty("java.library.path");
-System.loadLibrary(property);&lt;/pre&gt;&lt;h4&gt;Loading the library from its absolute path using System.load:&lt;/h4&gt;&lt;pre&gt;String path = "/path/to/lib/";
-String lib = "crypto.so";
-System.load(path + lib);&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using the application configuration property to load a native library, allowing an attacker to load a library or an executable and potentially execute arbitrary code:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
-Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);&lt;/pre&gt;&lt;h4&gt;Validating the configuration property before loading a native library:&lt;/h4&gt;&lt;pre&gt;string lib = ConfigurationManager.AppSettings["APPHOME"];
-if ( isValidHomePath(lib) )
-{
-    Environment.ExitCode = AppDomain.CurrentDomain.ExecuteAssembly(lib);
-} 
-else
-{ 
-    Console.WriteLine("Action denied.");
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_342</key><name>Stored_DB_Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;A malicious user could access other users&amp;#8217; personal information, by simply altering the reference parameter sent to the server. Thus, the malicious user could bypass access controls and access unauthorized records, such as other users accounts,&amp;#160;stealing confidential or restricted information.&amp;#160;&lt;/div&gt;
 &lt;/div&gt;      
@@ -9844,33 +9844,7 @@ else
 &lt;/ul&gt;
 &lt;li&gt;Ideally, avoid dynamically building connection strings. If it is necessary to dynamically build a connection string, try not to include user input. In any case use platform-provided utlities, such as .NET&amp;#8217;s SqlConnectionStringBuilder, or at least encode the validated input as appropriate for your platform.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import cx_Oracle
-print 'Insert your ID: '
-userInput = stdin.readline()
-connection = cx_Oracle.connect(userInput + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h4&gt;The user inputed file number is turned to a string of that number before use&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import cx_Oracle
-print 'Insert your ID: '
-userInput = stdin.readline()
-connection = cx_Oracle.connect(str(int(userInput)) + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjection {
-	public static void main(String[] args) throws SQLException {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter url name: ");
-		String connURL = userInputScanner.nextLine();
-		Connection con = DriverManager.getConnection(connURL, "username", "password");
-	}
-}&lt;/pre&gt;&lt;h4&gt;The user input is translated to a predefined connection string&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjectionFixed {
-	public static void main(String[] args) throws SQLException {
-		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
-		sanitize.put("DB_url_1", "DB_url_1");
-		sanitize.put("DB_url_2", "DB_url_2");
-		sanitize.put("DB_url_3", "DB_url_3");
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter url name: ");
-		String connURL = userInputScanner.nextLine();
-		Connection con = DriverManager.getConnection(sanitize.get(connURL), "username", "password");
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application constructs a connection string using input from the user
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -9900,7 +9874,33 @@ The user input is first checked for malicious characters before adding to the co
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_346</key><name>Stored_Format_String_Attack</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjection {
+	public static void main(String[] args) throws SQLException {
+		Scanner userInputScanner = new Scanner(System.in);
+		System.out.print("\nEnter url name: ");
+		String connURL = userInputScanner.nextLine();
+		Connection con = DriverManager.getConnection(connURL, "username", "password");
+	}
+}&lt;/pre&gt;&lt;h4&gt;The user input is translated to a predefined connection string&lt;/h4&gt;&lt;pre&gt;public class ConnectionStringInjectionFixed {
+	public static void main(String[] args) throws SQLException {
+		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
+		sanitize.put("DB_url_1", "DB_url_1");
+		sanitize.put("DB_url_2", "DB_url_2");
+		sanitize.put("DB_url_3", "DB_url_3");
+		Scanner userInputScanner = new Scanner(System.in);
+		System.out.print("\nEnter url name: ");
+		String connURL = userInputScanner.nextLine();
+		Connection con = DriverManager.getConnection(sanitize.get(connURL), "username", "password");
+	}
+}&lt;/pre&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application constructs a connection string using input from the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import cx_Oracle
+print 'Insert your ID: '
+userInput = stdin.readline()
+connection = cx_Oracle.connect(userInput + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;h4&gt;The user inputed file number is turned to a string of that number before use&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import cx_Oracle
+print 'Insert your ID: '
+userInput = stdin.readline()
+connection = cx_Oracle.connect(str(int(userInput)) + '/password@99.999.9.99:PORT/SID')&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_346</key><name>Stored_Format_String_Attack</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Uncontrolled Format String&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -10118,19 +10118,10 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
-
-
-print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
+NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
 
 
 &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
@@ -10143,10 +10134,19 @@ Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
 
 
 
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
 
 
-NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+
+
+print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_344</key><name>Stored_Environment_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
@@ -10356,7 +10356,29 @@ a Control Plane ('Command Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td styl
 &lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
 &lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text;
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+Potentially hazardous characters are removed from the user input before use
+      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
+{
+        private void foo(TextBox textbox1)
+        {
+                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
+                string path = "c:\files\file" + fileNum;
+                FileStream f = new FileStream(path, FileMode.Open);
+                byte[] output = new byte[10];
+                f.Read(output,0, 10);
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
     public static void main(String[] args) {
         Scanner userInputScanner = new Scanner(System.in);
         System.out.print("\nEnter file name: ");
@@ -10381,28 +10403,6 @@ a Control Plane ('Command Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td styl
             e.printStackTrace();
         }
     }
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text;
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters are removed from the user input before use
-      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_335</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including data obtained from the database. Since that data may have been previously obtained from user input, and is neither checked for data type validity nor subsequently sanitized, the data could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
@@ -10417,7 +10417,30 @@ Potentially hazardous characters are removed from the user input before use
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using data obtained from a database
+      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName"); 
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The data obtained from the database is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName");
+                string userName = DS[0]["UserName"].ToString().Replace("'", "");
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
 	public static void sql(Connection con, String sqlStm) {
 		try {
 			Statement stmt = con.createStatement();
@@ -10442,29 +10465,6 @@ Potentially hazardous characters are removed from the user input before use
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_350</key><name>Stored_Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Control of Resource Identifiers ('Resource Injection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;

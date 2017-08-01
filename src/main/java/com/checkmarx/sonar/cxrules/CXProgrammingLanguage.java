@@ -20,7 +20,8 @@ public enum CXProgrammingLanguage {
     SCALA("Scala", "scala", 65536),
     VB6("VB6", "vb6", 256),
     CSHARP("csharp", "cs", 1),
-    VBNET("vbnet", "vbnet", 32);
+    VBNET("vbnet", "vbnet", 32),
+    VB_SCRIPT("VbScript", "vb" ,64);
 
     private String name;
     private String sonarName;

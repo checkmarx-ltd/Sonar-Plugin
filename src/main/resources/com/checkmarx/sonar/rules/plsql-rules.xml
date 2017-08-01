@@ -198,7 +198,11 @@ public Connection createConnection(Properties connectionProperties) {
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -219,11 +223,7 @@ withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
     SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
 })
     
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2642</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2642</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker succeeds in impersonating the user or application, she will have full access to the system, and be able to do anything the impersonated identity could do.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application codebase&amp;#160;has string literal passwords embedded in the source code. This hardcoded value is used either to compare to user-provided credentials, or to authenticate downstream to a remote system (such as a database or a remote web service). &amp;#160;&lt;/div&gt;
 &lt;div&gt;An attacker only needs to gain access to the source code to reveal the hardcoded password. Likewise, the attacker can reverse engineer the compiled application binaries, and easily retrieve the embedded password. Once found, the attacker can easily use the password in impersonation attacks, either directly on the application or to the remote system.&amp;#160;&lt;/div&gt;
@@ -479,29 +479,7 @@ public class HTTPResponseSplittingFixed
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
-	public static void XSSExample(TextArea name) {	
-		Label label = new Label();		
-		label.setText("Hello " + name.getText());	
-	}
-}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
-	public static void XSSExample(TextArea name) {
-		Label label = new Label();		
-		switch (name) {
-		case "Joan":
-			label.setText("Hello Joan");	
-			break;
-		case "Jim":
-			label.setText("Hello Jim");	
-			break;
-		case "James":
-			label.setText("Hello James");	
-			break;
-		default:
-			System.out.println("Wrong Input");
-		}
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
 {
         public static void foo(HttpRequest Request, HttpResponse Response)
         {
@@ -557,6 +535,28 @@ public class HTTPResponseSplittingFixed
                 
                 Response.BinaryWrite(AntiXss.HtmlEncode(filename));
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
+	public static void XSSExample(TextArea name) {	
+		Label label = new Label();		
+		label.setText("Hello " + name.getText());	
+	}
+}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
+	public static void XSSExample(TextArea name) {
+		Label label = new Label();		
+		switch (name) {
+		case "Joan":
+			label.setText("Hello Joan");	
+			break;
+		case "Jim":
+			label.setText("Hello Jim");	
+			break;
+		case "James":
+			label.setText("Hello James");	
+			break;
+		default:
+			System.out.println("Wrong Input");
+		}
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2640</key><name>Reversible_One_Way_Hash</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Reversible One-Way Hash&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -617,7 +617,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;For URLs outside the application (if necessary), use an intermediate disclaimer page to provide users with a clear warning that they are leaving your site.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -626,14 +626,14 @@ Avoid redirecting to arbitrary URLs, instead map the parameter to a list of stat
 Response.Redirect(getUrlById(targetUrlId));
 
 
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
 Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
 
       &lt;/h4&gt;&lt;pre&gt;
 
 
 Response.Redirect(getUrlById(targetUrlId));
-
 
 
       &lt;/pre&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
@@ -675,7 +675,51 @@ return pageRef;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</descr
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
+{
+        public string foo(Label lblOutput, SqlConnection connection, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar();
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The outputed string is Html encoded before it is displayed in the label
+      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
+{
+        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar()
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
+        }
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
 		ResultSet rs;
@@ -701,50 +745,6 @@ return pageRef;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</descr
 		}
 		label.setText("Mickey last names are: " + lastNames + " ");
 	}
-}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
-{
-        public string foo(Label lblOutput, SqlConnection connection, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar();
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The outputed string is Html encoded before it is displayed in the label
-      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
-{
-        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar()
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2637</key><name>Default_Definer_Rights_in_Method_Definition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Privilege / Sandbox Issues&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -811,7 +811,30 @@ Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using data obtained from a database
+      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName"); 
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The data obtained from the database is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName");
+                string userName = DS[0]["UserName"].ToString().Replace("'", "");
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
 	public static void sql(Connection con, String sqlStm) {
 		try {
 			Statement stmt = con.createStatement();
@@ -836,29 +859,6 @@ Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2678</key><name>Dangling_Database_Cursor</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Dangling Database Cursor ('Cursor Injection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -918,40 +918,40 @@ Name&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2008-04-11&
 &lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2644</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application opens a network socket, for listening to incoming network connections. However, the application uses user input to define the socket, enabling an attacker to control it.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Don&amp;#8217;t allow a user to define parameters of network sockets.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import socket
-import sys
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application opens a network socket using a port number inputed by the user
+      &lt;/h4&gt;&lt;pre&gt;
 
-userInput = stdin.readline()
+class ResourceInjection
+{
+            public void foo(TextBox textBox1)
+        {
+                        long address = Convert.ToInt32(textBox1.Text);
+            IPEndPoint endpoint = new IPEndPoint(address, port);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
 
-HOST = userInput 
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
-import sys
 
-HOST = ''   # Symbolic name, meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
+
+      &lt;/pre&gt;&lt;h4&gt;
+The application opens a hard-coded port number and does receive it from the user
+      &lt;/h4&gt;&lt;pre&gt;
+
+class ResourceInjection
+{
+            public void foo(TextBox textBox1, long address)
+        {
+            IPEndPoint endpoint = new IPEndPoint(address, 15551);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
 	public static void main(String[] args) {
 		Scanner userInputScanner = new Scanner(System.in);
 		System.out.print("\nEnter port number: ");
@@ -988,40 +988,40 @@ print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The a
 			System.err.println("Caught Exception: " + e.getMessage());
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application opens a network socket using a port number inputed by the user
-      &lt;/h4&gt;&lt;pre&gt;
+}&lt;/pre&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+import socket
+import sys
 
-class ResourceInjection
-{
-            public void foo(TextBox textBox1)
-        {
-                        long address = Convert.ToInt32(textBox1.Text);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
+userInput = stdin.readline()
 
+HOST = userInput 
+PORT = 8888 # Arbitrary non-privileged port
+	 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print 'Socket created'
+	 
+#Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error as msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
+import sys
 
-
-      &lt;/pre&gt;&lt;h4&gt;
-The application opens a hard-coded port number and does receive it from the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1, long address)
-        {
-            IPEndPoint endpoint = new IPEndPoint(address, 15551);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2634</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
+HOST = ''   # Symbolic name, meaning all available interfaces
+PORT = 8888 # Arbitrary non-privileged port
+	 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print 'Socket created'
+	 
+#Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error as msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+print 'Socket bind complete'&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2634</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application places user input, which is untrusted data, in the server-side Session folder, which is considered a trusted location. This could lead developers to treat untrusted data as trusted.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -1145,26 +1145,7 @@ Management&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid 
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application creates an SQL query using string obtained from the user
       &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
 {
@@ -1190,6 +1171,25 @@ class SqlInjectionFixed
                 connection.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = " + user;
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = ?";
+		PreparedStatement stmt = con.createStatement(query);
+		stmt.setString(1, user);
+		ResultSet rs = stmt.executeQuery(query);
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2627</key><name>DoS_By_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a user-provided value to set its sleep period, without enforcing a limited range for this value.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;

@@ -762,7 +762,11 @@ function storeUserData() {
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -783,11 +787,7 @@ withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
     SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
 })
     
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2911</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2911</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker&amp;#160;finds the user passwords in memory, these can be reused to easily impersonate the user to the system.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;String variables are immutable - in other words, once a string variable is assigned, its value cannot be changed or removed. Thus, these strings may remain&amp;#160;around in memory, possibly in multiple locations, for an indefinite period of time until the garbage collector happens to remove it. Sensitive data, such as passwords, will remain exposed in memory as plaintext with no control over their lifetime.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
@@ -818,7 +818,32 @@ NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
+class Heap_Inspection 
+{
+  private string password;
+	
+  void setPassword()
+  {	
+	password = System.console().readLine("Enter your password: ");
+  }
+}
+&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
+{
+  private SealedObject password;
+	
+  void setPassword()
+  {	
+	byte[] sKey = getKeyFromConfig();
+	Cipher c = Cipher.getInstance("AES");
+	c.init(Cipher.ENCRYPT_MODE, sKey);
+
+	char[] input = System.console().readPassword("Enter your password: ");
+	password = new SealedObject(Arrays.asList(input), c);
+  }
+}
+
+&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
 
 #include &lt;stdio.h&gt;
 
@@ -897,31 +922,6 @@ int main()
 			break;
 	}
 }
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
-class Heap_Inspection 
-{
-  private string password;
-	
-  void setPassword()
-  {	
-	password = System.console().readLine("Enter your password: ");
-  }
-}
-&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
-{
-  private SealedObject password;
-	
-  void setPassword()
-  {	
-	byte[] sKey = getKeyFromConfig();
-	Cipher c = Cipher.getInstance("AES");
-	c.init(Cipher.ENCRYPT_MODE, sKey);
-
-	char[] input = System.console().readPassword("Enter your password: ");
-	password = new SealedObject(Arrays.asList(input), c);
-  }
-}
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3633</key><name>Buffer_Size_Literal_Condition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;
 
 &lt;div&gt;An attacker can exploit the buffer overflow to execute an arbitrary code with the privileges of the vulnerable application.&lt;/div&gt;
@@ -1416,7 +1416,7 @@ References&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan=
 &lt;li&gt;Configure a global handler to prevent unhandled errors from leaving the application.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -1433,7 +1433,8 @@ Response.Write("Error occurred.");
 }
 
 
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -1448,7 +1449,6 @@ catch (SqlException ex)
 LogException(ex);
 Response.Write("Error occurred.");
 }
-
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2916</key><name>Sensitive_Data_In_Temp_Folders</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used by the application to save data to disk could leave the sensitive information in a temporary file. This file might be publicly accessible, or vulnerable due to path-based operations based on untrusted, and potentially dangerous, resource.&amp;nbsp;&lt;/p&gt;
@@ -1526,44 +1526,7 @@ bool validateInput(HttpServletRequest req) {
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3587</key><name>Improper_Implementation_of_NSSecureCoding</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An archive received from untrusted source can be deserialized, and if an attacker substitutes an instance of a different class than expected, the unexpected behavior is initiated. In this way, an attacker could potentially cause a buffer overflow or trigger another vulnerability and possibly seize control of the system.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker manipulates the serialization archive on transit, and replaces one of the NSString objects with an object of a different class. The root class of the archive implements NSSecureCoding protocol which marks this class as safe for deserialization. The received archive is deserialized. A property of type NSString* is initialized with an object of a different type. Buffer overflow of other unexpected behavior happens when NSString selectors are called on a substituted object. For more information see section &amp;#8220;Modifications to Archived Data&amp;#8221; in the &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;1. Use only decodeObjectOfClass:forKey:methods for object deserialization in classes implementing the NSSecureCoding protocol.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of vulnerable code usingdecodeObjectForKey:method.&lt;/h4&gt;&lt;pre&gt;
-
-class VulnerableClass: NSObject, NSSecureCoding { // Using NSSecureCoding indicates the class uses secure methods in initWithCoder: initializer
-    
-    var name: NSString?
-    
-    // Inspite of the fact that this class implements an NSSecureCoding protocol, the
-    // implementation of initWithCoder: uses unsecure method decodeObjectForKey:.
-    
-    required init(coder aDecoder: NSCoder)
-    {
-        super.init()
-    
-        self.name = aDecoder.decodeObjectForKey("name") as? NSString // This is insecure.
-
-    }
-}
-
-
-
-&lt;/pre&gt;&lt;h4&gt;Example of secure code using decodeObjectOfClass:forKey:method.&lt;/h4&gt;&lt;pre&gt;
-
-class CXSecureCoding: NSObject, NSSecureCoding { // Using NSSecureCoding indicates the class uses secure methods in initWithCoder: initializer
-    
-    var name: NSString?
-    
-    required init(coder aDecoder: NSCoder)
-    {
-        super.init()
-        
-        self.name = aDecoder.decodeObjectOfClass(NSString.self, forKey: "name") // This is secure
-    }
-    
-}
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 Example of vulnerable code usingdecodeObjectForKey:method.
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -1621,7 +1584,44 @@ Example of secure code using decodeObjectOfClass:forKey:method.
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3624</key><name>Path_Manipulation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of vulnerable code usingdecodeObjectForKey:method.&lt;/h4&gt;&lt;pre&gt;
+
+class VulnerableClass: NSObject, NSSecureCoding { // Using NSSecureCoding indicates the class uses secure methods in initWithCoder: initializer
+    
+    var name: NSString?
+    
+    // Inspite of the fact that this class implements an NSSecureCoding protocol, the
+    // implementation of initWithCoder: uses unsecure method decodeObjectForKey:.
+    
+    required init(coder aDecoder: NSCoder)
+    {
+        super.init()
+    
+        self.name = aDecoder.decodeObjectForKey("name") as? NSString // This is insecure.
+
+    }
+}
+
+
+
+&lt;/pre&gt;&lt;h4&gt;Example of secure code using decodeObjectOfClass:forKey:method.&lt;/h4&gt;&lt;pre&gt;
+
+class CXSecureCoding: NSObject, NSSecureCoding { // Using NSSecureCoding indicates the class uses secure methods in initWithCoder: initializer
+    
+    var name: NSString?
+    
+    required init(coder aDecoder: NSCoder)
+    {
+        super.init()
+        
+        self.name = aDecoder.decodeObjectOfClass(NSString.self, forKey: "name") // This is secure
+    }
+    
+}
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3624</key><name>Path_Manipulation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;External Control of File Name or Path&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -1856,7 +1856,32 @@ void f() {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
+class Heap_Inspection 
+{
+  private string password;
+	
+  void setPassword()
+  {	
+	password = System.console().readLine("Enter your password: ");
+  }
+}
+&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
+{
+  private SealedObject password;
+	
+  void setPassword()
+  {	
+	byte[] sKey = getKeyFromConfig();
+	Cipher c = Cipher.getInstance("AES");
+	c.init(Cipher.ENCRYPT_MODE, sKey);
+
+	char[] input = System.console().readPassword("Enter your password: ");
+	password = new SealedObject(Arrays.asList(input), c);
+  }
+}
+
+&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
 
 #include &lt;stdio.h&gt;
 
@@ -1935,49 +1960,10 @@ int main()
 			break;
 	}
 }
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
-class Heap_Inspection 
-{
-  private string password;
-	
-  void setPassword()
-  {	
-	password = System.console().readLine("Enter your password: ");
-  }
-}
-&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
-{
-  private SealedObject password;
-	
-  void setPassword()
-  {	
-	byte[] sKey = getKeyFromConfig();
-	Cipher c = Cipher.getInstance("AES");
-	c.init(Cipher.ENCRYPT_MODE, sKey);
-
-	char[] input = System.console().readPassword("Enter your password: ");
-	password = new SealedObject(Arrays.asList(input), c);
-  }
-}
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3588</key><name>Unsecure_Deserialization</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;If an archive is manipulated in transit by an attacker and then deserialized with unsecure deserialization method decodeObjectForKey:, unexpected behavior may occur. In this way, an attacker could potentially cause a buffer overflow or trigger another vulnerability and possibly seize control of the system. Not conforming to NSSecureCoding protocol, does not guarantee absence of unsecure deserialization methods.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker manipulates the archive on transit, and replaces one of the NSString objects with an object of a different class. The received archive is deserialized. A property of type NSString* is initialized with an object of different type. Buffer overflow or other unexpected behavior occurs when the NSString selectors are called on a substituted object. For more information see section &amp;#8220;Modifications to Archived Data&amp;#8221; in &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Deserialize only objects of classes conforming to the NSSecureCoding protocol when the archive is received from an untrusted input.&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of secure deserialization.&lt;/h4&gt;&lt;pre&gt;
-
-let url = NSURL(string:"http://www.example.com")
-
-// objectContentsData represents data received from untrusted source
-let objectContentsData = NSData(contentsOfURL:url!)
-
-let decoder1 = NSKeyedUnarchiver(forReadingWithData: objectContentsData!)
-
-// CXSecureCoding conforms to NSSecureCoding protocol
-let obj1 = CXSecureCoding(coder: decoder1)
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
          Example of secure deserialization.
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -1993,10 +1979,32 @@ CXSecureCoding* obj1 = [[CXSecureCoding alloc] initWithCoder:decoder1];
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3596</key><name>URL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker can tamper with the URL and point it to an unintended server. Sensitive information may then be transmitted to the attacker's server.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of secure deserialization.&lt;/h4&gt;&lt;pre&gt;
+
+let url = NSURL(string:"http://www.example.com")
+
+// objectContentsData represents data received from untrusted source
+let objectContentsData = NSData(contentsOfURL:url!)
+
+let decoder1 = NSKeyedUnarchiver(forReadingWithData: objectContentsData!)
+
+// CXSecureCoding conforms to NSSecureCoding protocol
+let obj1 = CXSecureCoding(coder: decoder1)
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3596</key><name>URL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker can tamper with the URL and point it to an unintended server. Sensitive information may then be transmitted to the attacker's server.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application fetches data from a server that contains a username. Then a URL is constructed using this username: url = sprintf("https://%s@www.mysite.com/path",username) The attacker manipulates the network input and substitutes "www.attacker.com/?q=" in place of the username. The resulting URL looks like this: "https://www.attacker.com/?q=@www.mysite.com/path", pointing to the attacker server. The application thinks the url uses SSL/TLS and points to a trusted server, and transmits sensitive information. The attacker receives the sensitive information at his own server.&lt;br /&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; If the network input is substituted in the url after the domain name, in a path or query string, then this vulnerability does not exist.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Do not construct the url scheme, credentials, or domain name using network input. Put the network input in the query string.&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of URL construction from inputs&lt;/h4&gt;&lt;pre&gt;do {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Example of URL construction from inputs&lt;/h4&gt;&lt;pre&gt;NSURL* inputUrl = [NSURL URLWithString:@"http://www.other.com/getUser"];
+NSString* user = [NSString stringWithContentsOfURL:inputUrl encoding:NSUTF8StringEncoding error:nil];
+
+NSURL* outputUrl = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@@www.mysite.com/path",user]];
+
+NSString* secret; // Some sensitive information
+NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:outputUrl];
+[request setHTTPBody:[secret dataUsingEncoding:NSUTF8StringEncoding]];
+[NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of URL construction from inputs&lt;/h4&gt;&lt;pre&gt;do {
     let inputUrl = NSURL(string: "http://www.other.com/getUser")
     let user = try String(contentsOfURL: inputUrl!, encoding: NSUTF8StringEncoding)
     
@@ -2007,15 +2015,7 @@ CXSecureCoding* obj1 = [[CXSecureCoding alloc] initWithCoder:decoder1];
     request.HTTPBody = secret.dataUsingEncoding(NSUTF8StringEncoding)
     try NSURLConnection.sendSynchronousRequest(request, returningResponse: nil)
 }
-catch{print(error)}&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Example of URL construction from inputs&lt;/h4&gt;&lt;pre&gt;NSURL* inputUrl = [NSURL URLWithString:@"http://www.other.com/getUser"];
-NSString* user = [NSString stringWithContentsOfURL:inputUrl encoding:NSUTF8StringEncoding error:nil];
-
-NSURL* outputUrl = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@@www.mysite.com/path",user]];
-
-NSString* secret; // Some sensitive information
-NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:outputUrl];
-[request setHTTPBody:[secret dataUsingEncoding:NSUTF8StringEncoding]];
-[NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2913</key><name>Insufficient_Encryption_Key_Size</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Using weak or outdated cryptography does not provide sufficient protection for sensitive data. An attacker that gains access to the encrypted data would likely be able to break the encryption, using either cryptanalysis or brute force attacks. Thus, the attacker would be able to steal user passwords and other personal data. This could lead to user impersonation or identity theft.&amp;#160;&lt;/div&gt;      
+catch{print(error)}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2913</key><name>Insufficient_Encryption_Key_Size</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Using weak or outdated cryptography does not provide sufficient protection for sensitive data. An attacker that gains access to the encrypted data would likely be able to break the encryption, using either cryptanalysis or brute force attacks. Thus, the attacker would be able to steal user passwords and other personal data. This could lead to user impersonation or identity theft.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a weak algorithm, that is considered obselete since it is relatively easy to break. These obselete algorithms are vulnerable to several different kinds of attacks, including brute force.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
 &lt;div&gt;
@@ -2088,7 +2088,7 @@ NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:outputUrl];
 &lt;li&gt;Configure a global handler to prevent unhandled errors from leaving the application.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -2105,7 +2105,8 @@ Response.Write("Error occurred.");
 }
 
 
-      &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
 Do not reveal exception details, instead always return a static message.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -2120,7 +2121,6 @@ catch (SqlException ex)
 LogException(ex);
 Response.Write("Error occurred.");
 }
-
 
 
       &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2907</key><name>Improper_Certificate_Validation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Server certificate validation is explicitly disabled. This may be a not-removed by a debug statement. This enables the attacker to impersonate the server you are communicating with.&lt;/div&gt;      
@@ -2131,7 +2131,45 @@ Response.Write("Error occurred.");
 &lt;li&gt;If using AFNetworking, set the allowInvalidCertificates property to NO, which is the default.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (up to iOS7 inclusive). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (up to iOS7 inclusive). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
+
+/*
+ // This code disables the server certificate validation, remove after debug
+ - (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+ {
+ return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
+ }
+
+ - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+ {
+ [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+ }
+ */
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (from iOS5 and newer). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
+
+/*
+// This code disables the server certificate validation, remove after debug
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
+    {
+        [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+    }
+}
+
+*/
+
+
+&lt;/pre&gt;&lt;h4&gt;Enabling the server certificate validation in AFNetworking class:&lt;/h4&gt;&lt;pre&gt;
+
+[[AFSecurityPolicy defaultPolicy] setAllowInvalidCertificates:NO]
+
+
+
+&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (up to iOS7 inclusive). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
 
 /*
 // This code disables the server certificate validation, remove after debug
@@ -2171,44 +2209,6 @@ AFSecurityPolicy.defaultPolicy().allowInvalidCertificates = false
 
 
 
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (up to iOS7 inclusive). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
-
-/*
- // This code disables the server certificate validation, remove after debug
- - (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
- {
- return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
- }
-
- - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
- {
- [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
- }
- */
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;Enable the server certificate validation in NSURLConnection class (from iOS5 and newer). Comment out the disabling methods, as shown in the example:&lt;/h4&gt;&lt;pre&gt;
-
-/*
-// This code disables the server certificate validation, remove after debug
-- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-{
-    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
-    {
-        [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-    }
-}
-
-*/
-
-
-&lt;/pre&gt;&lt;h4&gt;Enabling the server certificate validation in AFNetworking class:&lt;/h4&gt;&lt;pre&gt;
-
-[[AFSecurityPolicy defaultPolicy] setAllowInvalidCertificates:NO]
-
-
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2184</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including data obtained from the database. Since that data may have been previously obtained from user input, and is neither checked for data type validity nor subsequently sanitized, the data could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
@@ -2223,7 +2223,30 @@ AFSecurityPolicy.defaultPolicy().allowInvalidCertificates = false
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using data obtained from a database
+      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName"); 
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The data obtained from the database is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
+{
+        public void foo(SqlConnection connection, SqlDataAdapter DA)
+        {
+                DataSet DS = new DataSet();
+                DA.Fill(ref DS, "UserName");
+                string userName = DS[0]["UserName"].ToString().Replace("'", "");
+                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
+                command.ExecuteNonQuery();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
 	public static void sql(Connection con, String sqlStm) {
 		try {
 			Statement stmt = con.createStatement();
@@ -2248,29 +2271,6 @@ AFSecurityPolicy.defaultPolicy().allowInvalidCertificates = false
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2187</key><name>Unsafe_Reflection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -2409,26 +2409,7 @@ Reflection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px soli
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 The application creates an SQL query using string obtained from the user
       &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
 {
@@ -2454,6 +2435,25 @@ class SqlInjectionFixed
                 connection.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = " + user;
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = ?";
+		PreparedStatement stmt = con.createStatement(query);
+		stmt.setString(1, user);
+		ResultSet rs = stmt.executeQuery(query);
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2197</key><name>XML_External_Entity</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Information Leak Through XML External Entity File Disclosure&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -2676,29 +2676,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
-	public static void XSSExample(TextArea name) {	
-		Label label = new Label();		
-		label.setText("Hello " + name.getText());	
-	}
-}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
-	public static void XSSExample(TextArea name) {
-		Label label = new Label();		
-		switch (name) {
-		case "Joan":
-			label.setText("Hello Joan");	
-			break;
-		case "Jim":
-			label.setText("Hello Jim");	
-			break;
-		case "James":
-			label.setText("Hello James");	
-			break;
-		default:
-			System.out.println("Wrong Input");
-		}
-	}
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
 {
         public static void foo(HttpRequest Request, HttpResponse Response)
         {
@@ -2754,6 +2732,28 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
                 
                 Response.BinaryWrite(AntiXss.HtmlEncode(filename));
         }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
+	public static void XSSExample(TextArea name) {	
+		Label label = new Label();		
+		label.setText("Hello " + name.getText());	
+	}
+}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
+	public static void XSSExample(TextArea name) {
+		Label label = new Label();		
+		switch (name) {
+		case "Joan":
+			label.setText("Hello Joan");	
+			break;
+		case "Jim":
+			label.setText("Hello Jim");	
+			break;
+		case "James":
+			label.setText("Hello James");	
+			break;
+		default:
+			System.out.println("Wrong Input");
+		}
+	}
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2188</key><name>Log_Forging</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could engineer audit logs of security-sensitive actions and lay a false audit trail, potentially implicating an innocent user or hiding an incident.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application writes audit logs upon security-sensitive actions. Since the audit log includes user input that is neither checked for data type validity nor subsequently sanitized, the input could contain false information made to look like legitimate audit log data,&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
@@ -2768,19 +2768,10 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
-
-
-print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
+NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
 
 
 &lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
@@ -2793,10 +2784,19 @@ Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
 
 
 
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
 
 
-NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+
+
+print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2908</key><name>Information_Exposure_Through_Query_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
@@ -3045,37 +3045,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt
 &lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3609</key><name>Jailbreak_Unchecked_File_Operation_Result_Code</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Data written to temporary file may become corrupted. A buffer overflow or other unintended behavior may happen when the corrupted file is read back by the application. This may allow an attacker to seize control of the system.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application writes data to a temporary file. The write operation fails in the middle. Part of the data is written to the file, and another part is lost. The application does not check the result code of the file operation, and takes no corrective actions. The application reads back the corrupted file, and a buffer overflow or other unintended behavior happens. An attacker exploits the buffer overflow to gain control of the application. For more information see section &amp;#8220;Check Result Codes&amp;#8221; in &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Check the result code of every file operation and address failures appropriately.&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of ignoring file operation result code (insecure).&lt;/h4&gt;&lt;pre&gt;
-
-
-let stringToWrite = "Hello world"
-let filePath = NSTemporaryDirectory().stringByAppendingString("/f1.txt")
-
-do {
-    try stringToWrite.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding)
-}
-catch {}
-
-
-
-&lt;/pre&gt;&lt;h4&gt;Example of checking file operation result code (secure).&lt;/h4&gt;&lt;pre&gt;
-
-
-
-let stringToWrite = "Hello world"
-let filePath = NSTemporaryDirectory().stringByAppendingString("/f1.txt")
-
-do {
-    try stringToWrite.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding)
-}
-catch let error as NSError {
-    NSException(name: "FileWriteError", reason: error.localizedFailureReason, userInfo: nil).raise()
-}
-
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 
 Example of ignoring file operation result code (insecure).
       
@@ -3111,41 +3081,40 @@ if (![stringToWrite writeToFile:filePath atomically:NO encoding:NSUTF8StringEnco
 
       
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3608</key><name>Jailbrake_File_Referenced_By_Name</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;In a jail-broken device, an attacker could manipulate the contents of a file written by the application. A buffer overflow or other unintended behavior may happen when the modified file is read back by the application. This may allow an attacker to seize control of the system.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of ignoring file operation result code (insecure).&lt;/h4&gt;&lt;pre&gt;
+
+
+let stringToWrite = "Hello world"
+let filePath = NSTemporaryDirectory().stringByAppendingString("/f1.txt")
+
+do {
+    try stringToWrite.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding)
+}
+catch {}
+
+
+
+&lt;/pre&gt;&lt;h4&gt;Example of checking file operation result code (secure).&lt;/h4&gt;&lt;pre&gt;
+
+
+
+let stringToWrite = "Hello world"
+let filePath = NSTemporaryDirectory().stringByAppendingString("/f1.txt")
+
+do {
+    try stringToWrite.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding)
+}
+catch let error as NSError {
+    NSException(name: "FileWriteError", reason: error.localizedFailureReason, userInfo: nil).raise()
+}
+
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3608</key><name>Jailbrake_File_Referenced_By_Name</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;In a jail-broken device, an attacker could manipulate the contents of a file written by the application. A buffer overflow or other unintended behavior may happen when the modified file is read back by the application. This may allow an attacker to seize control of the system.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates a temporary file. An attacker detects a file creation event, deletes the created file, and creates a new file with the same name but different permissions. The application writes to a file referencing it by name. Data is written to the file owned by the attacker without the application noticing it. The attacker steals sensitive information from the temporary file or modifies its content. The application reads back the tampered file, and a buffer overflow or other unintended behavior happens. The attacker exploits the buffer overflow to gain control of the application. For more information see section &amp;#8220;Files in Publicly Writable Directories Are Dangerous&amp;#8221; in &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Reference all files by descriptor rather than by name.&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of insecure way to reference files by name.&lt;/h4&gt;&lt;pre&gt;
-
-
-let fileName = NSTemporaryDirectory().stringByAppendingString("f1.txt")
- 
-let stringToWrite = "Hello world"
-do {
-    try stringToWrite.writeToFile(fileName, atomically: true, encoding: NSUTF8StringEncoding)
-}
-catch {print(error)}
-
-
-
-
-&lt;/pre&gt;&lt;h4&gt;Example of secure way to reference files by descriptor.&lt;/h4&gt;&lt;pre&gt;
-
-
-let fileNameTemplate = NSTemporaryDirectory().stringByAppendingString("myTmpFile-XXXXXX.txt")
-let bufLength: CFIndex = 2048
-let fileNameBuf = UnsafeMutablePointer&lt;CChar&gt;.alloc(bufLength)
-strncpy(&amp;fileNameBuf.memory, fileNameTemplate.cStringUsingEncoding(NSUTF8StringEncoding)!, bufLength)
-
-let fileDescriptor = mkstemp(fileNameBuf);
-let fileHandle = NSFileHandle(fileDescriptor: fileDescriptor)
-
-let stringToWrite = "Hello world"
-fileHandle.writeData(stringToWrite.dataUsingEncoding(NSUTF8StringEncoding)!)
-
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 
 Example of insecure way to reference files by name.
       
@@ -3184,7 +3153,38 @@ NSString* stringToWrite = @"Hello world";
 
       
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3865</key><name>Third_Party_Keyboard_Enabled</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A malicious third party keyboard may perform key-logging and transmit the logged information to an attacker&amp;#8217;s server. By default, all UITextField and UITextView objects with secureTextEntry property set to YES disallow the usage of third party keyboards. However, if secureTextEntry is set to NO, to make the characters visible for example, a third party keyboard may steal sensitive data.&lt;/div&gt;      
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of insecure way to reference files by name.&lt;/h4&gt;&lt;pre&gt;
+
+
+let fileName = NSTemporaryDirectory().stringByAppendingString("f1.txt")
+ 
+let stringToWrite = "Hello world"
+do {
+    try stringToWrite.writeToFile(fileName, atomically: true, encoding: NSUTF8StringEncoding)
+}
+catch {print(error)}
+
+
+
+
+&lt;/pre&gt;&lt;h4&gt;Example of secure way to reference files by descriptor.&lt;/h4&gt;&lt;pre&gt;
+
+
+let fileNameTemplate = NSTemporaryDirectory().stringByAppendingString("myTmpFile-XXXXXX.txt")
+let bufLength: CFIndex = 2048
+let fileNameBuf = UnsafeMutablePointer&lt;CChar&gt;.alloc(bufLength)
+strncpy(&amp;fileNameBuf.memory, fileNameTemplate.cStringUsingEncoding(NSUTF8StringEncoding)!, bufLength)
+
+let fileDescriptor = mkstemp(fileNameBuf);
+let fileHandle = NSFileHandle(fileDescriptor: fileDescriptor)
+
+let stringToWrite = "Hello world"
+fileHandle.writeData(stringToWrite.dataUsingEncoding(NSUTF8StringEncoding)!)
+
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3865</key><name>Third_Party_Keyboard_Enabled</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A malicious third party keyboard may perform key-logging and transmit the logged information to an attacker&amp;#8217;s server. By default, all UITextField and UITextView objects with secureTextEntry property set to YES disallow the usage of third party keyboards. However, if secureTextEntry is set to NO, to make the characters visible for example, a third party keyboard may steal sensitive data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The user installs a malicious third party keyboard that presents itself as legitimate. The user taps a UITextField in the application UI to enter his social security number. The UITextField has its secureTextEntry property set to NO, so that typed in characters are visible. In this case, third party keyboards are available for use. The user chooses to use the malicious keyboard. The keyboard logs the entered social security number and sends it to an attacker's server.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -3192,37 +3192,7 @@ NSString* stringToWrite = @"Hello world";
 &lt;li&gt;Disable the usage of third party keyboards entirely in your application. Note that this may degrade the user experience of your application. See example &amp;#8220;To disabling third party keyboards, add the following code to your UIApplicationDelegate&amp;#8221;.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextField as secure&lt;/h4&gt;&lt;pre&gt;
-
-
-
-
-let textField = UITextField()
-textField.secureTextEntry = true
-
-
-
-
-&lt;/pre&gt;&lt;h4&gt;To disabling third party keyboards, add the following code to your UIApplicationDelegate&lt;/h4&gt;&lt;pre&gt;
-
-
-
-
-func application(application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: String) -&gt; Bool
-{
-    
-    if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier)
-    {
-        return false
-    }
-    return true
-        
-}
-
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 
 Marking a UITextField as secure
       
@@ -3260,7 +3230,37 @@ To disabling third party keyboards, add the following code to your UIApplication
 
       
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3866</key><name>Third_Party_Keyboards_On_Sensitive_Field</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A malicious third party keyboard may perform key-logging and transmit the logged information to an attacker&amp;#8217;s server. By default, all UITextField and UITextView objects with the secureTextEntry property set to YES disallow the usage of third party keyboards. However, if secureTextEntry is set to NO, to make the characters visible for example, a third party keyboard may steal sensitive data.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextField as secure&lt;/h4&gt;&lt;pre&gt;
+
+
+
+
+let textField = UITextField()
+textField.secureTextEntry = true
+
+
+
+
+&lt;/pre&gt;&lt;h4&gt;To disabling third party keyboards, add the following code to your UIApplicationDelegate&lt;/h4&gt;&lt;pre&gt;
+
+
+
+
+func application(application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: String) -&gt; Bool
+{
+    
+    if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier)
+    {
+        return false
+    }
+    return true
+        
+}
+
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3866</key><name>Third_Party_Keyboards_On_Sensitive_Field</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A malicious third party keyboard may perform key-logging and transmit the logged information to an attacker&amp;#8217;s server. By default, all UITextField and UITextView objects with the secureTextEntry property set to YES disallow the usage of third party keyboards. However, if secureTextEntry is set to NO, to make the characters visible for example, a third party keyboard may steal sensitive data.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The user installs a malicious third party keyboard that presents itself as legitimate. The user taps a UITextField in the application UI to enter his social security number. The UITextField has its secureTextEntry property set to NO, so that typed-in characters are visible. In this case, third party keyboards are available for use. The user chooses to use the malicious keyboard. The keyboard logs the entered social security number and sends it to an attacker's server.&lt;/div&gt;
 &lt;div&gt;NOTE: The&amp;#160;secureTextEntry&amp;#160;property can also be set from XIB file, in this case the a false positive result may be reported.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -3269,18 +3269,7 @@ To disabling third party keyboards, add the following code to your UIApplication
 &lt;li&gt;Disable the usage of third party keyboards entirely in your application. Note that this may degrade the user experience of your application. See example &amp;#8220;To disabling third party keyboards, add the following code to your UIApplicationDelegate&amp;#8221;.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextField as secure&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
-textField.secureTextEntry = true&lt;/pre&gt;&lt;h4&gt;To disabling third party keyboards, add the following code to your UIApplicationDelegate&lt;/h4&gt;&lt;pre&gt;func application(application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: String) -&gt; Bool
-{
-    
-    if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier)
-    {
-        return false
-    }
-    
-    return true
-        
-}&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 
 Marking a UITextField as secure
       
@@ -3298,26 +3287,21 @@ To disabling third party keyboards, add the following code to your UIApplication
     }
 
     return YES;
+}&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextField as secure&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
+textField.secureTextEntry = true&lt;/pre&gt;&lt;h4&gt;To disabling third party keyboards, add the following code to your UIApplicationDelegate&lt;/h4&gt;&lt;pre&gt;func application(application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: String) -&gt; Bool
+{
+    
+    if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier)
+    {
+        return false
+    }
+    
+    return true
+        
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3594</key><name>NSPredicate_Injection_Via_Deserialization</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An archive of NSPredicate object that is received from untrusted input may contain a malicious predicate. This may lead to fetching unintended data from a database and revealing it.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker manipulates the archive of NSPredicate object in transit. The archive is deserialized into a new object. Without checking the new object, the allowEvaluation method is called making this object eligible for database fetching. Fetching more data than was initially intended from the database. Displaying this data to the user.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Before you enable evaluation, you should validate key paths, selectors, and more, to ensure no erroneous or malicious code will be executed. Once you&amp;#8217;ve pre-flighted the predicate, you can enable the receiver for evaluation by calling allowEvaluation (see example 1).&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;
-
-let url = NSURL(string: "http://www.example.com")
-let serializedPredicate = NSData(contentsOfURL: url!)
-let decoder = NSKeyedUnarchiver(forReadingWithData: serializedPredicate!)
-        
-let predicate = NSPredicate(coder: decoder)
-if (predicate!.predicateFormat == "name Like $NAME")
-{
-    // Report violation
-}
-else {
-predicate?.allowEvaluation()
-}
-        
-        
-        &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
          Example of sanitation after deserialization.
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -3335,7 +3319,23 @@ if (![[predicate predicateFormat] isEqualToString:@"name Like $NAME"])
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3610</key><name>Unchecked_CString_Convertion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Converted C-String length may be less than the CFString length. If the program then makes decisions based on that erroneously converted string, any number of erroneous behaviors can result.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;
+
+let url = NSURL(string: "http://www.example.com")
+let serializedPredicate = NSData(contentsOfURL: url!)
+let decoder = NSKeyedUnarchiver(forReadingWithData: serializedPredicate!)
+        
+let predicate = NSPredicate(coder: decoder)
+if (predicate!.predicateFormat == "name Like $NAME")
+{
+    // Report violation
+}
+else {
+predicate?.allowEvaluation()
+}
+        
+        
+        &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3610</key><name>Unchecked_CString_Convertion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Converted C-String length may be less than the CFString length. If the program then makes decisions based on that erroneously converted string, any number of erroneous behaviors can result.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A CFString have an explicit length and can contain null bytes at arbitrary locations in the data. A CFString with a null character in the middle is converted into C-String. The resulting C-String is evaluated. The application behaves incorrectly behavior because the resulting C string effectively ends at the first null byte. Example of a real life attack: This vulnerability occurred in many SSL stacks a few years ago. By applying for an SSL cert for a carefully crafted subdomain of a domain that you own, you could effectively create a certificate that was valid for arbitrary domains. Consider a subdomain in the form targetdomain.tld[null_byte].yourdomain.tld. Because the certificate signing request contains a Pascal string (which like CFString can contain null characters), assuming that the certificate authority interprets it correctly, the certificate authority would contact the owner of yourdomain.tld and would ask for permission to deliver the certificate. Because you own the domain, you would agree to it. You would then have a certificate that is valid for the rather odd-looking subdomain in question. When checking the certificate for validity, however, many SSL stacks incorrectly converted that Pascal string into a C string without any validity checks. When this happened, the resulting C string contained only the targetdomain.tld portion. The SSL stack then compared that truncated version with the domain the user requested, and interpreted the certificate as being valid for the targeted domain. In some cases, it was even possible to construct wildcard certificates that were valid for every possible domain in such browsers (*.com[null] .yourdomain.tld would match every .com address, for example). For more information see section &amp;#8220;Avoiding Buffer Underflows&amp;#8221; in &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -3343,43 +3343,7 @@ if (![[predicate predicateFormat] isEqualToString:@"name Like $NAME"])
 &lt;li&gt;If this is not possible, always perform length checks on the resulting C string or check for null bytes in the source data.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of converting CFString to C-String without length check (insecure).&lt;/h4&gt;&lt;pre&gt;
-
-
-
-
-var s1 = "Hello" as CFStringRef
-let buf_len: CFIndex = 10
-var buffer = UnsafeMutablePointer&lt;CChar&gt;.alloc(buf_len)
-
-CFStringGetCString(s1, buffer, buf_len, kCFStringEncodingASCII)
-
-
-
-
-
-
-
-&lt;/pre&gt;&lt;h4&gt;Example of converting CFString to C-String with length check (secure).&lt;/h4&gt;&lt;pre&gt;
-
-
-
-
-var s1 = "Hello" as CFStringRef
-let buf_len: CFIndex = 10
-var buffer = UnsafeMutablePointer&lt;CChar&gt;.alloc(buf_len)
-
-CFStringGetCString(s1, buffer, buf_len, kCFStringEncodingASCII)
-
-if (strnlen(buffer, buf_len) != CFStringGetLength(s1))
-{
-    print("Error")
-}
-
-
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 
 Example of converting CFString to C-String without length check (insecure).
       
@@ -3416,34 +3380,46 @@ if (strnlen(buffer,buf_len) != CFStringGetLength(s1))
 
       
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3593</key><name>NSPredicate_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could access other user information. Manipulating input, an attacker could fetch more data from the database that was originally intended by the application. Currently, iOS is a single user system so a local database would not contain data from other users. However, this may change in the future, and this risk may become real.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of converting CFString to C-String without length check (insecure).&lt;/h4&gt;&lt;pre&gt;
+
+
+
+
+var s1 = "Hello" as CFStringRef
+let buf_len: CFIndex = 10
+var buffer = UnsafeMutablePointer&lt;CChar&gt;.alloc(buf_len)
+
+CFStringGetCString(s1, buffer, buf_len, kCFStringEncodingASCII)
+
+
+
+
+
+
+
+&lt;/pre&gt;&lt;h4&gt;Example of converting CFString to C-String with length check (secure).&lt;/h4&gt;&lt;pre&gt;
+
+
+
+
+var s1 = "Hello" as CFStringRef
+let buf_len: CFIndex = 10
+var buffer = UnsafeMutablePointer&lt;CChar&gt;.alloc(buf_len)
+
+CFStringGetCString(s1, buffer, buf_len, kCFStringEncodingASCII)
+
+if (strnlen(buffer, buf_len) != CFStringGetLength(s1))
+{
+    print("Error")
+}
+
+
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3593</key><name>NSPredicate_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could access other user information. Manipulating input, an attacker could fetch more data from the database that was originally intended by the application. Currently, iOS is a single user system so a local database would not contain data from other users. However, this may change in the future, and this risk may become real.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker crafts a malicious input, the application uses this input to construct an NSPredicate object by using a pattern string. By virtue of input manipulation, the constructed predicate becomes always true. The predicate is intended to fetch only current user data from the database. The manipulated predicate is used to access the database; the data of all users is fetched and displayed on screen.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;1. Make the format a string literal and put all input derived data into substitution parameters, i.e. second, third, and so on arguments of the predicateWithFormat:method, see example 2.&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of vulnerable code. This vulnerability can be exploited if the input stored in name variable is: “'John') OR TRUE (“.&lt;/h4&gt;&lt;pre&gt;
-
-let url = NSURL(string: "http://www.example.com")
-var name: String?
-do {
-    name = try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)  // input
-}
-catch {print(error)}
-let predicateFormat = String(format: "(firstName == %@) AND (age &gt; %%@)", name!)
-
-let predicate = NSPredicate(format: predicateFormat, NSNumber(int: 11)) // vulnerable to NSPredicate Injection
-
-&lt;/pre&gt;&lt;h4&gt;Example of secure code using string literal for predicate format, and input derived data in substitution arguments.&lt;/h4&gt;&lt;pre&gt;
-
-let url = NSURL(string: "http://www.example.com")
-var name: String?
-do {
-    name = try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)  // input
-}
-catch {print(error)}
-
-let predicate = NSPredicate(format: "(firstName == %@) AND (age &gt; %@)", name!, NSNumber(int: 11)) // Secure. Format is a string literal, input is provided in second argument
-        
-        
-        &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
             Example of vulnerable code. This vulnerability can be exploited if the input stored in name variable is: “'John') OR TRUE (“.
         &lt;/h4&gt;&lt;pre&gt;
 
@@ -3467,7 +3443,31 @@ NSString* name = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEnco
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3843</key><name>Autocorrection_Keystroke_Logging</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the store of autocorrection exception strings that were saved by the system. If sensitive data was saved in this store, it could be leaked.&lt;/div&gt;      
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Example of vulnerable code. This vulnerability can be exploited if the input stored in name variable is: “'John') OR TRUE (“.&lt;/h4&gt;&lt;pre&gt;
+
+let url = NSURL(string: "http://www.example.com")
+var name: String?
+do {
+    name = try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)  // input
+}
+catch {print(error)}
+let predicateFormat = String(format: "(firstName == %@) AND (age &gt; %%@)", name!)
+
+let predicate = NSPredicate(format: predicateFormat, NSNumber(int: 11)) // vulnerable to NSPredicate Injection
+
+&lt;/pre&gt;&lt;h4&gt;Example of secure code using string literal for predicate format, and input derived data in substitution arguments.&lt;/h4&gt;&lt;pre&gt;
+
+let url = NSURL(string: "http://www.example.com")
+var name: String?
+do {
+    name = try String(contentsOfURL: url!, encoding: NSUTF8StringEncoding)  // input
+}
+catch {print(error)}
+
+let predicate = NSPredicate(format: "(firstName == %@) AND (age &gt; %@)", name!, NSNumber(int: 11)) // Secure. Format is a string literal, input is provided in second argument
+        
+        
+        &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_3843</key><name>Autocorrection_Keystroke_Logging</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the store of autocorrection exception strings that were saved by the system. If sensitive data was saved in this store, it could be leaked.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application presents a text input UI element to the user for sensitive data, such as a security question. The user types in the answer. The input UI element checks with the autocorrection system if the input needs correction, and presents a suggestion to the user. The user cancels the suggestion. The input string is saved in a system repository of strings that will not be corrected in the future. An attacker steals the mobile device, gets access to the autocorrection store, and steals the answer to the security question.&lt;/div&gt;
 &lt;div&gt;NOTE: The &lt;em&gt;secureTextEntry&lt;/em&gt; property can also be set from XIB file, in this case the a false positive result may be reported.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -3476,9 +3476,7 @@ NSString* name = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEnco
 &lt;li&gt;Disable the autocorrection mechanism on sensitive UI elements.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextFieldas secure:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
-textField.secureTextEntry = true&lt;/pre&gt;&lt;h4&gt;Disabling the autocorrection on UITextField input element:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
-textField.autocorrectionType = .No&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 Marking a UITextFieldas secure:
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -3498,38 +3496,15 @@ textField.autocorrectionType = UITextAutocorrectionTypeNo;
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2910</key><name>Screen_Caching</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the application screenshots that were saved by the system. If sensitive data was presented in the screenshot, it could be leaked.&lt;/div&gt;      
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Marking a UITextFieldas secure:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
+textField.secureTextEntry = true&lt;/pre&gt;&lt;h4&gt;Disabling the autocorrection on UITextField input element:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
+textField.autocorrectionType = .No&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2910</key><name>Screen_Caching</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the application screenshots that were saved by the system. If sensitive data was presented in the screenshot, it could be leaked.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application shows some sensitive data on a screen, such as a credit card numbers, using a regular UI element. The user presses the home button and sends the active application to the background. At the same moment, the system takes a screenshot of the application screen and saves the screenshot in a system folder. The screenshot is later used in an App Switcher to present open application screen previews. An attacker steals the mobile device, gets access to the screenshots folder, and steals the sensitive information.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Mark UITextView and UITextField that contain sensitive data as secure by setting the secureTextEntry property to YES.&lt;br /&gt;&lt;br /&gt;-Or-&lt;/li&gt;
 &lt;li&gt;Make the sensitive UI elements invisible just before the application moves to the background, and the screenshot is taken. To accomplish this, listen to UIApplicationDidEnterBackgroundNotification or implement an applicationDidEnterBackground: method in UIApplicationDelegate, and hide the sensitive UI element in this method.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;The example below shows how to hide a sensitive UI element just before the application goes to background:&lt;/h4&gt;&lt;pre&gt;
-
-func viewDidLoad() {
-    
-    NSNotificationCenter.defaultCenter().addObserver(self,
-        selector: "didEnterBackground:",
-        name: UIApplicationDidEnterBackgroundNotification,
-        object: nil)
-    
-    NSNotificationCenter.defaultCenter().addObserver(self,
-        selector: "didBecomeActive:",
-        name: UIApplicationDidBecomeActiveNotification,
-        object: nil)
-}
-
-
-func didEnterBackground(notification: NSNotification) {
-    self.creditCardNumberTextFieldsetHidden = true
-}
-
-func didBecomeActive(notification: NSNotification) {
-    self.creditCardNumberTextFieldsetHidden = false
-}
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 Marking a UITextField as secure:
       &lt;/h4&gt;&lt;pre&gt;
 
@@ -3572,38 +3547,39 @@ object:nil];
       &lt;Title format="text/plain"&gt;Marking a UITextField as secure:&lt;/Title&gt;
       &lt;SourceCodeExample format="text/plain"&gt;&lt;![CDATA[
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2191</key><name>Cut_And_Paste_Leakage</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the data stored in the cut and paste buffer. If sensitive data was stored in the buffer, it could be leaked.&lt;/div&gt;      
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;The example below shows how to hide a sensitive UI element just before the application goes to background:&lt;/h4&gt;&lt;pre&gt;
+
+func viewDidLoad() {
+    
+    NSNotificationCenter.defaultCenter().addObserver(self,
+        selector: "didEnterBackground:",
+        name: UIApplicationDidEnterBackgroundNotification,
+        object: nil)
+    
+    NSNotificationCenter.defaultCenter().addObserver(self,
+        selector: "didBecomeActive:",
+        name: UIApplicationDidBecomeActiveNotification,
+        object: nil)
+}
+
+
+func didEnterBackground(notification: NSNotification) {
+    self.creditCardNumberTextFieldsetHidden = true
+}
+
+func didBecomeActive(notification: NSNotification) {
+    self.creditCardNumberTextFieldsetHidden = false
+}
+
+
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2191</key><name>Cut_And_Paste_Leakage</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could get access to the data stored in the cut and paste buffer. If sensitive data was stored in the buffer, it could be leaked.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application shows some sensitive data on a screen, such as a credit card number, using a UI element that allows copying its contents to the paste buffer. The user finishes using the application, and closes it. The sensitive data remains in the paste buffer. An attacker steals the mobile device, and pastes this data into some other application, such as email.&lt;/div&gt;
 &lt;div&gt;NOTE: The&amp;#160;secureTextEntry&amp;#160;property can also be set from XIB file, in this case the a false positive result may be reported.&lt;/div&gt;
 &lt;div&gt;&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;1. Mark UITextView and UITextField that contain sensitive data as secure by setting the secureTextEntry property to YES.&lt;br /&gt;&lt;br /&gt;-Or-&lt;/div&gt;
 &lt;div&gt;2. Disable the &amp;#8220;copy&amp;#8221; action on UITextView and UITextField instances that contain sensitive data. &lt;br /&gt;&lt;br /&gt;-Or-&lt;/div&gt;
 &lt;div&gt;3. Clear the paste board buffer just before the application moves to the background. Listen to UIApplicationDidEnterBackgroundNotification or implement an applicationDidEnterBackground: method in UIApplicationDelegate, and clear the paste board using this method.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;To disable the copy action on UITextField, implement a new class inheriting from UITextFiled, and implement canPerformAction:withSender:&lt;/h4&gt;&lt;pre&gt;import UIKit
-
-class CXTextField: UITextField {
-    
-    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -&gt; Bool {
-        
-        if (sender === UIApplication.sharedApplication() &amp;&amp; (action == Selector("copy:") || action == Selector("cut:")))
-        {
-            return false
-        }
-        else {
-            return super.canPerformAction(action, withSender: sender)
-        }
-    }
-}&lt;/pre&gt;&lt;h4&gt;The example below shows how to clear the paste buffer just before the application goes to background:&lt;/h4&gt;&lt;pre&gt;func viewDidLoad()
-{
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
-}
-    
-func didEnterBackground(notification: NSNotification)
-{
-    let pasteboard = UIPasteboard.generalPasteboard()
-    pasteboard.string = ""
-}&lt;/pre&gt;&lt;h4&gt;Marking a UITextField as secure:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
-textField.secureTextEntry = true&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;
 To disable the copy action on UITextField, implement a new class inheriting from UITextFiled, and implement canPerformAction:withSender:
       &lt;/h4&gt;&lt;pre&gt;/* CXTextField.h file */
 
@@ -3651,7 +3627,31 @@ pasteboard.string = @"";
 
 Marking a UITextField as secure:
       &lt;/h4&gt;&lt;pre&gt;UITextField* textField = [[UITextField alloc] init];
-textField.secureTextEntry = YES;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4728</key><name>Universal_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A Universal XSS vulnerability enables an attacker to steal the user's password, request the user&amp;rsquo;s credit card information, provide false information, or run malware, from within the context of a secure web-application, by attacking a vulnerable browser or WebView wrapping it.&lt;/p&gt;
+textField.secureTextEntry = YES;&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;To disable the copy action on UITextField, implement a new class inheriting from UITextFiled, and implement canPerformAction:withSender:&lt;/h4&gt;&lt;pre&gt;import UIKit
+
+class CXTextField: UITextField {
+    
+    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -&gt; Bool {
+        
+        if (sender === UIApplication.sharedApplication() &amp;&amp; (action == Selector("copy:") || action == Selector("cut:")))
+        {
+            return false
+        }
+        else {
+            return super.canPerformAction(action, withSender: sender)
+        }
+    }
+}&lt;/pre&gt;&lt;h4&gt;The example below shows how to clear the paste buffer just before the application goes to background:&lt;/h4&gt;&lt;pre&gt;func viewDidLoad()
+{
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
+}
+    
+func didEnterBackground(notification: NSNotification)
+{
+    let pasteboard = UIPasteboard.generalPasteboard()
+    pasteboard.string = ""
+}&lt;/pre&gt;&lt;h4&gt;Marking a UITextField as secure:&lt;/h4&gt;&lt;pre&gt;let textField = UITextField()
+textField.secureTextEntry = true&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4728</key><name>Universal_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A Universal XSS vulnerability enables an attacker to steal the user's password, request the user&amp;rsquo;s credit card information, provide false information, or run malware, from within the context of a secure web-application, by attacking a vulnerable browser or WebView wrapping it.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An XSS (Cross-Site Scripting) vulnerability is caused by an input, supplied by a user, to be evaluated and executed as JavaScript. Unlike common XSS attacks, where the web-application is vulnerable, a Universal XSS occurs when, regardless of the current web application's own security resilience, it is the browser or webview within which the web-application is executed that suffers from an XSS vulnerability. The browser receives input from a user, which is then evaluated as JavaScript to be run within the context of the browser or WebView, and thus affecting the web-application.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div style="box-sizing: border-box; color: rgba(0, 0, 0, 0.870588); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;
 &lt;ul style="box-sizing: border-box; margin-top: 0px; margin-bottom: 10px;"&gt;
@@ -3704,7 +3704,51 @@ NSString *script = [NSString stringWithFormat:@"document.write('Hello, %@!');",i
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
+{
+        public string foo(Label lblOutput, SqlConnection connection, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar();
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The outputed string is Html encoded before it is displayed in the label
+      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
+{
+        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
+        {
+                string sql = "select email from CustomerLogin where customerNumber = @id";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", id);
+                string output = (string)cmd.ExecuteScalar()
+                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
+        }
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
 		ResultSet rs;
@@ -3730,60 +3774,12 @@ NSString *script = [NSString stringWithFormat:@"document.write('Hello, %@!');",i
 		}
 		label.setText("Mickey last names are: " + lastNames + " ");
 	}
-}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
-{
-        public string foo(Label lblOutput, SqlConnection connection, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar();
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The outputed string is Html encoded before it is displayed in the label
-      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
-{
-        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar()
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
-        }
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_4732</key><name>App_Transport_Security_Bypass</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;App Transport Security (ATS) enforces best practices in the secure connections between an app and its back end.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;ATS prevents accidental disclosures, provides secure default behavior, and is easy to adopt.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;You should adopt ATS as soon as possible, regardless of whether you're creating a new app or updating an existing one.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;ATS shouldn't be disabled in order to make sure that the application traffic is encrypted and secured.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;Use as fewer as possible domain exceptions, only if it's not possible to use a secure transport (HTTPS), otherwise it is always prefered to use HTTPS.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;This is available from iOS 10&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
-&lt;dict&gt;
-    &lt;key&gt;NSAllowsArbitraryLoadsInWebContent&lt;/key&gt;
-    &lt;true/&gt;
-&lt;/dict&gt;&lt;/pre&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;Disables ATS altogether&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;Disables ATS altogether&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
 &lt;dict&gt;
   &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;
       &lt;true/&gt;
@@ -3818,6 +3814,10 @@ The outputed string is Html encoded before it is displayed in the label
       &lt;string&gt;TLSv1.2&lt;/string&gt;
     &lt;/dict&gt;
   &lt;/dict&gt;
+&lt;/dict&gt;&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;This is available from iOS 10&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+&lt;dict&gt;
+    &lt;key&gt;NSAllowsArbitraryLoadsInWebContent&lt;/key&gt;
+    &lt;true/&gt;
 &lt;/dict&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type></rule><rule><key>checkmarx_2221</key><name>Use_of_Broken_or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application code specifies the name of the selected cryptographic algorithm, either via a String argument, a factory method, or a specific implementation class. These algorithms have fatal cryptographic weaknesses, that make it trivial to break in a reasonable timeframe. Strong algorithms should withstand attacks far beyond the realm of possible.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
