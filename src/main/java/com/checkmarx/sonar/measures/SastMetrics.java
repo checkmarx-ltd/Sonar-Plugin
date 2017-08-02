@@ -14,8 +14,6 @@ import static java.util.Arrays.asList;
  */
 public class SastMetrics implements Metrics {
 
-    //public static String CX_SAST_DOMAIN = "Checkmarx SAST Security";
-
     public static String CX_SAST_DOMAIN = CoreMetrics.DOMAIN_SECURITY;
 
     public static String SAST_BASE_KEY = "cx.sast.result";
@@ -78,6 +76,14 @@ public class SastMetrics implements Metrics {
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
+    public static final Metric<Integer> SONAR_PROJECT_HAVE_SAST_RESULTS = new Metric.Builder(SAST_BASE_KEY +".have_results", "Sonar project have sast results", Metric.ValueType.INT)
+            .setDescription("Sonar project have sast results")
+            .setQualitative(false)
+            .setHidden(true)
+            .setDomain(CX_SAST_DOMAIN)
+            .create();
+
+
     public static final Metric<String> SAST_SCAN_DETAILS = new Metric.Builder(SAST_BASE_KEY +".details", "Checkmarx sast scan details", Metric.ValueType.STRING)
             .setDescription("Additional scan details")
             .setQualitative(true)
@@ -89,6 +95,7 @@ public class SastMetrics implements Metrics {
     @Override
     public List<Metric> getMetrics() {
         return asList(SAST_HIGH_VULNERABILITIES, SAST_MEDIUM_VULNERABILITIES, SAST_LOW_VULNERABILITIES, SAST_TOTAL_VULNERABILITIES,
-                SAST_NEW_HIGH_VULNERABILITIES, SAST_NEW_MEDIUM_VULNERABILITIES, SAST_NEW_LOW_VULNERABILITIES, SAST_TOTAL_NEW_VULNERABILITIES, SAST_SCAN_DETAILS);
+                SAST_NEW_HIGH_VULNERABILITIES, SAST_NEW_MEDIUM_VULNERABILITIES, SAST_NEW_LOW_VULNERABILITIES, SAST_TOTAL_NEW_VULNERABILITIES,
+                SONAR_PROJECT_HAVE_SAST_RESULTS, SAST_SCAN_DETAILS);
     }
 }
