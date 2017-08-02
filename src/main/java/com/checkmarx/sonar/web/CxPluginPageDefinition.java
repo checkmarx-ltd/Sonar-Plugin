@@ -10,10 +10,6 @@ public class CxPluginPageDefinition implements PageDefinition {
   @Override
   public void define(Context context) {
     context
-      .addPage(Page.builder("checkmarx/global_configuration")
-              .setName("Checkmarx")
-              .setScope(Scope.GLOBAL)
-              .setAdmin(Boolean.TRUE).build())
       .addPage(Page.builder("checkmarx/project_configuration")
               .setName("Checkmarx")
               .setScope(Scope.COMPONENT)
