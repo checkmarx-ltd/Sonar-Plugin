@@ -5,6 +5,7 @@ import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 import com.checkmarx.sonar.sensor.dto.SastSeverity;
+import com.checkmarx.sonar.settings.CxProperties;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.ActiveRule;
@@ -31,12 +32,21 @@ public class SastMeasuresStageExecutor {
     private Logger logger = Loggers.get(SastMeasuresStageExecutor.class);
 
     private ActiveRules activeRules;
+    //assignment with a small number will generate zero (assignment with zero will generate 1min)
+    private Double remediationEffortPerVulnerability = 0.000000001d;
 
     private FileMetricsCounter currFileSumVulnerabilityCounter;
     private FileMetricsCounter currFileNewVulnerabilityCounter;
 
     public void execute(SensorContext context, CxReportToSonarReport cxReport){
         activeRules = context.activeRules();
+        String remediationEffortInSonarDb = context.settings().getString(CxProperties.CX_REMEDIATION_EFFORT);
+        if((remediationEffortInSonarDb != null) && !remediationEffortInSonarDb.equals("0")){
+            try {
+                remediationEffortPerVulnerability = Double.valueOf(remediationEffortInSonarDb);
+            }catch (Exception ignored)
+            {}
+        }
         collectVulnerabilitiesAndSaveToMetrics(context, cxReport);
     }
 
@@ -61,8 +71,13 @@ public class SastMeasuresStageExecutor {
                         }
 
                         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
+
+                  //  NewIssue newIssue= context.newIssue();
+
+                    //    newIssue
                         context.newIssue()
                                 .forRule(rule.ruleKey())
+                                .gap(remediationEffortPerVulnerability)
                                 .at(defaultIssueLocation.on(file)
                                 .at(file.selectLine(result.getNodeToMarkOnFile().getLine()))
                                 .message("Checkmarx Vulnerability : " + result.getQuery().getName()))

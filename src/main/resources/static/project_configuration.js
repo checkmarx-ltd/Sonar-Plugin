@@ -8,11 +8,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     var sessionId;
     var projectsIn;
     var selectedProjectInSonarDb;
+    var securityRemediationEffortInSonarDb;
 
-    var staticUrl = window.baseUrl +'/static/checkmarx';
+    var staticUrl = window.baseUrl + '/static/checkmarx';
 
     var configurationPage;
-    
+
     if (isDisplayed) {
 
         loadCssFile();
@@ -30,10 +31,13 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }).then(function (res3) {
             return getCxProjectFromSonarResponse(res3);
         }).then(function (res4) {
+            return getCxRemediationEffortFromSonarResponse(res4)
+        }).then(function (res5) {
             //Session id is no longer necessary
             cleanConnection();
+
             options.el.removeChild(spanSpinner);
-            return loadUI(res4);
+            return loadUI(res5);
         });
     }
 
@@ -45,11 +49,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         fileRef.id = "perojectConfigCss";
         fileRef.rel = "stylesheet";
         fileRef.type = "text/css";
-        fileRef.href = staticUrl+'/project_config_style.css';
+        fileRef.href = staticUrl + '/project_config_style.css';
         document.getElementsByTagName("head")[0].appendChild(fileRef)
     }
 
-    function getConnectingSpinner(){
+    function getConnectingSpinner() {
         var span = document.createElement('span');
         var h1 = document.createElement('h1');
         h1.textContent = "Connecting...";
@@ -66,12 +70,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function loadUI(response) {
         try {
-            selectedProjectInSonarDb = response.settings[0].value;
-        } catch(err){
-            selectedProjectInSonarDb = "";
+            securityRemediationEffortInSonarDb = response.settings[0].value;
+        } catch (err) {
+            securityRemediationEffortInSonarDb = 0;
         }
         return new Promise(function () {
-
             var div = document.createElement('div');
             div.className = "configurationDiv";
             div.id = "configurationDivId";
@@ -82,17 +85,18 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             createTestConnectionButton();
             creatLineSeparator();
             createProjectOptionsForm();
+            createRemediationEffort();
             createSaveButton();
         })
     }
-    
+
     /*********************Headline****************************/
 
     function createHeadline() {
         var div = document.createElement('div');
         div.className = "header";
-       var img = document.createElement('img');
-        img.src = staticUrl+'/CxIcon48x48.png';
+        var img = document.createElement('img');
+        img.src = staticUrl + '/CxIcon48x48.png';
         div.appendChild(img);
         var h1 = document.createElement('h1');
         h1.textContent = "Checkmarx Configuration";
@@ -103,36 +107,62 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
 
-    /*********************Credentials*******************/
+    /*********************Inputs*******************/
 
-    function createCredentialsForms(){
-        if(credentials != ""  && credentials != null) {
+    function createCredentialsForms() {
+        if (credentials != "" && credentials != null) {
             var credentialsJson = JSON.parse(credentials);
-            createInput('Server Url','text', 'serverUrl', credentialsJson.cxServerUrl);
-            createInput('Username','text', 'username', credentialsJson.cxUsername);
-            createInput('Password','password', 'password', credentialsJson.cxPassword);
-        }else {
-            createInput('Server Url','text', 'serverUrl', "");
+            createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
+            createInput('Username', 'text', 'username', credentialsJson.cxUsername);
+            createInput('Password', 'password', 'password', credentialsJson.cxPassword);
+        } else {
+            createInput('Server Url', 'text', 'serverUrl', "");
             createInput('Username', 'text', 'username', "");
-            createInput('Password','password', 'password', "");
+            createInput('Password', 'password', 'password', "");
         }
         createUrlDescription();
     }
 
-    function createInput(labelText,inputType, id, value) {
+    function createRemediationEffort() {
+        //todo set with saved effort
+        createRemediationEffortInput("Remediation Effort (In Minutes) Per Checkmarx Vulnerability:", 'number', 'remedEffort', securityRemediationEffortInSonarDb);
+    }
+
+    function createInput(labelText, inputType, id, value) {
         var paragraph = document.createElement("p");
-        paragraph.id = id+'P';
-        var label = createLabel(labelText);
+        paragraph.id = id + 'P';
+        var label = createLabel(labelText, id);
         paragraph.appendChild(label);
+        var input = createAnyInput(inputType, id, value);
+        var errSpan = createErrSpan(id);
+        paragraph.appendChild(input);
+        paragraph.appendChild(errSpan);
+        configurationPage.appendChild(paragraph);
+    }
+
+    function createRemediationEffortInput(labelText, inputType, id, value) {
+        var paragraph = document.createElement("p");
+        paragraph.id = id + 'P';
+        var label = createLabel(labelText, id);
+        paragraph.appendChild(label);
+        var input = createAnyInput(inputType, id, value);
+        input.min = 0;
+        input.max = 180;
+        var br = document.createElement("br");
+        var errSpan = createErrSpan(id);
+        paragraph.appendChild(input);
+        paragraph.appendChild(br);
+        paragraph.appendChild(errSpan);
+        configurationPage.appendChild(paragraph);
+    }
+
+    function createAnyInput(inputType, id, value) {
         var input = document.createElement("INPUT");
         input.name = id;
         input.type = inputType;
         input.value = value;
         input.id = id;
-        var errSpan = createErrSpan(id);
-        paragraph.appendChild(input);
-        paragraph.appendChild(errSpan);
-        configurationPage.appendChild(paragraph);
+        return input;
     }
 
     function createUrlDescription() {
@@ -142,7 +172,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         div.textContent = 'Syntax: http(s)://server-name or server-ip(:port)';
         urlParagraph.appendChild(div);
     }
-    
 
     /***************Test Connection**********************/
 
@@ -153,7 +182,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         btn.id = 'testConBtn';
         var t = document.createTextNode("Test Connection");       // Create a text node
         btn.appendChild(t);// Append the text to <button>
-        btn.onclick =  function() {testConnection()};
+        btn.onclick = function () {
+            testConnection()
+        };
         var spanSpinner = createSpan(btn.id);
         var spanErr = createErrSpan(btn.id);
         var spanSuccess = createSuccessSpan(btn.id);
@@ -187,12 +218,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             projectsIn = JSON.parse(response.projects);
             if (response.isSuccessful) {
                 createSuccessMsg('testConBtn', 'Connection Successful');
-            }else {
-                createFailureMsg('testConBtn','Connection Failed');
+            } else {
+                createFailureMsg('testConBtn', 'Connection Failed');
             }
-        } catch(err){
+        } catch (err) {
             projectsIn = "";
-            createFailureMsg('testConBtn','Connection Failed');
+            createFailureMsg('testConBtn', 'Connection Failed');
         }
         return new Promise(function () {
             //Session id is no longer necessary
@@ -234,10 +265,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }
 
         var trueSelected = getAndValidateSelectedProjectToPresent();
-        var options = '<option value=\"'+trueSelected[0]+'\">'+trueSelected[1]+'</option>';
-        for (i=0; i<projectsIn.length ; ++i){
-            if(projectsIn[i] != trueSelected[0])
-                options = options + '<option value=\"'+projectsIn[i]+'\">'+projectsIn[i]+'</option>';
+        var options = '<option value=\"' + trueSelected[0] + '\">' + trueSelected[1] + '</option>';
+        for (i = 0; i < projectsIn.length; ++i) {
+            if (projectsIn[i] != trueSelected[0])
+                options = options + '<option value=\"' + projectsIn[i] + '\">' + projectsIn[i] + '</option>';
         }
         return options;
     }
@@ -245,12 +276,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     //will return the project to be presented as selected the project option list
     function getAndValidateSelectedProjectToPresent() {
         var selectedProjectInUi = getSelectedProjectInUI();
-        if(selectedProjectInUi != "" && projectsIn.includes(selectedProjectInUi)){
+        if (selectedProjectInUi != "" && projectsIn.includes(selectedProjectInUi)) {
             return [selectedProjectInUi, selectedProjectInUi];
-        }else if(selectedProjectInSonarDb != "" && projectsIn.includes(selectedProjectInSonarDb)){
-            return [selectedProjectInSonarDb,selectedProjectInSonarDb];
-        }else{
-            return ["","- Select -"];
+        } else if (selectedProjectInSonarDb != "" && projectsIn.includes(selectedProjectInSonarDb)) {
+            return [selectedProjectInSonarDb, selectedProjectInSonarDb];
+        } else {
+            return ["", "- Select -"];
         }
     }
 
@@ -263,7 +294,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         btn.id = 'saveBtn';
         var t = document.createTextNode("Save");       // Create a text node
         btn.appendChild(t);// Append the text to <button>
-        btn.onclick =  function() {save()};
+        btn.onclick = function () {
+            save()
+        };
         var spanSpinner = createSpan(btn.id);
         var spanErr = createErrSpan(btn.id);
         var spanSuccess = createSuccessSpan(btn.id);
@@ -281,20 +314,26 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
         var credentialsToSave = getInputCredentialsAndValidateValues();
         var projectToSave = getAndValidateProjectToSave();
+        var remediationEffortToSave = getAndValidateRemediationEffortSave();
 
-        if(credentialsToSave != "" && projectToSave != "") {
+        if (credentialsToSave != "" && projectToSave != "" && remediationEffortToSave != "") {
             saveCxProject(projectToSave).then(function () {
                 selectedProjectInSonarDb = projectToSave;
                 return saveCxCredentials(credentialsToSave);
             }).then(function () {
+                securityRemediationEffortInSonarDb = remediationEffortToSave;
+                return saveCxRemediationEffort(remediationEffortToSave);
+            }).then(function () {
                 try {
-                deleteSpanSpinner('saveBtn');
-                }catch(err){}
-                createSuccessMsg('saveBtn','Save Successful')
+                    deleteSpanSpinner('saveBtn');
+                } catch (err) {
+                }
+                createSuccessMsg('saveBtn', 'Save Successful')
             }).catch(function (error) {
                 try {
                     deleteSpanSpinner('saveBtn');
-                }catch(err){}
+                } catch (err) {
+                }
                 var msg = "Save failed due to SonarQube error " + error.response.statusText;
                 createFailureMsg('saveBtn', msg);
             });
@@ -304,82 +343,84 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
 
-
-
     /*********************Create\Delete Sub Elements*****************************************************************/
 
-    function createLabel(labelText) {
+    function createLabel(labelText, id) {
         var label = document.createElement("label");
         label.textContent = labelText;
+        label.id = id + 'Label';
         return label;
     }
 
     function createSpan(id) {
         var span = document.createElement('span');
-        span.id = id+'Span';
+        span.id = id + 'Span';
         return span;
     }
 
     function createSpanSpinner(id) {
         var spinner = document.createElement('div');
         spinner.className = "spinner";
-        spinner.id = id+'Span'+'Spinner';
-        var spanId = id+'Span';
+        spinner.id = id + 'Span' + 'Spinner';
+        var spanId = id + 'Span';
         var span = document.getElementById(spanId);
         span.appendChild(spinner);
     }
 
     function deleteSpanSpinner(id) {
-        var spinnerId = id+'Span'+'Spinner';
-        var spinner= document.getElementById(spinnerId);
-        var spanId = id+'Span';
-        var span= document.getElementById(spanId);
+        var spinnerId = id + 'Span' + 'Spinner';
+        var spinner = document.getElementById(spinnerId);
+        var spanId = id + 'Span';
+        var span = document.getElementById(spanId);
         span.removeChild(spinner);
     }
 
     function createErrSpan(id) {
         var errSpan = document.createElement("span");
-        errSpan.id = id+'Err';
+        errSpan.id = id + 'Err';
         return errSpan;
     }
 
     function createSuccessSpan(id) {
         var errSpan = document.createElement("span");
-        errSpan.id = id+'Success';
+        errSpan.id = id + 'Success';
         return errSpan;
     }
 
     function eraseFailureMsg(id) {
-        var errSpan = document.getElementById(id+'Err');
+        var errSpan = document.getElementById(id + 'Err');
         errSpan.textContent = "";
     }
+
     function createFailureMsg(id, msg) {
-        var errSpan = document.getElementById(id+'Err');
+        var errSpan = document.getElementById(id + 'Err');
         errSpan.textContent = msg;
     }
 
     function eraseSuccessMsg(id) {
-        var successSpan = document.getElementById(id+'Success');
+        var successSpan = document.getElementById(id + 'Success');
         successSpan.textContent = "";
     }
 
     function createSuccessMsg(id, msg) {
-        var successSpan = document.getElementById(id+'Success');
+        var successSpan = document.getElementById(id + 'Success');
         successSpan.textContent = msg;
     }
 
     function clearButtonsAndProjectListMsgs() {
-       try{
-           //delete unnecessary spinner the user press test connection multiple times
-           deleteSpanSpinner('testConBtn');
-       }catch(err){}
+        try {
+            //delete unnecessary spinner the user press test connection multiple times
+            deleteSpanSpinner('testConBtn');
+        } catch (err) {
+        }
         eraseSuccessMsg('testConBtn');
         eraseFailureMsg('testConBtn');
 
         try {
             //delete unnecessary spinner the user press save multiple times
             deleteSpanSpinner('saveBtn');
-        }catch(err){}
+        } catch (err) {
+        }
         eraseFailureMsg('saveBtn');
         eraseSuccessMsg('saveBtn');
 
@@ -390,7 +431,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /************************Validations and Retrievals*****************************************************************/
 
     //returns empty string if credentials are not valid
-    function getInputCredentialsAndValidateValues(){
+    function getInputCredentialsAndValidateValues() {
         var server = document.getElementById('serverUrl');
         var serverValue = server.value;
         var isServerValid = validateUrl('serverUrl', serverValue);
@@ -400,38 +441,52 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var password = document.getElementById('password');
         var passwordValue = password.value;
         var isPasswordInput = validateInputHasValue('password', passwordValue);
-        if(isServerValid && isUsernameInput && isPasswordInput) {
+        if (isServerValid && isUsernameInput && isPasswordInput) {
             return parseCredentials(serverValue, usernameValue, passwordValue);
-        }else {
+        } else {
             return "";
         }
     }
 
     function validateUrl(id, inputValue) {
         var isInput = validateInputHasValue(id, inputValue);
-        if(isInput){
+        if (isInput) {
             var isUrl = isURL(inputValue);
-            if(isUrl){
+            if (isUrl) {
                 return true;
             }
-            var errSpan = document.getElementById(id+'Err');
+            var errSpan = document.getElementById(id + 'Err');
             errSpan.textContent = 'Invalid URL';
         }
         return false;
-    }
-
-    function validateInputHasValue(id, inputValue){
-        return validateInputCostumeErrMsg(id, inputValue, 'content must not be empty');
     }
 
     //returns empty String if there is no valid project to save
     function getAndValidateProjectToSave() {
         var selectedItem = getSelectedProjectInUI();
         var isValidProject = validateInputCostumeErrMsg('projectForm', selectedItem, 'Please choose a project from the list');
-        if(isValidProject){
+        if (isValidProject) {
             return selectedItem;
         }
         return "";
+    }
+
+    function getAndValidateRemediationEffortSave() {
+        var insertedValue = document.getElementById('remedEffort').value;
+        var isInputHasValue = validateInputHasValue('remedEffort', insertedValue);
+        if (isInputHasValue) {
+            var errSpan = document.getElementById('remedEffortErr');
+            if (insertedValue > 1800 || insertedValue < 0) {
+                errSpan.textContent = "Remediation effort must be between 0 to 1800 minutes";
+                return "";
+            }
+            errSpan.textContent = "";
+        }
+        return insertedValue;
+    }
+
+    function validateInputHasValue(id, inputValue){
+        return validateInputCostumeErrMsg(id, inputValue, 'content must not be empty');
     }
 
     function getSelectedProjectInUI() {
@@ -539,8 +594,21 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         return getSonarSettingResponse("checkmarx.server.project_name.secured")
     }
 
+    function getCxRemediationEffortFromSonarResponse(response) {
+        try {
+            selectedProjectInSonarDb = response.settings[0].value;
+        } catch(err){
+            selectedProjectInSonarDb = "";
+        }
+        return getCxRemediationEffortResponse()
+    }
+
     function getCxCredentialsResponse() {
         return getSonarSettingResponse("checkmarx.server.credentials.secured")
+    }
+
+    function getCxRemediationEffortResponse() {
+        return getSonarSettingResponse("checkmarx.server.remediation")
     }
 
     function getSonarSettingResponse(key) {
@@ -556,6 +624,15 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             resolved: false,
             key: "checkmarx.server.project_name.secured",
             value: cxProject,
+            component: options.component.key
+        })
+    }
+
+    function saveCxRemediationEffort(remediation) {
+        return window.SonarRequest.post('/api/settings/set', {
+            resolved: false,
+            key: "checkmarx.server.remediation",
+            value: remediation,
             component: options.component.key
         })
     }

@@ -14,6 +14,7 @@ public class CxProperties {
 
     public static final String CXPROJECT_KEY = "checkmarx.server.project_name.secured";
     public static final String CX_CREDENTIALS_KEY = "checkmarx.server.credentials.secured";
+    public static final String CX_REMEDIATION_EFFORT = "checkmarx.server.remediation";
     public static final String CX_REPORT_DATA_KEY = "checkmarx.server.report_data";
 
     public CxProperties() {
@@ -40,14 +41,23 @@ public class CxProperties {
                 .onQualifiers(Qualifiers.PROJECT)
                 .build());
 
-
-        propertyDefinitionList.add(PropertyDefinition.builder(CX_REPORT_DATA_KEY)
-                .name("cx_report_data")
-                .description("data for checkmarx report")
+        propertyDefinitionList.add(PropertyDefinition.builder(CX_REMEDIATION_EFFORT)
+                .name("cx_remediation_effort")
+                .description("remediation per checkmarx vulnerability")
                 .defaultValue("")
                 .category("checkmarx")
                 .onQualifiers(Qualifiers.PROJECT)
                 .build());
+
+
+        propertyDefinitionList.add(PropertyDefinition.builder(CX_REPORT_DATA_KEY)
+                .name("cx_report_data")
+                .description("data for checkmarx report")
+                .defaultValue("0")
+                .category("checkmarx")
+                .onQualifiers(Qualifiers.PROJECT)
+                .build());
+
 
 
         return propertyDefinitionList;
