@@ -1810,7 +1810,7 @@ public class CxXMLResults
                     @XmlElement(name = "Line")
                     protected int line;
                     @XmlElement(name = "Column")
-                    protected String column;
+                    protected int column;
                     @XmlElement(name = "NodeId")
                     protected String nodeId;
                     @XmlElement(name = "Name", required = true)
@@ -1818,7 +1818,7 @@ public class CxXMLResults
                     @XmlElement(name = "Type", required = true)
                     protected String type;
                     @XmlElement(name = "Length")
-                    protected String length;
+                    protected int length;
                     @XmlElement(name = "Snippet", required = true)
                     protected Snippet snippet;
 
@@ -1866,7 +1866,7 @@ public class CxXMLResults
                      * Gets the value of the column property.
                      * 
                      */
-                    public String getColumn() {
+                    public int getColumn() {
                         return column;
                     }
 
@@ -1874,7 +1874,7 @@ public class CxXMLResults
                      * Sets the value of the column property.
                      * 
                      */
-                    public void setColumn(String value) {
+                    public void setColumn(int value) {
                         this.column = value;
                     }
 
@@ -1946,7 +1946,7 @@ public class CxXMLResults
                      * Gets the value of the length property.
                      * 
                      */
-                    public String getLength() {
+                    public int getLength() {
                         return length;
                     }
 
@@ -1954,7 +1954,7 @@ public class CxXMLResults
                      * Sets the value of the length property.
                      * 
                      */
-                    public void setLength(String value) {
+                    public void setLength(int value) {
                         this.length = value;
                     }
 
