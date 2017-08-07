@@ -55,36 +55,47 @@ public class SastMeasuresCollector {
                             continue;
                         }
 
-                        List<NewIssueLocation> locations = new LinkedList<>();
-                        int nodeLoopStartIdx = 0;
+                        DefaultIssueLocation firstLocationInFile = null;
+                        List<NewIssueLocation> allLocationsInFile = new LinkedList<>();
 
                         List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes = result.getResultData().getPath().getPathNode();
-                        if(!CxSonarFilePathUtil.isCxPathAndSonarPathEquals(resultsNodes.get(0).getFileName(), file.absolutePath())){
-                            String msg = "Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
 
+                        //locations iteration will be from end to start because sonar inserts the list in that order
+                        int nodeLoopEndIdx = 0;
+                        int nodeLoopStartIdx = resultsNodes.size() - 1;
+
+                        //if the first node in result is not within the scanned file
+                        if(!CxSonarFilePathUtil.isCxPathAndSonarPathEquals(resultsNodes.get(0).getFileName(), file.absolutePath())){
+                            //a message stating the location of the first node
+                            String msg = "Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
+                            //find the first node that do appear in the file, create location for it, and add to it the above message
                             for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()){
                                  if(CxSonarFilePathUtil.isCxPathAndSonarPathEquals(node.getFileName(), file.absolutePath())){
-                                     DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, node);
-                                     if(defaultIssueLocation == null){
+                                     firstLocationInFile = createLocationFromPathNode(file, node);
+                                     if(firstLocationInFile == null){
                                          continue;
                                      }
-                                     nodeLoopStartIdx = resultsNodes.indexOf(node) + 1;
-                                     locations.add(defaultIssueLocation.message(msg));
+                                     firstLocationInFile.message(msg);
+                                     //set index to the node that comes after the first location
+                                     nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
                                      break;
                                  }
                              }
                         }
 
-                        int nodeLoopEndIdx = resultsNodes.size() - 1;
-                        for (int i = nodeLoopStartIdx ; i < nodeLoopEndIdx ; ++i){
+                        //iteration from end to start because sonar inserts the list in that order
+                        for (int i = nodeLoopStartIdx ; i > nodeLoopEndIdx ; --i){
                             CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
                             DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, currNode);
                             if(defaultIssueLocation == null){
                                 continue;
                             }
-                            locations.add(defaultIssueLocation);
+                            allLocationsInFile.add(defaultIssueLocation);
                         }
 
+                        if(firstLocationInFile != null) {
+                            allLocationsInFile.add(firstLocationInFile);
+                        }
                         //DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, result.getNodeToMarkOnFile());
                         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
                         context.newIssue()
@@ -93,7 +104,7 @@ public class SastMeasuresCollector {
                                 .at(defaultIssueLocation.on(file)
                                 .at(file.selectLine(result.getNodeToMarkOnFile().getLine()))
                                 .message("Checkmarx Vulnerability : " + result.getQuery().getName()))
-                                .addFlow(locations)
+                                .addFlow(allLocationsInFile)
                                 .save();
 
                         updateCurrFileVulnerabilities(result);
