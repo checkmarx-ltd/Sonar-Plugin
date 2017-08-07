@@ -30,7 +30,7 @@ public class SastMeasuresCollector {
     private Logger logger = Loggers.get(SastMeasuresCollector.class);
 
     private ActiveRules activeRules;
-    Iterable<InputFile> mainFiles;
+    private Iterable<InputFile> mainFiles;
     //assignment with a small number will generate zero (assignment with zero will generate 1min)
     private Double remediationEffortPerVulnerability = 0.000000001d;
 
