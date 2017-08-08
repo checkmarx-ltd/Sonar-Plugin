@@ -25,9 +25,9 @@ import static com.checkmarx.sonar.measures.SastMetrics.*;
  * Created by: zoharby.
  * Date: 20/06/2017.
  */
-public class SastMeasuresCollector {
+public class SastMetricsCollector {
 
-    private Logger logger = Loggers.get(SastMeasuresCollector.class);
+    private Logger logger = Loggers.get(SastMetricsCollector.class);
 
     private ActiveRules activeRules;
     private Iterable<InputFile> mainFiles;

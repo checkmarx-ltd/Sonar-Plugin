@@ -29,6 +29,9 @@ public class SastReportData {
     @JsonProperty("lowVulnerabilityQueries")
     private List<QueryData> lowVulnerabilityQueries;
 
+    @JsonProperty("viewerUri")
+    private String viewerUri;
+
     public SastReportData() {
     }
 
@@ -89,28 +92,11 @@ public class SastReportData {
         this.lowVulnerabilityQueries = lowVulnerabilityQueries;
     }
 
-    /*public void setAllQueries(Map<CxWSQueryVulnerabilityData, Integer> queriesSummery){
-        List<QueryData> high = new LinkedList<>();
-        List<QueryData> low = new LinkedList<>();
-        List<QueryData> medium = new LinkedList<>();
-        for (Object o : queriesSummery.entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            CxWSQueryVulnerabilityData currQuery = (CxWSQueryVulnerabilityData) pair.getKey();
+    public String getViewerUri() {
+        return viewerUri;
+    }
 
-            SastSeverity severity = SastSeverity.fromId(currQuery.getSeverity());
-            if(severity == null){
-                continue;
-            }
-            switch(severity){
-                case SAST_HIGH: high.add(new QueryData(currQuery.getQueryName(), currQuery.getSeverity(), (Integer) pair.getValue()));
-                    continue;
-                case SAST_MEDIUM: medium.add(new QueryData(currQuery.getQueryName(), currQuery.getSeverity(), (Integer) pair.getValue()));
-                    continue;
-                case SAST_LOW: low.add(new QueryData(currQuery.getQueryName(), currQuery.getSeverity(), (Integer) pair.getValue()));
-            }
-        }
-        setHighVulnerabilityQueries(high);
-        setMediumVulnerabilityQueries(medium);
-        setLowVulnerabilityQueries(low);
-    }*/
+    public void setViewerUri(String viewerUri) {
+        this.viewerUri = viewerUri;
+    }
 }

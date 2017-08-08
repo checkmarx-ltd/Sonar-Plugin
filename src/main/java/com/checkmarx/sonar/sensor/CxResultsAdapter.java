@@ -1,6 +1,7 @@
 package com.checkmarx.sonar.sensor;
 
 import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
+import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.*;
 
@@ -52,12 +53,14 @@ public class CxResultsAdapter {
         return new CxReportToSonarReport(resultHashMap);
     }
 
-    public static SastReportData adaptCxXmlResultsToCxDetailReport(CxXMLResults results){
+    public static SastReportData adaptCxXmlResultsToCxDetailReport(CxXMLResults results, CxFullCredentials cxFullCredentials){
         SastReportData sastReportData = new SastReportData();
         setQueryDataListsToRepoerData(sastReportData, results.getQuery());
         sastReportData.setNumOfCodeLines(results.getLinesOfCodeScanned());
         sastReportData.setNumOfFiles(results.getFilesScanned());
         setStartEndDateTime(sastReportData, results);
+        String viewerUri = cxFullCredentials.getCxServerUrl() + "/CxWebClient/ViewerMain.aspx?scanId=" + results.getScanId() + "&ProjectID=" + results.getProjectId();
+        sastReportData.setViewerUri(viewerUri);
         return sastReportData;
     }
 

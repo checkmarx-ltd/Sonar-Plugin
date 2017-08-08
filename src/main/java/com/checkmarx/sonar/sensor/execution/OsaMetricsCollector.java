@@ -24,14 +24,14 @@ import static com.checkmarx.sonar.measures.OsaMetrics.*;
  * Created by: zoharby.
  * Date: 19/06/2017.
  */
-public class OsaStageExecutor {
+public class OsaMetricsCollector {
 
     private OsaScanClient osaScanClient;
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Logger logger = Loggers.get(OsaStageExecutor.class);
+    private Logger logger = Loggers.get(OsaMetricsCollector.class);
 
-    public void execute(SensorContext context, CxFullCredentials cxFullCredentials, long projectId){
+    public void collectOsaVulnerabilitiesAndSaveToMetrics(SensorContext context, CxFullCredentials cxFullCredentials, long projectId){
         logger.info("Extracting Checkmarx Osa results.");
 
         OsaLatestScansData osaLatestScansData = null;

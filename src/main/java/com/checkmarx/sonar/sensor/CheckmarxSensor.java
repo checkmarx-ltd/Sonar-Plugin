@@ -6,7 +6,7 @@ import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
-import com.checkmarx.sonar.sensor.execution.SastMeasuresCollector;
+import com.checkmarx.sonar.sensor.execution.SastMetricsCollector;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ public class CheckmarxSensor implements Sensor {
     private static final String CANCEL_MESSAGE = "NOTE: Checkmarx scan is canceled;\n";
 
     private CxSastResultsService cxSastResultsService = new CxSastResultsService();
-    private SastMeasuresCollector sastMeasuresCollector = new SastMeasuresCollector();
+    private SastMetricsCollector sastMetricsCollector = new SastMetricsCollector();
 
     @Override
     public void describe(SensorDescriptor descriptor) {
@@ -68,10 +68,10 @@ public class CheckmarxSensor implements Sensor {
             CxXMLResults cxXMLResults = cxSastResultsService.retrieveScan(cxFullCredentials, cxProject);
             CxReportToSonarReport cxReportToSonarReport = CxResultsAdapter.adaptCxXmlResultsForSonar(cxXMLResults);
 
-            sastMeasuresCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
+            sastMetricsCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
             notifyComputeSatMeasuresSonarProjectHaveSastResults(context);
 
-            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults);
+            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxFullCredentials);
             saveSastForDetailReport(context, sastReportData);
 
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class CheckmarxSensor implements Sensor {
 
     private void saveSastForDetailReport(SensorContext context, SastReportData sastReportData) throws JsonProcessingException {
         String scanDetails = mapper.writeValueAsString(sastReportData);
-        context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue("\"" + scanDetails + "\"").save();
+        context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue(scanDetails).save();
     }
 
     private void logErrorAndNotifyContext(String massage, SensorContext context){
