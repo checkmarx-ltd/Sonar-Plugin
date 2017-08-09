@@ -1065,7 +1065,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                    ""+*/
                   ""+
                   "        <tr id=\"sast-full\" class=\"sast-full full-results-section\">"+
-               //   "                <hr class = separator>" +
+                  "                <hr class = separator>" +
                   "            <div class=\"summary-table-row cxsast-full\">"+
                   "<div class=\"title-column\">"+
                   "                    <div class=\"summary-title\">"+
@@ -1286,6 +1286,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   ""+
                   "        <\/table>"+
                   "                <\/div>"+
+                  "                <hr class = separator>" +
                   "";
 
 
