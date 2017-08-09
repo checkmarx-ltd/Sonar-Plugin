@@ -18,7 +18,7 @@ public enum CXProgrammingLanguage {
     PYTHON("Python", "py", 16384),
     RUBY("Ruby", "ruby", 1024),
     SCALA("Scala", "scala", 65536),
-    VB6("VB6", "vb6", 256),
+    VB6("VB6", "vb", 256),
     CSHARP("csharp", "cs", 1),
     VBNET("vbnet", "vbnet", 32),
     VB_SCRIPT("VbScript", "vb" ,64);
