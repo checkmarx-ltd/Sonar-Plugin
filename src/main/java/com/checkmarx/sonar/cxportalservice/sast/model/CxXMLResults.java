@@ -1246,7 +1246,7 @@ public class CxXMLResults
             @XmlAttribute(name = "AssignToUser")
             protected String assignToUser;
             @XmlAttribute(name = "state")
-            protected String state;
+            protected int state;
             @XmlAttribute(name = "Remark")
             protected String remark;
             @XmlAttribute(name = "DeepLink")
@@ -1479,7 +1479,7 @@ public class CxXMLResults
              *     {@link String }
              *     
              */
-            public String getState() {
+            public int getState() {
                 return state;
             }
 
@@ -1491,7 +1491,7 @@ public class CxXMLResults
              *     {@link String }
              *     
              */
-            public void setState(String value) {
+            public void setState(int value) {
                 this.state = value;
             }
 

@@ -17,7 +17,10 @@ import org.sonar.api.measures.Metric;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.checkmarx.sonar.measures.SastMetrics.*;
 
@@ -50,8 +53,16 @@ public class SastMetricsCollector {
                 }
 
                 for (CxResultToSonarResult result : resultsForCurrFile) {
+                        if(result.getResultData().getState() == 1){
+                            //continue if result status is "Not Exploitable"
+                            continue;
+                        }
                         ActiveRule rule = findRuleAndHandleErrors(activeRules, result.getQuery());
                         if (rule == null) {
+                            continue;
+                        }
+                        SastSeverity sastSeverity = getSastSeverity(result);
+                        if(SastSeverity.SAST_INFO.equals(sastSeverity) || sastSeverity == null){
                             continue;
                         }
 
@@ -66,6 +77,7 @@ public class SastMetricsCollector {
 
                         //if the first node in result is not within the scanned file
                         if(!CxSonarFilePathUtil.isCxPathAndSonarPathEquals(resultsNodes.get(0).getFileName(), file.absolutePath())){
+                            logger.debug("Creating highlight for the first location in file:");
                             //a message stating the location of the first node
                             String msg = "Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
                             //find the first node that do appear in the file, create location for it, and add to it the above message
@@ -83,23 +95,27 @@ public class SastMetricsCollector {
                              }
                         }
 
+                        logger.debug("Creating highlight for locations:");
                         //iteration from end to start because sonar inserts the list in that order
                         for (int i = nodeLoopStartIdx ; i > nodeLoopEndIdx ; --i){
                             CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
-                            DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, currNode);
-                            if(defaultIssueLocation == null){
-                                continue;
+                            if(CxSonarFilePathUtil.isCxPathAndSonarPathEquals(currNode.getFileName(), file.absolutePath())) {
+                                DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, currNode);
+                                if (defaultIssueLocation == null) {
+                                    continue;
+                                }
+                                allLocationsInFile.add(defaultIssueLocation);
                             }
-                            allLocationsInFile.add(defaultIssueLocation);
                         }
-
                         if(firstLocationInFile != null) {
                             allLocationsInFile.add(firstLocationInFile);
                         }
-                        //DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, result.getNodeToMarkOnFile());
+
+
                         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
                         context.newIssue()
                                 .forRule(rule.ruleKey())
+                                .overrideSeverity(sastSeverity.getSonarSeverity())
                                 .gap(remediationEffortPerVulnerability)
                                 .at(defaultIssueLocation.on(file)
                                 .at(file.selectLine(result.getNodeToMarkOnFile().getLine()))
@@ -136,6 +152,14 @@ public class SastMetricsCollector {
         return mainFiles;
     }
 
+        private SastSeverity getSastSeverity(CxResultToSonarResult result){
+            SastSeverity sastSeverity = SastSeverity.fromName(result.getResultData().getSeverity());
+            if(sastSeverity == null){
+                sastSeverity = SastSeverity.fromId(result.getQuery().getSeverityIndex());
+            }
+            return sastSeverity;
+        }
+
         private void setRemediationEffortPerVulnerability(SensorContext context){
             String remediationEffortInSonarDb = context.settings().getString(CxProperties.CX_REMEDIATION_EFFORT);
             if((remediationEffortInSonarDb != null) && !remediationEffortInSonarDb.equals("0")){
@@ -151,6 +175,7 @@ public class SastMetricsCollector {
             if(highlight == null){
                 return null;
             }
+            logger.debug("File "+ file.absolutePath() +","+ highlight.toString());
             DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
             return defaultIssueLocation.on(file)
                     .at(file.newRange(file.newPointer(highlight.getLine(), highlight.getStart()),
@@ -181,9 +206,8 @@ public class SastMetricsCollector {
             return rule;
         }
 
-
         private void updateCurrFileVulnerabilities(CxResultToSonarResult result){
-            SastSeverity severity = SastSeverity.fromId(result.getQuery().getSeverityIndex());
+            SastSeverity severity = SastSeverity.fromName(result.getResultData().getSeverity());
             if(severity == null){
                 logger.error("Result for query " + result.getQuery().getName() + " has no severity. Checkmarx result may be incomplete.");
                 return;

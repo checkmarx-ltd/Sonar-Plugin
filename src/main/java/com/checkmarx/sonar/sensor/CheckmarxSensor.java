@@ -6,6 +6,7 @@ import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
+import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
 import com.checkmarx.sonar.sensor.execution.SastMetricsCollector;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;

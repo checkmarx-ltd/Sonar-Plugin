@@ -25,7 +25,7 @@ public class CodeHighlightsUtil {
                 return new Highlight(pathNode.getLine(), pathNode.getColumn() - 1, pathNode.getColumn() + pathNode.getLength() - 1);
             }
         }catch (Exception e){
-            //todo logging
+             e.printStackTrace();
         }
         return null;
     }
@@ -53,6 +53,14 @@ public class CodeHighlightsUtil {
         public int getEnd() {
             return end;
         }
-    }
 
+        @Override
+        public String toString() {
+            return "Highlight{" +
+                    "line=" + line +
+                    ", start=" + start +
+                    ", end=" + end +
+                    '}';
+        }
+    }
 }

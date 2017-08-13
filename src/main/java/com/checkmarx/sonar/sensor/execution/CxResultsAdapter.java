@@ -1,4 +1,4 @@
-package com.checkmarx.sonar.sensor;
+package com.checkmarx.sonar.sensor.execution;
 
 import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
@@ -13,26 +13,22 @@ import java.util.*;
 /**
  * Created by: zoharby.
  * Date: 30/07/2017.
- */
+ **/
+
 public class CxResultsAdapter {
 
     private static CxLogger logger = new CxLogger(CxResultsAdapter.class);
 
+    /*
+     * Changes the hierarchy of Checkmarx results and maps it by files.
+     * The purpose of the rearrangement is to simplify the process of matching Cx results with the projects filesystem,
+     * as Sonar ScannerContext provides the filesystem.
+     */
     public static CxReportToSonarReport adaptCxXmlResultsForSonar(CxXMLResults results){
         HashMap<String, List<CxResultToSonarResult>> resultHashMap = new HashMap<>();
 
         for (CxXMLResults.Query query : results.getQuery()){
-
-            if("Info".equals(query.getSeverity())){
-                continue;
-            }
-
             for (CxXMLResults.Query.Result result : query.getResult()){
-                SastSeverity severity = SastSeverity.fromId(query.getSeverityIndex());
-                if (SastSeverity.SAST_INFO.equals(severity) || severity == null) {
-                    continue;
-                }
-
                 CxXMLResults.Query.Result.Path.PathNode markNode = retrieveNodeToMarkInResultFile(result);
 
                if(markNode != null) {
@@ -53,6 +49,11 @@ public class CxResultsAdapter {
         return new CxReportToSonarReport(resultHashMap);
     }
 
+    /**
+     * Creates dto to be saves as Json in sonar DB.
+     * The Json's contains data that needs to be presented in Checkmarx details report (at project> more> Checkmarx)
+     * but is not presented as numeric metric in the measures page.
+     */
     public static SastReportData adaptCxXmlResultsToCxDetailReport(CxXMLResults results, CxFullCredentials cxFullCredentials){
         SastReportData sastReportData = new SastReportData();
         setQueryDataListsToRepoerData(sastReportData, results.getQuery());
