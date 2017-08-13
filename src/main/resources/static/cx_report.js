@@ -159,15 +159,17 @@ window.registerExtension('checkmarx/cx_report', function (options) {
       }
 
       function setDetails(details) {
-          var parsedDetails = JSON.parse(details);
-          sastStartDate =  parsedDetails.scanStart;
-           sastEndDate = parsedDetails.scanFinish;
-           sastNumFiles = parsedDetails.numOfFiles;
-           sastLoc = parsedDetails.numOfCodeLines;
-           highCveList = parsedDetails.highVulnerabilityQueries;
-           medCveList = parsedDetails.mediumVulnerabilityQueries;
-           lowCveList = parsedDetails.lowVulnerabilityQueries;
-          sastScanResultsLink = parsedDetails.viewerUri;
+          try {
+              var parsedDetails = JSON.parse(details);
+              sastStartDate = parsedDetails.scanStart;
+              sastEndDate = parsedDetails.scanFinish;
+              sastNumFiles = parsedDetails.numOfFiles;
+              sastLoc = parsedDetails.numOfCodeLines;
+              highCveList = parsedDetails.highVulnerabilityQueries;
+              medCveList = parsedDetails.mediumVulnerabilityQueries;
+              lowCveList = parsedDetails.lowVulnerabilityQueries;
+              sastScanResultsLink = parsedDetails.viewerUri;
+          }catch (ignored){}
       }
 
 
@@ -664,7 +666,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                                        <\/g>"+
                   "                                    <\/svg>"+
                   "                                <\/div>"+
-                  "                                <div class=\"summary-link-text\">Results<\/div>"+
+                  "                                <div class=\"summary-link-text\">Analyze Results<\/div>"+
                   "                            <\/div>"+
                   "                        <\/a>"+
                   "                    <\/div>"+

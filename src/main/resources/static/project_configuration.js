@@ -124,7 +124,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function createRemediationEffort() {
-        //todo set with saved effort
         createRemediationEffortInput("Remediation Effort (In Minutes) Per Checkmarx Vulnerability:", 'number', 'remedEffort', securityRemediationEffortInSonarDb);
     }
 
@@ -328,7 +327,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                     deleteSpanSpinner('saveBtn');
                 } catch (err) {
                 }
-                createSuccessMsg('saveBtn', 'Save Successful')
+                createSuccessMsg('saveBtn', 'Saved Successfully')
             }).catch(function (error) {
                 try {
                     deleteSpanSpinner('saveBtn');
