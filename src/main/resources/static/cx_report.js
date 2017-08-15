@@ -265,8 +265,8 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                 }
                 //sast info
                 if (sastStartDate != null && sastEndDate != null) {
-                    document.getElementById("sast-full-start-date").innerHTML = formatDate(sastStartDate, "dd/mm/yy hh:mm");
-                    document.getElementById("sast-full-end-date").innerHTML = formatDate(sastEndDate, "dd/mm/yy hh:mm");
+                    document.getElementById("sast-full-start-date").innerHTML = sastStartDate;
+                    document.getElementById("sast-full-end-date").innerHTML = sastEndDate;
                 }
                 if (sastNumFiles != null) {
                     document.getElementById("sast-full-files").innerHTML = numberWithCommas(sastNumFiles);
