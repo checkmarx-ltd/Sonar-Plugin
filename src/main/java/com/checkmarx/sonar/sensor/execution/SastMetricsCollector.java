@@ -79,7 +79,7 @@ public class SastMetricsCollector {
                         if(!CxSonarFilePathUtil.isCxPathAndSonarPathEquals(resultsNodes.get(0).getFileName(), file.absolutePath())){
                             logger.debug("Creating highlight for the first location in file:");
                             //a message stating the location of the first node
-                            String msg = "Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
+                            String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
                             //find the first node that do appear in the file, create location for it, and add to it the above message
                             for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()){
                                  if(CxSonarFilePathUtil.isCxPathAndSonarPathEquals(node.getFileName(), file.absolutePath())){
@@ -87,7 +87,7 @@ public class SastMetricsCollector {
                                      if(firstLocationInFile == null){
                                          continue;
                                      }
-                                     firstLocationInFile.message(msg);
+                                     firstLocationInFile.message(node.getName() + msg);
                                      //set index to the node that comes after the first location
                                      nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
                                      break;
@@ -104,7 +104,7 @@ public class SastMetricsCollector {
                                 if (defaultIssueLocation == null) {
                                     continue;
                                 }
-                                allLocationsInFile.add(defaultIssueLocation);
+                                allLocationsInFile.add(defaultIssueLocation.message(currNode.getName()));
                             }
                         }
                         if(firstLocationInFile != null) {
