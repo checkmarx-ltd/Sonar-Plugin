@@ -10,11 +10,11 @@ import java.util.List;
  * Created by: zoharby.
  * Date: 06/08/2017.
  */
-public class CxSonarFilePathUtil {
+class CxSonarFilePathUtil {
 
     static List<CxResultToSonarResult> findResultsByFilePath(CxReportToSonarReport cxReport, String sonarFilePath){
         //adjust for cx path pattern
-        String formattedSonarFilePath = sonarFilePath.replace("\\", "/");
+        String formattedSonarFilePath = toCxFilePathFormat(sonarFilePath);
         List<CxResultToSonarResult> toRet = cxReport.getResultsMappedByFileDir().get(formattedSonarFilePath);
 
         //in a case where sonar and cx wrote the file directories from different starting point
@@ -32,7 +32,7 @@ public class CxSonarFilePathUtil {
 
    static boolean isCxPathAndSonarPathEquals(String cxFilePath, String sonarFilePath){
         //adjust for cx path pattern
-        String formattedSonarFilePath = sonarFilePath.replace("\\", "/");
+        String formattedSonarFilePath = toCxFilePathFormat(sonarFilePath);
 
         if (sonarFilePath.equals(cxFilePath)) {
             return true;
@@ -42,5 +42,8 @@ public class CxSonarFilePathUtil {
         return false;
     }
 
+    private static String toCxFilePathFormat(String sonarFilePath){
+        return sonarFilePath.replace("\\", "/");
+    }
 
 }

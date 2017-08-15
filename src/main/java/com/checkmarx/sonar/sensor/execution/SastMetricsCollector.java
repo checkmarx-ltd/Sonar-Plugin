@@ -54,7 +54,7 @@ public class SastMetricsCollector {
 
                 for (CxResultToSonarResult result : resultsForCurrFile) {
                         if(result.getResultData().getState() == 1){
-                            //continue if result status is "Not Exploitable"
+                            //continue if result state is "Not Exploitable"
                             continue;
                         }
                         ActiveRule rule = findRuleAndHandleErrors(activeRules, result.getQuery());

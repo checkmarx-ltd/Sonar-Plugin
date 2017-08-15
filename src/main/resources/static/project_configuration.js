@@ -7,6 +7,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     var isCxConnectionSuccessful;
     var sessionId;
     var projectsIn;
+    var projectListNoServerConnectionMsg = "Unable to connect to server. Make sure URL and Credentials are valid to see project list.";
     var selectedProjectInSonarDb;
     var securityRemediationEffortInSonarDb;
 
@@ -260,7 +261,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function createOptions() {
         if (isCxConnectionSuccessful == false || projectsIn == "" || projectsIn == null) {
-            return '<option value=\"">Unable to connect to server. Make sure URL and Credentials are valid to see project list.</option>';
+            return '<option value=\"">' + projectListNoServerConnectionMsg + '</option>';
         }
 
         var trueSelected = getAndValidateSelectedProjectToPresent();
@@ -432,10 +433,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     //returns empty string if credentials are not valid
     function getInputCredentialsAndValidateValues() {
         var server = document.getElementById('serverUrl');
-        var serverValue = server.value;
+        var serverValue = server.value.trim();
         var isServerValid = validateUrl('serverUrl', serverValue);
         var username = document.getElementById('username');
-        var usernameValue = username.value;
+        var usernameValue = username.value.trim();
         var isUsernameInput = validateInputHasValue('username', usernameValue);
         var password = document.getElementById('password');
         var passwordValue = password.value;
@@ -462,6 +463,16 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     //returns empty String if there is no valid project to save
     function getAndValidateProjectToSave() {
+        try{
+            var projectSelect  = document.getElementById('projectSelect');
+            var selectedIdx = projectSelect.selectedIndex;
+            var content = projectSelect.options[selectedIdx].textContent;
+            if(content == projectListNoServerConnectionMsg){
+                validateInputCostumeErrMsg('projectForm', "", 'Please Connect to Checkmarx server');
+                return "";
+            }
+        }catch (ignored){}
+
         var selectedItem = getSelectedProjectInUI();
         var isValidProject = validateInputCostumeErrMsg('projectForm', selectedItem, 'Please choose a project from the list');
         if (isValidProject) {
