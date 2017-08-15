@@ -39,7 +39,7 @@ public class CheckmarxSensor implements Sensor {
 
     @Override
     public void describe(SensorDescriptor descriptor) {
-        descriptor.name("Compute size of file names");
+        descriptor.name("Import Checkmarx scan results to SonarQube");
     }
 
     @Override
