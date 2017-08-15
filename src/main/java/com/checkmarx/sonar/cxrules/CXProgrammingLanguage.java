@@ -16,8 +16,6 @@ public enum CXProgrammingLanguage {
     PHP("PHP", "php", 512),
     PLSQL("PLSQL", "plsql", 8192),
     PYTHON("Python", "py", 16384),
-    RUBY("Ruby", "ruby", 1024),
-    SCALA("Scala", "scala", 65536),
     VB6("VB6", "vb", 256),
     CSHARP("csharp", "cs", 1),
     VBNET("vbnet", "vbnet", 32),
