@@ -76,16 +76,16 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
             CxWSReportStatusResponse cxWSReportStatusResponse = webServiceSoap.getScanReportStatus(sessionId, reportId);
 
             if (cxWSReportStatusResponse == null) {
-                String message = "Error retrieving scan report status: Web method getScanReportStatus returned null";
+                String message = "Error retrieving scan report, status: Web method getScanReportStatus returned null";
                 logger.error(message);
-               ++failed;
+                ++failed;
                 if(failed > 3) {
                    throw new ConnectionException(message);
                }
             }else {
 
                 if (!cxWSReportStatusResponse.isIsSuccesfull()) {
-                    String message = "Error retrieving scan report status: " + cxWSReportStatusResponse.getErrorMessage();
+                    String message = "Error retrieving scan report, status: " + cxWSReportStatusResponse.getErrorMessage();
                     logger.error(message);
                     ++failed;
                     if (failed > 3) {
@@ -94,8 +94,7 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
                 }
 
                 if (cxWSReportStatusResponse.isIsFailed()) {
-                    String message = "Failed to create scan report";
-                    logger.error("Web method getScanReportStatus returned status response with isFailed field set to true");
+                    String message = "Failed to create scan report: Web method getScanReportStatus has failed.";
                     logger.error(message);
                     if (failed > 3) {
                         throw new ConnectionException(message);
