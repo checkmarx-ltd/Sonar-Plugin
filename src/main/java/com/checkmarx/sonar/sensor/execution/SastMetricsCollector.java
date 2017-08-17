@@ -192,7 +192,7 @@ public class SastMetricsCollector {
             if(highlight == null){
                 return null;
             }
-            logger.debug("File "+ file.absolutePath() +","+ highlight.toString());
+            logger.debug("File "+ file.absolutePath() +", "+ highlight.toString());
             DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
 
            if(highlight.getStart() == -1){
