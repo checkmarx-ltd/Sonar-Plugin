@@ -6,7 +6,7 @@ import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
  * Created by: zoharby.
  * Date: 06/08/2017.
  */
-public class CodeHighlightsUtil {
+class CodeHighlightsUtil {
 
     static Highlight getHighlightForPathNode(CxXMLResults.Query.Result.Path.PathNode pathNode){
         try {
@@ -22,6 +22,9 @@ public class CodeHighlightsUtil {
                     return new Highlight(pathNode.getLine(), lineText.indexOf(pathNode.getName(), pathNode.getColumn()), lineText.indexOf(pathNode.getName(), pathNode.getColumn()) + pathNode.getName().length());
                 }
             } else {
+                if(pathNode.getLength() == 0){
+                    return new Highlight(pathNode.getLine(), -1 , -1);
+                }
                 return new Highlight(pathNode.getLine(), pathNode.getColumn() - 1, pathNode.getColumn() + pathNode.getLength() - 1);
             }
         }catch (Exception e){
@@ -36,7 +39,7 @@ public class CodeHighlightsUtil {
         private int start;
         private int end;
 
-        public Highlight(int line, int start, int end) {
+        Highlight(int line, int start, int end) {
             this.line = line;
             this.start = start;
             this.end = end;
