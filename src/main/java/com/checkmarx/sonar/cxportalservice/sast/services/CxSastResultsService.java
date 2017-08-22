@@ -204,21 +204,21 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         }
         List<ProjectScannedDisplayData> projects = Arrays.asList(webServiceSoap.getProjectScannedDisplayData(sessionId).getProjectScannedList().getProjectScannedDisplayData());
 
-        ProjectScannedDisplayData project = null;
+        ProjectScannedDisplayData projectDisplayData = null;
         for (ProjectScannedDisplayData p : projects) {
             if (p.getProjectID() == projectId) {
-                project = p;
+                projectDisplayData = p;
                 break;
             }
         }
 
-        if (project == null) {
+        if (projectDisplayData == null) {
             String message = "Project \"" + projectName + "\" was not found on Checkmarx server. This may be because the project contains no scans.";
             logger.warn(message);
             throw new ConnectionException(message);
         }
 
-        return project;
+        return projectDisplayData;
     }
 
     private CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {

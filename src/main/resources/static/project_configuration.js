@@ -321,7 +321,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 selectedProjectInSonarDb = projectToSave;
                 return saveCxCredentials(credentialsToSave);
             }).then(function () {
-                securityRemediationEffortInSonarDb = remediationEffortToSave;
+                securityRemediationEffortInSonarDb = remediationEffortToSave.trim();
                 return saveCxRemediationEffort(remediationEffortToSave);
             }).then(function () {
                 try {
@@ -483,7 +483,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function getAndValidateRemediationEffortSave() {
         var insertedValue = document.getElementById('remedEffort').value;
-        var isInputHasValue = validateInputHasValue('remedEffort', insertedValue);
+        var isInputHasValue = validateInputCostumeErrMsg('remedEffort', insertedValue, 'Content must be a number between 0 to 1800');
         if (isInputHasValue) {
             var errSpan = document.getElementById('remedEffortErr');
             if (insertedValue > 1800 || insertedValue < 0) {

@@ -50,7 +50,8 @@ public class CheckmarxSensor implements Sensor {
         String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
         String cxProject = context.settings().getString(CxProperties.CXPROJECT_KEY);
         if (cxCredentialsJson == null || cxProject == null) {
-            logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while retrieving Checkmarx settings from sonar Database.\n", context);
+            logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while retrieving Checkmarx settings from sonar Database.\n" + "" +
+                                                                        "Please make sure Checkmarx credentials are configured.", context);
             return;
         }
         if ("".equals(cxCredentialsJson) || "".equals(cxProject)) {
@@ -74,7 +75,7 @@ public class CheckmarxSensor implements Sensor {
 
             SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxFullCredentials);
             saveSastForDetailReport(context, sastReportData);
-
+            logger.info("Sast results retrieval finished.");
         } catch (Exception e) {
             logger.error("---------------------------------------------------------------------------------------\n");
             logger.error("Sast results retrieval failed due to exception: "+e.getMessage() + "\n");
