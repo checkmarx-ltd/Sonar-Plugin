@@ -2,6 +2,7 @@ package com.checkmarx.sonar.sensor.execution;
 
 import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
+import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 import com.checkmarx.sonar.sensor.dto.SastSeverity;
@@ -14,12 +15,9 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
 import org.sonar.api.measures.Metric;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.checkmarx.sonar.measures.SastMetrics.*;
@@ -30,7 +28,7 @@ import static com.checkmarx.sonar.measures.SastMetrics.*;
  */
 public class SastMetricsCollector {
 
-    private Logger logger = Loggers.get(SastMetricsCollector.class);
+    private CxLogger logger = new CxLogger(SastMetricsCollector.class);
 
     private ActiveRules activeRules;
     private Iterable<InputFile> mainFiles;
@@ -45,6 +43,7 @@ public class SastMetricsCollector {
         for (InputFile file : mainFiles) {
             currFileSumVulnerabilityCounter = new FileMetricsCounter();
             currFileNewVulnerabilityCounter = new FileMetricsCounter();
+            FileIssueLocationsCreator fileLocationsCreator = new FileIssueLocationsCreator(file);
 
             if (!file.isEmpty() && file.isFile()) {
                 List<CxResultToSonarResult> resultsForCurrFile = CxSonarFilePathUtil.findResultsByFilePath(cxReport, file.absolutePath());
@@ -57,104 +56,25 @@ public class SastMetricsCollector {
                             //continue if result state is "Not Exploitable"
                             continue;
                         }
+
                         ActiveRule rule = findRuleAndHandleErrors(activeRules, result.getQuery());
                         if (rule == null) {
                             continue;
                         }
+
                         SastSeverity sastSeverity = getSastSeverity(result);
                         if(SastSeverity.SAST_INFO.equals(sastSeverity) || sastSeverity == null){
                             continue;
                         }
 
-                        DefaultIssueLocation firstLocationInFile = null;
-                        List<NewIssueLocation> allLocationsInFile = new LinkedList<>();
-
-                        try {
-                            List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes = result.getResultData().getPath().getPathNode();
-
-                            //locations iteration will be from end to start because sonar inserts the list in that order
-                            int nodeLoopEndIdx = 0;
-                            int nodeLoopStartIdx = resultsNodes.size() - 1;
-
-                            //if the first node in result is not within the scanned file
-                            if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(0).getFileName(), file.absolutePath())) {
-                                logger.debug("Creating highlight for the first location in file:");
-                                //a message stating the location of the first node
-                                String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
-                                //find the first node that do appear in the file, create location for it, and add to it the above message
-                                for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()) {
-                                    if (CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(node.getFileName(), file.absolutePath())) {
-                                        firstLocationInFile = createLocationFromPathNode(file, node);
-                                        if (firstLocationInFile == null) {
-                                            continue;
-                                        }
-                                        //set index to the node that comes after the first location
-                                        nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
-
-                                        if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopEndIdx).getFileName(), file.absolutePath())) {
-                                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + " ; file: " +
-                                                    resultsNodes.get(nodeLoopEndIdx).getFileName() + " line: " + resultsNodes.get(nodeLoopEndIdx).getLine();
-                                            ++nodeLoopEndIdx;
-                                        }
-                                        firstLocationInFile.message(node.getName() + msg);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            logger.debug("Creating highlight for locations:");
-                            //set isPrevInFile as true to stay within legal index in resultsNodes
-                            boolean isPrevNodeInFile = true;
-                            boolean isCurrNodeInFile = CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopStartIdx).getFileName(), file.absolutePath());
-                            boolean isNextNodeInFile;
-                            //iteration from end to start because sonar inserts the list in that order
-                            for (int i = nodeLoopStartIdx; i >= nodeLoopEndIdx; --i) {
-                                //set isNextNodeInFile as true in last node to stay within legal index in resultsNodes
-                                isNextNodeInFile = i <= 0 || CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(i - 1).getFileName(), file.absolutePath());
-                                CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
-                                if (isCurrNodeInFile) {
-                                    DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(file, currNode);
-                                    if (defaultIssueLocation == null) {
-                                        isCurrNodeInFile = isNextNodeInFile;
-                                        continue;
-                                    }
-                                    //next and prev in messages are to be opposites to next and prev in loop booleans(because iteration is end to start)
-                                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + " ; file: " +
-                                            resultsNodes.get(i - 1).getFileName() + " line: " + resultsNodes.get(i - 1).getLine();
-                                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + " ; file: " +
-                                            resultsNodes.get(i + 1).getFileName() + " line: " + resultsNodes.get(i + 1).getLine();
-                                    String msg = currNode.getName() + msgPrev + msgNext;
-                                    allLocationsInFile.add(defaultIssueLocation.message(msg));
-
-                                    isPrevNodeInFile = true;
-                                } else {
-                                    isPrevNodeInFile = false;
-                                }
-                                isCurrNodeInFile = isNextNodeInFile;
-                            }
-
-                            if (firstLocationInFile != null) {
-                                allLocationsInFile.add(firstLocationInFile);
-                            }
-
-                        }catch (Exception e){
-                            logger.warn("Could not hightlight locations for vulnerability: "+ result.getQuery().getName() + " on file: "+file.absolutePath());
-                            logger.warn("due to exception: " + e.getMessage());
-                        }
-
-                        CodeHighlightsUtil.Highlight highlightLine = CodeHighlightsUtil.getHighlightForPathNode(file, result.getNodeToMarkOnFile());
-                        if(highlightLine == null){
-                            highlightLine = new CodeHighlightsUtil.Highlight(1, -1, -1);
-                        }
-                        DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
+                        List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
+                        DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
                         context.newIssue()
                                 .forRule(rule.ruleKey())
                                 .overrideSeverity(sastSeverity.getSonarSeverity())
                                 .gap(remediationEffortPerVulnerability)
-                                .at(defaultIssueLocation.on(file)
-                                .at(file.selectLine(highlightLine.getLine()))
-                                .message("Checkmarx Vulnerability : " + result.getQuery().getName()))
-                                .addFlow(allLocationsInFile)
+                                .at(issueLocation)
+                                .addFlow(flowLocationsInFile)
                                 .save();
 
                         updateCurrFileVulnerabilities(result);
@@ -194,6 +114,7 @@ public class SastMetricsCollector {
             return sastSeverity;
         }
 
+
         private void setRemediationEffortPerVulnerability(SensorContext context){
             String remediationEffortInSonarDb = context.settings().getString(CxProperties.CX_REMEDIATION_EFFORT);
             if((remediationEffortInSonarDb != null) && !remediationEffortInSonarDb.equals("0")){
@@ -204,25 +125,6 @@ public class SastMetricsCollector {
             }
         }
 
-        private DefaultIssueLocation createLocationFromPathNode(InputFile file, CxXMLResults.Query.Result.Path.PathNode node){
-            CodeHighlightsUtil.Highlight highlight = CodeHighlightsUtil.getHighlightForPathNode(file, node);
-            if(highlight == null){
-                return null;
-            }
-            logger.debug("File "+ file.absolutePath() +", "+ highlight.toString());
-            DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
-
-           if(highlight.getStart() == -1){
-               if(highlight.getLine() <= 1){
-                   return defaultIssueLocation.on(file);
-               }
-               return defaultIssueLocation.on(file)
-                       .at(file.selectLine(highlight.getLine()));
-           }
-            return defaultIssueLocation.on(file)
-                    .at(file.newRange(file.newPointer(highlight.getLine(), highlight.getStart()),
-                            file.newPointer(highlight.getLine(), highlight.getEnd())));
-        }
 
         private ActiveRule findRuleAndHandleErrors(ActiveRules activeRules, CxXMLResults.Query query){
             CXProgrammingLanguage language = CXProgrammingLanguage.fromLanguageName(query.getLanguage());
