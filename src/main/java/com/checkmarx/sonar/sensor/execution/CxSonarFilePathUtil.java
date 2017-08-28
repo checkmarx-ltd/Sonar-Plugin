@@ -55,6 +55,7 @@ class CxSonarFilePathUtil {
     private static boolean isUnequalLengthPathsRepresentsTheSamePath(String pathA, String pathB){
         String longPath;
         String shortPath;
+        //todo equal length query here (demands less explanation)
         if(pathA.length() > pathB.length()){
             longPath = pathA;
             shortPath = pathB;

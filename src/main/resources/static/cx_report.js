@@ -3,19 +3,11 @@ window.registerExtension('checkmarx/cx_report', function (options) {
   // let's create a flag telling if the static is still displayed
   var isDisplayed = true;
   var staticUrl = window.baseUrl +'/static/checkmarx';
+    var spanSpinner;
 
-  //-------------------------- sast vars --------------------------------------
-
-  var sastResultsReady = true;
-
-  //thresholds
-  var thresholdsEnabled = false;
-  //links
+    //-------------------------- sast vars --------------------------------------
 
   var sastScanResultsLink;
-
-  //AsyncMode
-
 
   //counts
   var highCount;
@@ -48,21 +40,17 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
   //full report info
   var sastStartDate;
-  var sastScanTime;
-
   var sastEndDate;// calculateEndDate(sastStartDate, sastScanTime);
   var sastNumFiles = 10;
   var sastLoc;
 
-  //lists
-  var queryList;
+    //for extracting query web requests (run repressively)
+    var queryPagesCounter = 0;
 
-  var isSastFullReady = true;
-
-
-  var highCveList;
-  var medCveList;
-  var lowCveList;
+    //query lists
+  var highCveList = [];
+  var medCveList = [];
+  var lowCveList = [];
 
 
   //-------------- osa ------------------
@@ -82,8 +70,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
   var osaNumFiles;
 */
   //cve lists
- /* var hardcodedCve = getHrdcodeCves();
-  var osaHighCveList = hardcodedCve.High;
+  /*var osaHighCveList = hardcodedCve.High;
   var osaMedCveList = hardcodedCve.Medium;
   var osaLowCveList = hardcodedCve.Low;*/
 
@@ -102,12 +89,10 @@ window.registerExtension('checkmarx/cx_report', function (options) {
       loadCssFile();
       //clear page in case where the page was loaded, redirected and then redirected back
       options.el.textContent = '';
-        initSastVulnerabilitiesAndReturnDetails().then(function () {
-            return new Promise(function () {
-                getHtml();
-                parseAndInsertVarToHtml();
-            })
-        });
+      spanSpinner = getConnectingSpinner();
+      options.el.appendChild(spanSpinner);
+
+      initDataAndLoadUi();
   }
 
   function loadCssFile() {
@@ -119,13 +104,21 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     document.getElementsByTagName("head")[0].appendChild(fileRef)
   }
 
-  /*function initVars() {
-    initSastVulnerabilitiesAndReturnDetails();
-    //initOsaVulnerabilities();
-  }*/
 
+    function getConnectingSpinner() {
+        var span = document.createElement('span');
+        var h1 = document.createElement('h1');
+        h1.textContent = "Loading...";
+        h1.id = "h1Loading";
+        span.appendChild(h1);
+        var spinner = document.createElement('div');
+        spinner.className = "spinner";
+        spinner.id = "loadingReportSpinner";
+        span.appendChild(spinner);
+        return span;
+    }
 
-  function initSastVulnerabilitiesAndReturnDetails() {
+  function initDataAndLoadUi() {
            return metricRequest('cx.sast.result.high').then(function (responseHigh) {
                highCount = getValue(responseHigh);
                return metricRequest('cx.sast.result.medium')
@@ -138,50 +131,100 @@ window.registerExtension('checkmarx/cx_report', function (options) {
            }).then(function (responseDetails) {
                var details = getValue(responseDetails);
                setDetails(details);
+           }).then(function () {
+               queryPagesCounter = 0;
+               return getQueriesRecursivelyAndLoadUiWhenDone();
            });
   }
 
-      function metricRequest(metricKey) {
+        function metricRequest(metricKey) {
             return window.SonarRequest.getJSON('/api/measures/component', {
-                  resolved: false,
-                  componentKey: options.component.key,
-                  metricKeys: metricKey
-      })}
+                resolved: false,
+                componentKey: options.component.key,
+                metricKeys: metricKey
+            })}
 
-      function getValue(response) {
-          try{
-              var component = response.component;
-              var measures = component.measures[0];
-              return measures.value;
-          }catch (e){
-              return null;
-          }
-      }
+        function getValue(response) {
+            try{
+                var component = response.component;
+                var measures = component.measures[0];
+                return measures.value;
+            }catch (e){
+                return null;
+            }
+        }
 
-      function setDetails(details) {
-          try {
-              var parsedDetails = JSON.parse(details);
-              sastStartDate = parsedDetails.scanStart;
-              sastEndDate = parsedDetails.scanFinish;
-              sastNumFiles = parsedDetails.numOfFiles;
-              sastLoc = parsedDetails.numOfCodeLines;
-              highCveList = parsedDetails.highVulnerabilityQueries;
-              medCveList = parsedDetails.mediumVulnerabilityQueries;
-              lowCveList = parsedDetails.lowVulnerabilityQueries;
-              sastScanResultsLink = parsedDetails.viewerUri;
-          }catch (ignored){}
-      }
+        function setDetails(details) {
+            try {
+                var parsedDetails = JSON.parse(details);
+                sastStartDate = parsedDetails.scanStart;
+                sastEndDate = parsedDetails.scanFinish;
+                sastNumFiles = parsedDetails.numOfFiles;
+                sastLoc = parsedDetails.numOfCodeLines;
+                sastScanResultsLink = parsedDetails.viewerUri;
+            }catch (ignored){}
+        }
 
+        //using recursion (and not a loop) due to promises malfunctions on sonar pages
+        function getQueriesRecursivelyAndLoadUiWhenDone(){
+            ++queryPagesCounter;
+            componentTreeRequest(queryPagesCounter).then(function (response) {
+                var iii = response.components;
+                if (iii == undefined || iii.length == 0) {
+                    //for timely execution this code needs to be here
+                    return new Promise(function () {
+                        options.el.removeChild(spanSpinner);
+                        getHtml();
+                        parseAndInsertVarToHtml();
+                    })
+                } else {
+                    iii.forEach(function (element) {
+                        var par = element.measures;
+                        if (par.length > 0) {
+                            var effectivePartOfElement = par[0].value;
+                            var queriesJson = JSON.parse(effectivePartOfElement);
+                            addQueriesToSummery(queriesJson);
+                        }
+                    });
+                }
+                     getQueriesRecursivelyAndLoadUiWhenDone();
+                });
+        }
 
-  /*function initOsaVulnerabilities() {
-      osaHighCount = 5;
-      osaMedCount = 6;
-      osaLowCount = 7;
+        function componentTreeRequest(pageIdx) {
+            return window.SonarRequest.getJSON('/api/measures/component_tree', {
+                resolved: false,
+                baseComponentKey: options.component.key,
+                metricKeys: 'cx.sast.result.queries',
+                qualifier: 'FIL',
+                ps : 500,
+                pageIndex: pageIdx
+            })}
 
-      osaLibraries = 90;
-      okLibraries = 10;
-  }*/
+        function addQueriesToSummery(queriesJson) {
+            if(queriesJson.highVulnerabilityQueries.length > 0){
+                addQueriesToArray(queriesJson.highVulnerabilityQueries, highCveList);
+            }
+            if(queriesJson.mediumVulnerabilityQuries.length > 0){
+                addQueriesToArray(queriesJson.mediumVulnerabilityQuries, medCveList);
+            }
+            if(queriesJson.lowVulnerabilityQueries.length > 0){
+                addQueriesToArray(queriesJson.lowVulnerabilityQueries, lowCveList);
+            }
+        }
 
+        function addQueriesToArray(queries, array) {
+            queries.forEach(function (element) {
+                //javascript hashes automatically
+                var query = array[element.name];
+                if(query == undefined){
+                    array[element.name] = element;
+                }else {
+                   query.numberOfOccurrences = query.numberOfOccurrences + element.numberOfOccurrences;
+                    array[element.name] = query;
+                }
+            });
+        }
 
 
   /******************************************************************************************************************************************/
@@ -412,19 +455,19 @@ window.registerExtension('checkmarx/cx_report', function (options) {
         switch (severity) {
           case SEVERITY.HIGH:
             severityCount = highCount;
-            severityCveList = highCveList;
+            severityCveList = hashedObjArrayToJsonArray(highCveList);
             tableElementId = "sast-cve-table-high";
             break;
 
           case SEVERITY.MED:
             severityCount = medCount;
-            severityCveList = medCveList;
+            severityCveList = hashedObjArrayToJsonArray(medCveList);
             tableElementId = "sast-cve-table-med";
             break;
 
           case SEVERITY.LOW:
             severityCount = lowCount;
-            severityCveList = lowCveList;
+            severityCveList = hashedObjArrayToJsonArray(lowCveList);
             tableElementId = "sast-cve-table-low";
             break;
         }
@@ -454,6 +497,15 @@ window.registerExtension('checkmarx/cx_report', function (options) {
           row.insertCell(1).innerHTML = query.numberOfOccurrences;
         });
       }
+
+        function hashedObjArrayToJsonArray(objects) {
+            var toRet = [];
+            for (var key in objects) {
+                if (objects.hasOwnProperty(key))
+                    toRet.push(objects[key]);
+            }
+            return toRet;
+        }
 
       function addZero(i) {
         if (i < 10) {
@@ -567,18 +619,6 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
       function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
-
-      //query lists
-      function generateQueryList(severity) {
-        var severityQueryList = {};
-        //loop through queries and push the relevant query - by severity - to the new list (lookup table)
-        for (var i = 0; i < queryList.length; i++) {
-          if (queryList[i].severity.toLowerCase() == severity.name) {
-            severityQueryList[queryList[i].name] = queryList[i].resultLength ? queryList[i].resultLength : 1;
-          }
-        }
-        return severityQueryList;
       }
 
       //osa list

@@ -5,8 +5,11 @@ import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
+import com.checkmarx.sonar.sensor.dto.FileQueries;
 import com.checkmarx.sonar.sensor.dto.SastSeverity;
 import com.checkmarx.sonar.settings.CxProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.ActiveRule;
@@ -26,9 +29,10 @@ import static com.checkmarx.sonar.measures.SastMetrics.*;
  * Created by: zoharby.
  * Date: 20/06/2017.
  */
-public class SastMetricsCollector {
+public class SastResultsCollector {
 
-    private CxLogger logger = new CxLogger(SastMetricsCollector.class);
+    private CxLogger logger = new CxLogger(SastResultsCollector.class);
+    private ObjectMapper mapper = new ObjectMapper();
 
     private ActiveRules activeRules;
     private Iterable<InputFile> mainFiles;
@@ -37,12 +41,15 @@ public class SastMetricsCollector {
 
     private FileMetricsCounter currFileSumVulnerabilityCounter;
     private FileMetricsCounter currFileNewVulnerabilityCounter;
+    private FileQueriesCollector currFileQueriesCollector;
 
     public void collectVulnerabilitiesAndSaveToMetrics(SensorContext context, CxReportToSonarReport cxReport) {
         init(context);
         for (InputFile file : mainFiles) {
             currFileSumVulnerabilityCounter = new FileMetricsCounter();
             currFileNewVulnerabilityCounter = new FileMetricsCounter();
+            currFileQueriesCollector = new FileQueriesCollector();
+
             FileIssueLocationsCreator fileLocationsCreator = new FileIssueLocationsCreator(file);
 
             if (!file.isEmpty() && file.isFile()) {
@@ -78,9 +85,11 @@ public class SastMetricsCollector {
                                 .save();
 
                         updateCurrFileVulnerabilities(result);
+                        updateQueryToCurrFile(result);
                     }//result loop
                 }//if !file.isEmpty() && file.isFile())
                 saveCxCustomMetrics(context, file);
+                saveCxQueriesMeasure(context, file);
             }//files loop
         }
 
@@ -150,6 +159,24 @@ public class SastMetricsCollector {
             return rule;
         }
 
+        private void updateQueryToCurrFile(CxResultToSonarResult nonIssueResult){
+            SastSeverity severity = SastSeverity.fromName(nonIssueResult.getResultData().getSeverity());
+            if(severity == null){
+                logger.error("Result for query " + nonIssueResult.getQuery().getName() + " has no severity. Checkmarx result may be incomplete.");
+                return;
+            }
+            switch (severity) {
+                    case SAST_HIGH:
+                        currFileQueriesCollector.addHighQuery(nonIssueResult.getQuery().getName());
+                        break;
+                    case SAST_MEDIUM:
+                        currFileQueriesCollector.addMediumQuery(nonIssueResult.getQuery().getName());
+                        break;
+                    case SAST_LOW:
+                        currFileQueriesCollector.addLowQuery(nonIssueResult.getQuery().getName());
+                }
+        }
+
         private void updateCurrFileVulnerabilities(CxResultToSonarResult result){
             SastSeverity severity = SastSeverity.fromName(result.getResultData().getSeverity());
             if(severity == null){
@@ -191,7 +218,6 @@ public class SastMetricsCollector {
             }
         }
 
-
         private void addSumVulnerabilitiesMetrics(SensorContext context, InputFile file){
            if(currFileSumVulnerabilityCounter.getSumVulnerabilities() > 0) {
                addMetric(context, file, SAST_TOTAL_VULNERABILITIES, currFileSumVulnerabilityCounter.getSumVulnerabilities());
@@ -224,5 +250,17 @@ public class SastMetricsCollector {
 
         private void addMetric(final SensorContext context, final InputFile inputFile, final Metric<Integer> metric, int value) {
             context.<Integer> newMeasure().forMetric(metric).on(inputFile).withValue(value).save();
+        }
+
+        private void saveCxQueriesMeasure(SensorContext context, InputFile file){
+            FileQueries fileQueries = currFileQueriesCollector.getAsFileQueriesObject();
+            String json = "";
+            try {
+                json = mapper.writeValueAsString(fileQueries);
+            }catch (JsonProcessingException e) {
+                logger.error("Error parsing Checkmarx queries du to exception: "+ e.getMessage());
+                logger.error("Details report may be incomplete.");
+            }
+            context.<String> newMeasure().forMetric(SAST_SCAN_QUERIES).on(file).withValue(json).save();
         }
 }

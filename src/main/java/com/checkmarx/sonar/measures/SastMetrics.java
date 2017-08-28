@@ -91,11 +91,19 @@ public class SastMetrics implements Metrics {
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
+    public static final Metric<String> SAST_SCAN_QUERIES = new Metric.Builder(SAST_BASE_KEY +".queries", "Checkmarx queries that are presented in sonar.", Metric.ValueType.STRING)
+            .setDescription("Checkmarx queries that are presented as issues in sonar.")
+            .setQualitative(true)
+            .setHidden(true)
+            .setDomain(CX_SAST_DOMAIN)
+            .create();
+
+
 
     @Override
     public List<Metric> getMetrics() {
         return asList(SAST_HIGH_VULNERABILITIES, SAST_MEDIUM_VULNERABILITIES, SAST_LOW_VULNERABILITIES, SAST_TOTAL_VULNERABILITIES,
                 SAST_NEW_HIGH_VULNERABILITIES, SAST_NEW_MEDIUM_VULNERABILITIES, SAST_NEW_LOW_VULNERABILITIES, SAST_TOTAL_NEW_VULNERABILITIES,
-                SONAR_PROJECT_HAVE_SAST_RESULTS, SAST_SCAN_DETAILS);
+                SONAR_PROJECT_HAVE_SAST_RESULTS, SAST_SCAN_DETAILS, SAST_SCAN_QUERIES);
     }
 }

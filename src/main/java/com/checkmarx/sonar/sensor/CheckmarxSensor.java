@@ -7,7 +7,7 @@ import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
 import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
-import com.checkmarx.sonar.sensor.execution.SastMetricsCollector;
+import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +35,7 @@ public class CheckmarxSensor implements Sensor {
     private static final String CANCEL_MESSAGE = "NOTE: Checkmarx scan is canceled;\n";
 
     private CxSastResultsService cxSastResultsService = new CxSastResultsService();
-    private SastMetricsCollector sastMetricsCollector = new SastMetricsCollector();
+    private SastResultsCollector sastMetricsCollector = new SastResultsCollector();
 
     @Override
     public void describe(SensorDescriptor descriptor) {
@@ -75,6 +75,7 @@ public class CheckmarxSensor implements Sensor {
 
             SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxFullCredentials);
             saveSastForDetailReport(context, sastReportData);
+
             logger.info("Sast results retrieval finished.");
         } catch (Exception e) {
             logger.error("---------------------------------------------------------------------------------------\n");

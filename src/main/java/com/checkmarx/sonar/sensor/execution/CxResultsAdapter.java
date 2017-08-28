@@ -52,11 +52,10 @@ public class CxResultsAdapter {
     /**
      * Creates dto to be saves as Json in sonar DB.
      * The Json's contains data that needs to be presented in Checkmarx details report (at project> more> Checkmarx)
-     * but is not presented as numeric metric in the measures page.
+     * (is not presented as numeric metric in the measures page)
      */
     public static SastReportData adaptCxXmlResultsToCxDetailReport(CxXMLResults results, CxFullCredentials cxFullCredentials){
         SastReportData sastReportData = new SastReportData();
-        setQueryDataListsToRepoerData(sastReportData, results.getQuery());
         sastReportData.setNumOfCodeLines(results.getLinesOfCodeScanned());
         sastReportData.setNumOfFiles(results.getFilesScanned());
         setStartEndDateTime(sastReportData, results);
@@ -75,28 +74,6 @@ public class CxResultsAdapter {
             }
         }
         return null;
-    }
-
-    private static void setQueryDataListsToRepoerData(SastReportData sastReportData, List<CxXMLResults.Query> queries){
-        List<QueryData> lowQueries = new LinkedList<>();
-        List<QueryData> mediumQueries = new LinkedList<>();
-        List<QueryData> highQueries = new LinkedList<>();
-        for (CxXMLResults.Query query : queries){
-            QueryData queryData = new QueryData(query.getName(), query.getResult().size());
-
-            switch (query.getSeverity()){
-                case "High": highQueries.add(queryData);
-                    break;
-                case "Medium": mediumQueries.add(queryData);
-                    break;
-                case "Low": lowQueries.add(queryData);
-                    break;
-            }
-
-        }
-        sastReportData.setHighVulnerabilityQueries(highQueries);
-        sastReportData.setMediumVulnerabilityQueries(mediumQueries);
-        sastReportData.setLowVulnerabilityQueries(lowQueries);
     }
 
 

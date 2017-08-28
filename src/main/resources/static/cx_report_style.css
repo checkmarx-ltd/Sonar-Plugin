@@ -1,3 +1,61 @@
+#h1Loading{
+    font-size: 40px;
+    margin-top: 80px;
+    margin-left: 690px;
+}
+
+#loadingReportSpinner{
+    width: 150px;
+    height: 150px;
+    margin-top: 50px;
+    margin-left: 690px;
+}
+
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+
+.spinner {
+    position: relative;
+    vertical-align: middle;
+    border: 2px solid #4b9fd5;
+    border-radius: 50%;
+    animation: spin .75s infinite linear;
+}
+
+.spinner:after,.spinner:before {
+    left: -2px;
+    top: -2px;
+    display: none;
+    position: absolute;
+    content: "";
+    width: inherit;
+    height: inherit;
+    border: inherit;
+    border-radius: inherit
+}
+
+.spinner,.spinner:after,.spinner:before {
+    display: inline-block;
+    box-sizing: border-box;
+    border-color: transparent;
+    border-top-color: #4b9fd5;
+    animation-duration: 1.2s
+}
+
+.spinner:before {
+    transform: rotate(120deg)
+}
+
+.spinner:after {
+    transform: rotate(240deg)
+}
+
+.spinner-margin {
+    margin: 10px
+}
+
 .aui-item.details {
     width: 530px;
 }
