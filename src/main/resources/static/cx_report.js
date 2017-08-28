@@ -229,8 +229,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
   /******************************************************************************************************************************************/
   /*************************************************************************************************************************************/
-
-    //todo braek into smaller pieces
+    
     function parseAndInsertVarToHtml() {
         if (highCount != null && medCount != null && lowCount != null) {
         try {
