@@ -35,7 +35,7 @@ public class CheckmarxSensor implements Sensor {
     private static final String CANCEL_MESSAGE = "NOTE: Checkmarx scan is canceled;\n";
 
     private CxSastResultsService cxSastResultsService = new CxSastResultsService();
-    private SastResultsCollector sastMetricsCollector = new SastResultsCollector();
+    private SastResultsCollector sastResultsCollector = new SastResultsCollector();
 
     @Override
     public void describe(SensorDescriptor descriptor) {
@@ -70,7 +70,7 @@ public class CheckmarxSensor implements Sensor {
             CxXMLResults cxXMLResults = cxSastResultsService.retrieveScan(cxFullCredentials, cxProject);
             CxReportToSonarReport cxReportToSonarReport = CxResultsAdapter.adaptCxXmlResultsForSonar(cxXMLResults);
 
-            sastMetricsCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
+            sastResultsCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
             notifyComputeSatMeasuresSonarProjectHaveSastResults(context);
 
             SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxFullCredentials);
