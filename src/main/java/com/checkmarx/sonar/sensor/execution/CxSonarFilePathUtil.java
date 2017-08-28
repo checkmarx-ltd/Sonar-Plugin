@@ -58,9 +58,6 @@ class CxSonarFilePathUtil {
         String shortPath;
 
         if(pathA.length() > pathB.length()){
-            return false;
-        }
-        if(pathA.length() > pathB.length()){
             longPath = pathA;
             shortPath = pathB;
         }else {
