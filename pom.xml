@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>checkmarx.com</groupId>
-    <artifactId>com.checkmarx.sonar.CxPlugin</artifactId>
+    <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>8.4.x-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
@@ -13,10 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.apiVersion>6.3</sonar.apiVersion>
         <jdk.min.version>1.8</jdk.min.version>
-        <!--<slf4j.version>1.7.5</slf4j.version>-->
-        <!--<sonar.pluginClass>org.sonar.plugins.jira.JiraPlugin</sonar.pluginClass>
-        <sonar.pluginName>JIRA</sonar.pluginName>
-        <sonar.version>3.6</sonar.version>-->
         <!-- Exclude generated classes from Sonar analyzes -->
         <sonar.exclusions>com/checkmarx/soap/client/**</sonar.exclusions>
     </properties>
@@ -66,26 +62,6 @@
             </exclusions>
         </dependency>
 
-       <!-- <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
-            <scope>provided</scope>
-        </dependency>-->
-
-        <!--<dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpmime</artifactId>
-          <version>4.4.1</version>
-        </dependency>-->
-        <!-- Logger -->
-          <!--<dependency>
-              <groupId>org.slf4j</groupId>
-              <artifactId>slf4j-api</artifactId>
-              <version>${slf4j.version}</version>
-                <scope>provided</scope>
-          </dependency>-->
-
         <!-- mapping between objects and jsons-->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
@@ -106,19 +82,12 @@
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
             <version>2.1.7</version>
-            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <!--<scope>provided</scope>-->
         </dependency>
-      <!--  <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
-            <version>2.22.2</version>
-        </dependency>-->
 
         <dependency>
             <groupId>axis</groupId>
@@ -212,46 +181,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${basedir}/target/generated/src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>w
-            </plugin>-->
-
-            <!--<plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>jaxws-maven-plugin</artifactId>
-              <version>1.12</version>
-              <configuration>
-                <wsdlDirectory>${basedir}/src/main/resources/wsdl</wsdlDirectory>
-                <packageName>com.raps.code.generate.ws</packageName>
-                <keep>true</keep>
-                <sourceDestDir>${basedir}/target/generated/src/main/java</sourceDestDir>
-                <sei/>
-              </configuration>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>wsimport</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>-->
         </plugins>
     </build>
 
