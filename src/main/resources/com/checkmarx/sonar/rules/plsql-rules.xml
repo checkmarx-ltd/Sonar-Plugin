@@ -1,4 +1,99 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><rules><rule><key>checkmarx_2668</key><name>Find_Personal_Info</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2641</key><name>Use_Of_Broken_Or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><rules><rule><key>checkmarx_2632</key><name>Plaintext_Storage_of_a_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application accesses the system database using a password. This password is stored in plaintext, without encryption. This could allow an attacker that gains access to the application storage to steal the application's database password, and connect directly to the database while&amp;#160;impersonating the application.&amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application retrieves the database password and uses it directly to open a connection to the database. The application does not decrypt the password before using it, since it is stored in plaintext.&amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not store any sensitive information, such as database passwords, in plain text.&lt;/li&gt;
+&lt;li&gt;Safely&amp;#160;encrypt application passwords, using proper methods of encryption. If the original password must be retrievable, e.g. to connect to the database, use AES-CBC or GCM with a strong encryption key and random IV.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Implement proper key management, including dynamically generating random keys, protecting keys, and replacing keys as necessary.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Alternatively, encrypt the password using platform mechanisms or a hardware device.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div&gt;Specific Recommendations:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Decrypt application password before opening the database connection.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Database Password&lt;/h4&gt;&lt;pre&gt;
+public Connection createConnection(Properties connectionProperties) {
+
+    string user = connectionProperties.getProperty("user");
+    string password = connectionProperties.getProperty("password");
+    
+    Connection conn = DriverManager.getConnection(CONN_STRING, user, password);
+    
+    return conn; 
+}&lt;/pre&gt;&lt;h4&gt;Encrypted Database Password&lt;/h4&gt;&lt;pre&gt;
+public Connection createConnection(Properties connectionProperties) {
+
+    string user = connectionProperties.getProperty("user");
+    string password = connectionProperties.getProperty("password");
+    
+    // Call encryption framework to decrypt password with protected key
+    password = decryptPassword(password); 
+    
+    try { 
+        Connection conn = DriverManager.getConnection(CONN_STRING, 
+                                                    user, password);
+    }
+    catch (SQLException e)  {
+        handleException(e); 
+    }
+    
+    return conn; 
+}
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2631</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
+&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;div&gt;The application provides user information without filtering by user ID. For example, it may provide information solely by a submitted account ID. The application concatenates the user input directly into the SQL query string, without any additional filtering. The application also does not perform any validation on the input, nor constrain it to a pre-computed list of acceptable values.&amp;#160;&lt;/div&gt;
+&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&amp;#160;&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;Enforce authorization checks before providing any access to sensitive data, including the specific object reference.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Explicitly block access to any unauthorized data, especially to other users&amp;#8217; data.&lt;/li&gt;
+&lt;li&gt;If possible, avoid allowing the user to request arbitrary data by simply sending a record ID. For example, instead of having the user send an account ID, the application should look up the account ID for the current authenticated user session.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div&gt;Specific Mitigation:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not concatenate user input directly into SQL queries.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Include a user-specific identifier as a filter in the WHERE clause of the SQL query.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Map the user input to an indirect reference, e.g. via a prepared list of allowable values.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Unfiltered Direct Object Reference&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
+    int accountId = Integer.parseInt(req.getParameter("accountId"));
+    
+    string sql = "select * from [Accounts] where [AccountId] = " 
+                        + accountId.toString();
+                        
+    Statement stmt = conn.createStatement();
+    ResultSet accountRS = stmt.executeQuery(sql); 
+    
+    return accountRS;
+}&lt;/pre&gt;&lt;h4&gt;Record References are Now Filtered and Indirect&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
+    int accountIndex = Integer.parseInt(req.getParameter("accountIndex"));
+    int realAccountId = userAccountList.get(accountIndex);
+    
+    int userId = req.getSession().getAttribute("userId"); 
+    
+    string sql = "select * from [Accounts] where [AccountId] = " 
+                        + realAccountId.toString() 
+                        + " and [UserId] = " + userId.toString();
+                        
+    Statement stmt = conn.createStatement();
+    ResultSet accountRS = stmt.executeQuery(sql); 
+    
+    return accountRS;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2641</key><name>Use_Of_Broken_Or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application code specifies the name of the selected cryptographic algorithm, either via a String argument, a factory method, or a specific implementation class. These algorithms have fatal cryptographic weaknesses, that make it trivial to break in a reasonable timeframe. Strong algorithms should withstand attacks far beyond the realm of possible.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
 &lt;li&gt;Only use strong, approved cryptographic algorithms, including AES, RSA, ECC, and SHA-256 respectively, amongst others.&amp;nbsp;&lt;/li&gt;
@@ -80,7 +175,55 @@
 	catch ( SQLException e ) {
 		handleError(e);
 	}
-}  &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2642</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
+}  &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2635</key><name>Use_of_Insufficiently_Random_Values</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Random values are often used as a mechanism to prevent malicious users from guessing a value, such as a password, encryption key, or session identifier. Depending on what&amp;#160;this random value is used for, an attacker would be able to predict&amp;#160;the next numbers generated, or previously generated values. This could enable the attacker to hijack another user's session, impersonate another user, or crack an encryption key (depending on what&amp;#160;the pseudo-random value was used for).&amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a weak method of generating pseudo-random values, such that other numbers could be determined from a relatively small sample size. Since the pseudo-random number generator used is designed for statistically uniform distribution of values, it is approximately deterministic. Thus, after collecting a few generated values (e.g. by creating a few individual sessions, and collecting the sessionids), it would be possible for an attacker to calculate another sessionid.&amp;#160;&lt;br /&gt;Specifically, if this&amp;#160;pseudo-random value is used in any security context, such as passwords, keys, or secret identifiers, an attacker would be able to predict&amp;#160;the next numbers generated, or previously generated values.&amp;#160;&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;div&gt;Generic Guidance:&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Whenever unpredicatable numbers are required in a security context, use a cryptographically strong random number generator, instead of a statistical pseudo-random generator.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Use the cryptorandom generator that is built-in to your language or platform, and ensure it is securely seeded. Do not seed the generator with a weak, non-random seed. (In most cases, the default is securely random).&amp;#160;&lt;/li&gt;
+&lt;li&gt;Ensure you use a long enough random value, to make brute-force attacks unfeasible.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;div&gt;
+&lt;div&gt;&amp;#160;&lt;/div&gt;
+&lt;div&gt;Specific Recommendations:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not use the statistical pseudo-random number generator, use the cryptorandom generator instead. In Java, this is the SecureRandom class.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
+let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
+withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
+    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
+})
+    
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+Random random = new Random();
+
+long sessNum = random.nextLong();
+
+String sessionId = sessNum.toString();
+&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;
+SecureRandom random = new SecureRandom();
+
+byte sessBytes[] = new byte[32];
+
+random.nextBytes(sessBytes);
+
+String sessionId = new String(sessBytes);
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2642</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker succeeds in impersonating the user or application, she will have full access to the system, and be able to do anything the impersonated identity could do.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application codebase&amp;#160;has string literal passwords embedded in the source code. This hardcoded value is used either to compare to user-provided credentials, or to authenticate downstream to a remote system (such as a database or a remote web service). &amp;#160;&lt;/div&gt;
 &lt;div&gt;An attacker only needs to gain access to the source code to reveal the hardcoded password. Likewise, the attacker can reverse engineer the compiled application binaries, and easily retrieve the embedded password. Once found, the attacker can easily use the password in impersonation attacks, either directly on the application or to the remote system.&amp;#160;&lt;/div&gt;
@@ -158,7 +301,55 @@
       out.println(System.getenv());
   } else {
       //[..]
-  };&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2664</key><name>Find_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2649</key><name>Use_of_Potentially_Dangerous_Function</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  };&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2633</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;ol&gt;
+&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
+&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The user's password is written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolation
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                insert_sql = insert_sql.Replace("$password", password);
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+the user's password is MD5 coded before being written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolationFixed
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
+                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+        StringBuilder md5Password = new StringBuilder();
+
+                for (int i = 0; i &lt; data.Length; i++)
+		{
+			md5Password.Append(data[i].ToString("x2"));
+		}
+		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2649</key><name>Use_of_Potentially_Dangerous_Function</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Use of Potentially Dangerous Function&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -230,7 +421,115 @@ Relationship Notes&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&l
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2679</key><name>Find_APEX_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2690</key><name>CxDefaultQuery</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2648</key><name>Unchecked_Error_Condition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2626</key><name>Default_Definer_Rights_in_Package_or_Object_Definition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
+&lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Privilege / Sandbox Issues&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
+
+&lt;span class="tool"&gt;&lt;/span&gt;
+
+&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="status"&gt;&lt;table width="100%" border="0" cellpadding="0" cellspacing="0"&gt;&lt;tr&gt;&lt;td valign="top" align="left" width="33%" nowrap=""&gt;&lt;b&gt;Category ID: &lt;/b&gt;265&lt;span style="font-style:italic; font-size:80%"&gt; (Category)&lt;/span&gt;&lt;/td&gt;&lt;td valign="top" align="center" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top" align="right" nowrap=""&gt;&lt;b&gt;Status: &lt;/b&gt;&lt;span class="Incomplete"&gt;Incomplete&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div id="Description"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Description&lt;/div&gt;&lt;div name="oc_265_Description" id="oc_265_Description" class="expandblock"&gt;&lt;div class="detail"&gt;
+&lt;p class="subheading"&gt;Description Summary&lt;/p&gt;&lt;div class="indent"&gt;Weaknesses in this category occur with improper enforcement of
+sandbox environments, or the improper handling, assignment, or management of
+privileges.&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Potential Mitigations"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Potential Mitigations&lt;/div&gt;&lt;div name="oc_265_Potential Mitigations" id="oc_265_Potential Mitigations" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Very carefully manage the setting, management and handling of
+privileges. Explicitly manage trust zones in the software.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Follow the principle of least privilege when assigning access rights
+to entities in a software system.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationships"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationships&lt;/div&gt;&lt;div name="oc_265_Relationships" id="oc_265_Relationships" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" id="Detail"&gt;&lt;tr&gt;&lt;th valign="top"&gt;Nature&lt;/th&gt;&lt;th valign="top"&gt;Type&lt;/th&gt;&lt;th valign="top"&gt;ID&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Name&lt;/th&gt;&lt;th valign="middle" class="left" style="text-align:center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;View(s) this relationship pertains to&lt;/span&gt;&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;ChildOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Category&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;264&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=264" target="_blank"&gt;Permissions, Privileges, and Access Controls&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;266&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=266" target="_blank"&gt;Incorrect Privilege Assignment&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;267&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=267" target="_blank"&gt;Privilege Defined With Unsafe Actions&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;268&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=268" target="_blank"&gt;Privilege Chaining&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;269&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=269" target="_blank"&gt;Improper Privilege Management&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;271&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=271" target="_blank"&gt;Privilege Dropping / Lowering Errors&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;274&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=274" target="_blank"&gt;Improper Handling of Insufficient Privileges&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;610&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=610" target="_blank"&gt;Externally Controlled Reference to a Resource in Another Sphere&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;648&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=648" target="_blank"&gt;Incorrect Use of Privileged APIs&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;250&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=250" target="_blank"&gt;Execution with Unnecessary Privileges&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;619&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=619" target="_blank"&gt;Dangling Database Cursor ('Cursor Injection')&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationship Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationship Notes&lt;/div&gt;&lt;div name="oc_265_Relationship Notes" id="oc_265_Relationship Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;This can strongly overlap authorization errors.&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Research Gaps"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Research Gaps&lt;/div&gt;&lt;div name="oc_265_Research Gaps" id="oc_265_Research Gaps" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;Many of the following concepts require deeper study. Most privilege
+problems are not classified at such a low level of detail, and terminology
+is very sparse. Certain classes of software, such as web browsers and
+software bug trackers, provide a rich set of examples for further research.
+Operating systems have matured to the point that these kinds of weaknesses
+are rare, but finer-grained models for privileges, capabilities, or roles
+might introduce subtler issues.&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Theoretical Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Theoretical Notes&lt;/div&gt;&lt;div name="oc_265_Theoretical Notes" id="oc_265_Theoretical Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;A sandbox could be regarded as an explicitly defined sphere of control, in
+that the sandbox only defines a limited set of behaviors, which can only
+access a limited set of resources.&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;It could be argued that any privilege problem occurs within the context of
+a sandbox.&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Taxonomy Mappings"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Taxonomy Mappings&lt;/div&gt;&lt;div name="oc_265_Taxonomy Mappings" id="oc_265_Taxonomy Mappings" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Mapped Taxonomy Name&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Node ID&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Fit&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Mapped Node Name&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;PLOVER&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top"&gt;Privilege / sandbox errors&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Content History"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Content History&lt;/div&gt;&lt;div name="oc_265_Content History" id="oc_265_Content History" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Submissions&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Submission Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Submitter&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;PLOVER&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Externally Mined&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Modifications&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Modification Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Modifier&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-09-08&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Relationships, Relationship Notes,
+Taxonomy Mappings, Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-10-14&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Research Gaps,
+Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-12-28&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Potential Mitigations&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;/html&gt;
+
+&lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
+
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2628</key><name>HTTP_Response_Splitting</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Arbitrarily change the application server&amp;rsquo;s response header to a victim&amp;rsquo;s HTTP request by manipulating headers&lt;/li&gt;
+&lt;li&gt;Arbitrarily change the application server&amp;rsquo;s response body by injecting two consecutive line breaks, which may result in Cross-Site Scripting (XSS) attacks&lt;/li&gt;
+&lt;li&gt;Cause cache poisoning, potentially controlling any site&amp;rsquo;s HTTP responses going through the same proxy as this application.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Since user input is being used in an HTTP response header, an attacker could include NewLine characters to make the header look like multiple headers with engineered content, potentially making the response look like multiple responses (for example, by engineering duplicate content-length headers). This can cause an organizational proxy server to provide the second, engineered response to a victim&amp;#8217;s subsequent request; or, if the proxy server also performs response caching, the attacker can send an immediate subsequent request to another site, causing the proxy server to cache the engineered response as a response from this second site and to later serve the response to other users.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Validate all input, regardless of source (including cookies). Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Additionally, URL-encode all user input before including it in the response header.&lt;/li&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+User input is being used in an HTTP response header, enabling an attacker to add a newline character and multiple headers
+      &lt;/h4&gt;&lt;pre&gt;
+
+public class HTTPResponseSplitting
+{
+        public void foo(HttpResponse Response)
+        {
+                String author3 = Console.ReadLine();
+                Response.AppendHeader("Author: " + author3);
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+The user input is examined to contain and newline character and the input is also URL encoded
+      &lt;/h4&gt;&lt;pre&gt;
+
+public class HTTPResponseSplittingFixed
+{
+        public void foo(HttpResponse Response)
+        {
+                String author3 = Console.ReadLine();
+                if (author3.Contains('\n') == false)
+                {
+                        author3 = HttpUtility.UrlEncode(author3);
+                        Response.AppendHeader("Author: " + author3);
+                }
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2648</key><name>Unchecked_Error_Condition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Unchecked Error Condition&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -319,7 +618,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2643</key><name>Reflected_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use social engineering to cause a user to send the website engineered input, rewriting web pages and inserting malicious scripts. The attacker can then pretend to be the original website, which would enable the attacker to steal the user's password, request the user&amp;#8217;s credit card information, provide false information, or run malware. From the victim&amp;#8217;s point of view, this is the original website, and the victim would blame the site for incurred damage.&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2643</key><name>Reflected_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use social engineering to cause a user to send the website engineered input, rewriting web pages and inserting malicious scripts. The attacker can then pretend to be the original website, which would enable the attacker to steal the user's password, request the user&amp;#8217;s credit card information, provide false information, or run malware. From the victim&amp;#8217;s point of view, this is the original website, and the victim would blame the site for incurred damage.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from previous user input. The user input is embedded directly in the page's HTML, causing the browser to display it as part of the web page. If the input includes HTML fragments or JavaScript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary user input without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -419,7 +718,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 			System.out.println("Wrong Input");
 		}
 	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2671</key><name>Find_Stored_Procedure_Parameter_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2640</key><name>Reversible_One_Way_Hash</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2640</key><name>Reversible_One_Way_Hash</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Reversible One-Way Hash&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -469,7 +768,54 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2666</key><name>Find_Parameters</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2647</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2630</key><name>Open_Redirect</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use social engineering to get a victim to click a link to the application, so that the user will be immediately redirected to another, arbitrary site. Users may think that they are still in the original application site. The second site may be offensive, contain malware, or, most commonly, be used for phishing.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application redirects the user&amp;#8217;s browser to a URL provided in a user request, without warning users that they are being redirected outside the site. An attacker could use social engineering to get a victim to click a link to the application with a parameter defining another site to which the application will redirect the user&amp;#8217;s browser, and the user may not be aware of the redirection.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Ideally, do not allow arbitrary URLs for redirection. Instead, create a server-side mapping from user-provided parameter values to legitimate URLs.&lt;/li&gt;
+&lt;li&gt;If it is necessary to allow arbitrary URLs:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;For URLs inside the application site, first filter and encode the user-provided parameter, and then use it as a relative URL by prefixing it with the application site domain.&lt;/li&gt;
+&lt;li&gt;For URLs outside the application (if necessary), use an intermediate disclaimer page to provide users with a clear warning that they are leaving your site.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
+PageReference pageRef;
+if(redirsite != null)
+{
+    pageRef = new PageReference(redirsite);
+    pageRef.setRedirect(true);
+    return pageRef;
+}
+pageRef = ApexPages.currentPage();
+return pageRef;&lt;/pre&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
+PageReference pageRef;
+if(redirsite != null)
+{
+    pageRef = new PageReference('http://domain.com/page.jsp?' + redirsite);
+    pageRef.setRedirect(true);
+    return pageRef;
+}
+pageRef = ApexPages.currentPage();
+return pageRef;&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Response.Redirect(getUrlById(targetUrlId));
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Response.Redirect(getUrlById(targetUrlId));
+
+
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2647</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from the application&amp;#8217;s database. The data is embedded directly in the page's HTML, causing the browser to display it as part of the web page. This data may have originated in input from another user. If the data includes HTML fragments or Javascript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary database data without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all dynamic data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -490,27 +836,7 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
 {
         public string foo(Label lblOutput, SqlConnection connection, int id)
         {
@@ -534,6 +860,26 @@ The outputed string is Html encoded before it is displayed in the label
                 string output = (string)cmd.ExecuteScalar()
                 lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
         }
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
 }&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
@@ -560,7 +906,7 @@ The outputed string is Html encoded before it is displayed in the label
 		}
 		label.setText("Mickey last names are: " + lastNames + " ");
 	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2652</key><name>Find_Dynamic_DB_In</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2637</key><name>Default_Definer_Rights_in_Method_Definition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2637</key><name>Default_Definer_Rights_in_Method_Definition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Privilege / Sandbox Issues&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -612,7 +958,7 @@ Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2654</key><name>Find_General_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2653</key><name>Find_Empty_Strings</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2660</key><name>Find_Interactive_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2673</key><name>Find_String_Types</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2667</key><name>Find_Passwords</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2645</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2645</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including data obtained from the database. Since that data may have been previously obtained from user input, and is neither checked for data type validity nor subsequently sanitized, the data could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -674,7 +1020,7 @@ The data obtained from the database is checked for potentially malicious charact
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2678</key><name>Dangling_Database_Cursor</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2678</key><name>Dangling_Database_Cursor</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Dangling Database Cursor ('Cursor Injection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -730,43 +1076,10 @@ Name&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2008-04-11&
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2675</key><name>Find_Write</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2663</key><name>Find_Missing_Current_User_Rights_In_Class</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2644</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2644</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application opens a network socket, for listening to incoming network connections. However, the application uses user input to define the socket, enabling an attacker to control it.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Don&amp;#8217;t allow a user to define parameters of network sockets.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application opens a network socket using a port number inputed by the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1)
-        {
-                        long address = Convert.ToInt32(textBox1.Text);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The application opens a hard-coded port number and does receive it from the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1, long address)
-        {
-            IPEndPoint endpoint = new IPEndPoint(address, 15551);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
 import socket
 import sys
 
@@ -799,7 +1112,40 @@ try:
 except socket.error as msg:
     print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
+print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application opens a network socket using a port number inputed by the user
+      &lt;/h4&gt;&lt;pre&gt;
+
+class ResourceInjection
+{
+            public void foo(TextBox textBox1)
+        {
+                        long address = Convert.ToInt32(textBox1.Text);
+            IPEndPoint endpoint = new IPEndPoint(address, port);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+The application opens a hard-coded port number and does receive it from the user
+      &lt;/h4&gt;&lt;pre&gt;
+
+class ResourceInjection
+{
+            public void foo(TextBox textBox1, long address)
+        {
+            IPEndPoint endpoint = new IPEndPoint(address, 15551);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+        }
+}
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
 	public static void main(String[] args) {
 		Scanner userInputScanner = new Scanner(System.in);
 		System.out.print("\nEnter port number: ");
@@ -836,412 +1182,7 @@ print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The a
 			System.err.println("Caught Exception: " + e.getMessage());
 		}
 	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2674</key><name>Find_Web_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2661</key><name>Find_Interactive_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2651</key><name>Find_DB_Out</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2658</key><name>Find_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2662</key><name>Find_Methods</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3421</key><name>Find_DB</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2691</key><name>CxDefaultQuery</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2665</key><name>Find_Packages</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2657</key><name>Find_Implicit_Cursor_Params</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2676</key><name>Find_XSS_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2669</key><name>Find_Read</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2656</key><name>Find_Html_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2646</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
-&lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
-&lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using string obtained from the user
-      &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
-{
-        public void foo(TextBox tbUserName, SqliteConnection connection)
-        {	
-                string user = tbUserName.Text;
-                string sql = "insert into users(name) VALUES (user)"
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The string obtained from the user is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;
-class SqlInjectionFixed
-{
-        public void foo(TextBox tbUserName, SqliteConnection connection)
-        {
-                string user = tbUserName.Text;
-                string sql = "insert into users(name) VALUES (@param1)";
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue(@param1, user);
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2650</key><name>Find_DB_In</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2672</key><name>Find_Strings</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2655</key><name>Find_Header_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2632</key><name>Plaintext_Storage_of_a_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application accesses the system database using a password. This password is stored in plaintext, without encryption. This could allow an attacker that gains access to the application storage to steal the application's database password, and connect directly to the database while&amp;#160;impersonating the application.&amp;#160;&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application retrieves the database password and uses it directly to open a connection to the database. The application does not decrypt the password before using it, since it is stored in plaintext.&amp;#160;&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not store any sensitive information, such as database passwords, in plain text.&lt;/li&gt;
-&lt;li&gt;Safely&amp;#160;encrypt application passwords, using proper methods of encryption. If the original password must be retrievable, e.g. to connect to the database, use AES-CBC or GCM with a strong encryption key and random IV.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Implement proper key management, including dynamically generating random keys, protecting keys, and replacing keys as necessary.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Alternatively, encrypt the password using platform mechanisms or a hardware device.&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div&gt;Specific Recommendations:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Decrypt application password before opening the database connection.&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Database Password&lt;/h4&gt;&lt;pre&gt;
-public Connection createConnection(Properties connectionProperties) {
-
-    string user = connectionProperties.getProperty("user");
-    string password = connectionProperties.getProperty("password");
-    
-    Connection conn = DriverManager.getConnection(CONN_STRING, user, password);
-    
-    return conn; 
-}&lt;/pre&gt;&lt;h4&gt;Encrypted Database Password&lt;/h4&gt;&lt;pre&gt;
-public Connection createConnection(Properties connectionProperties) {
-
-    string user = connectionProperties.getProperty("user");
-    string password = connectionProperties.getProperty("password");
-    
-    // Call encryption framework to decrypt password with protected key
-    password = decryptPassword(password); 
-    
-    try { 
-        Connection conn = DriverManager.getConnection(CONN_STRING, 
-                                                    user, password);
-    }
-    catch (SQLException e)  {
-        handleException(e); 
-    }
-    
-    return conn; 
-}
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2631</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
-&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;div&gt;The application provides user information without filtering by user ID. For example, it may provide information solely by a submitted account ID. The application concatenates the user input directly into the SQL query string, without any additional filtering. The application also does not perform any validation on the input, nor constrain it to a pre-computed list of acceptable values.&amp;#160;&lt;/div&gt;
-&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&amp;#160;&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;li&gt;Enforce authorization checks before providing any access to sensitive data, including the specific object reference.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Explicitly block access to any unauthorized data, especially to other users&amp;#8217; data.&lt;/li&gt;
-&lt;li&gt;If possible, avoid allowing the user to request arbitrary data by simply sending a record ID. For example, instead of having the user send an account ID, the application should look up the account ID for the current authenticated user session.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div&gt;Specific Mitigation:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not concatenate user input directly into SQL queries.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Include a user-specific identifier as a filter in the WHERE clause of the SQL query.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Map the user input to an indirect reference, e.g. via a prepared list of allowable values.&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Unfiltered Direct Object Reference&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
-    int accountId = Integer.parseInt(req.getParameter("accountId"));
-    
-    string sql = "select * from [Accounts] where [AccountId] = " 
-                        + accountId.toString();
-                        
-    Statement stmt = conn.createStatement();
-    ResultSet accountRS = stmt.executeQuery(sql); 
-    
-    return accountRS;
-}&lt;/pre&gt;&lt;h4&gt;Record References are Now Filtered and Indirect&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
-    int accountIndex = Integer.parseInt(req.getParameter("accountIndex"));
-    int realAccountId = userAccountList.get(accountIndex);
-    
-    int userId = req.getSession().getAttribute("userId"); 
-    
-    string sql = "select * from [Accounts] where [AccountId] = " 
-                        + realAccountId.toString() 
-                        + " and [UserId] = " + userId.toString();
-                        
-    Statement stmt = conn.createStatement();
-    ResultSet accountRS = stmt.executeQuery(sql); 
-    
-    return accountRS;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2635</key><name>Use_of_Insufficiently_Random_Values</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Random values are often used as a mechanism to prevent malicious users from guessing a value, such as a password, encryption key, or session identifier. Depending on what&amp;#160;this random value is used for, an attacker would be able to predict&amp;#160;the next numbers generated, or previously generated values. This could enable the attacker to hijack another user's session, impersonate another user, or crack an encryption key (depending on what&amp;#160;the pseudo-random value was used for).&amp;#160;&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a weak method of generating pseudo-random values, such that other numbers could be determined from a relatively small sample size. Since the pseudo-random number generator used is designed for statistically uniform distribution of values, it is approximately deterministic. Thus, after collecting a few generated values (e.g. by creating a few individual sessions, and collecting the sessionids), it would be possible for an attacker to calculate another sessionid.&amp;#160;&lt;br /&gt;Specifically, if this&amp;#160;pseudo-random value is used in any security context, such as passwords, keys, or secret identifiers, an attacker would be able to predict&amp;#160;the next numbers generated, or previously generated values.&amp;#160;&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;div&gt;Generic Guidance:&lt;/div&gt;
-&lt;/div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Whenever unpredicatable numbers are required in a security context, use a cryptographically strong random number generator, instead of a statistical pseudo-random generator.&amp;#160;&lt;/li&gt;
-&lt;li&gt;Use the cryptorandom generator that is built-in to your language or platform, and ensure it is securely seeded. Do not seed the generator with a weak, non-random seed. (In most cases, the default is securely random).&amp;#160;&lt;/li&gt;
-&lt;li&gt;Ensure you use a long enough random value, to make brute-force attacks unfeasible.&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;div&gt;
-&lt;div&gt;&amp;#160;&lt;/div&gt;
-&lt;div&gt;Specific Recommendations:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not use the statistical pseudo-random number generator, use the cryptorandom generator instead. In Java, this is the SecureRandom class.&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
-let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
-withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
-    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
-})
-    
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
-Random random = new Random();
-
-long sessNum = random.nextLong();
-
-String sessionId = sessNum.toString();
-&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;
-SecureRandom random = new SecureRandom();
-
-byte sessBytes[] = new byte[32];
-
-random.nextBytes(sessBytes);
-
-String sessionId = new String(sessBytes);
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2633</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ol&gt;
-&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
-&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The user's password is written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolation
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                insert_sql = insert_sql.Replace("$password", password);
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-the user's password is MD5 coded before being written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolationFixed
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
-                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-        StringBuilder md5Password = new StringBuilder();
-
-                for (int i = 0; i &lt; data.Length; i++)
-		{
-			md5Password.Append(data[i].ToString("x2"));
-		}
-		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2764</key><name>Find_All_Passwords</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2659</key><name>Find_Integers</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2670</key><name>Find_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2677</key><name>Find_XSS_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2626</key><name>Default_Definer_Rights_in_Package_or_Object_Definition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
-	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
-&lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Privilege / Sandbox Issues&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
-
-&lt;span class="tool"&gt;&lt;/span&gt;
-
-&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="status"&gt;&lt;table width="100%" border="0" cellpadding="0" cellspacing="0"&gt;&lt;tr&gt;&lt;td valign="top" align="left" width="33%" nowrap=""&gt;&lt;b&gt;Category ID: &lt;/b&gt;265&lt;span style="font-style:italic; font-size:80%"&gt; (Category)&lt;/span&gt;&lt;/td&gt;&lt;td valign="top" align="center" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top" align="right" nowrap=""&gt;&lt;b&gt;Status: &lt;/b&gt;&lt;span class="Incomplete"&gt;Incomplete&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div id="Description"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Description&lt;/div&gt;&lt;div name="oc_265_Description" id="oc_265_Description" class="expandblock"&gt;&lt;div class="detail"&gt;
-&lt;p class="subheading"&gt;Description Summary&lt;/p&gt;&lt;div class="indent"&gt;Weaknesses in this category occur with improper enforcement of
-sandbox environments, or the improper handling, assignment, or management of
-privileges.&lt;/div&gt;
-&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Potential Mitigations"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Potential Mitigations&lt;/div&gt;&lt;div name="oc_265_Potential Mitigations" id="oc_265_Potential Mitigations" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
-&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Very carefully manage the setting, management and handling of
-privileges. Explicitly manage trust zones in the software.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Follow the principle of least privilege when assigning access rights
-to entities in a software system.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationships"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationships&lt;/div&gt;&lt;div name="oc_265_Relationships" id="oc_265_Relationships" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" id="Detail"&gt;&lt;tr&gt;&lt;th valign="top"&gt;Nature&lt;/th&gt;&lt;th valign="top"&gt;Type&lt;/th&gt;&lt;th valign="top"&gt;ID&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Name&lt;/th&gt;&lt;th valign="middle" class="left" style="text-align:center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;View(s) this relationship pertains to&lt;/span&gt;&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;
-&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;ChildOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Category&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;264&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=264" target="_blank"&gt;Permissions, Privileges, and Access Controls&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
-&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;266&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=266" target="_blank"&gt;Incorrect Privilege Assignment&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;267&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=267" target="_blank"&gt;Privilege Defined With Unsafe Actions&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;268&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=268" target="_blank"&gt;Privilege Chaining&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;269&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=269" target="_blank"&gt;Improper Privilege Management&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;271&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=271" target="_blank"&gt;Privilege Dropping / Lowering Errors&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;274&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=274" target="_blank"&gt;Improper Handling of Insufficient Privileges&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;610&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=610" target="_blank"&gt;Externally Controlled Reference to a Resource in Another Sphere&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;648&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=648" target="_blank"&gt;Incorrect Use of Privileged APIs&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;250&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=250" target="_blank"&gt;Execution with Unnecessary Privileges&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;619&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=619" target="_blank"&gt;Dangling Database Cursor ('Cursor Injection')&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationship Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationship Notes&lt;/div&gt;&lt;div name="oc_265_Relationship Notes" id="oc_265_Relationship Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
-&lt;tr&gt;&lt;td&gt;
-&lt;p&gt;This can strongly overlap authorization errors.&lt;/p&gt;
-&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Research Gaps"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Research Gaps&lt;/div&gt;&lt;div name="oc_265_Research Gaps" id="oc_265_Research Gaps" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
-&lt;tr&gt;&lt;td&gt;
-&lt;p&gt;Many of the following concepts require deeper study. Most privilege
-problems are not classified at such a low level of detail, and terminology
-is very sparse. Certain classes of software, such as web browsers and
-software bug trackers, provide a rich set of examples for further research.
-Operating systems have matured to the point that these kinds of weaknesses
-are rare, but finer-grained models for privileges, capabilities, or roles
-might introduce subtler issues.&lt;/p&gt;
-&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Theoretical Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Theoretical Notes&lt;/div&gt;&lt;div name="oc_265_Theoretical Notes" id="oc_265_Theoretical Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
-&lt;tr&gt;&lt;td&gt;
-&lt;p&gt;A sandbox could be regarded as an explicitly defined sphere of control, in
-that the sandbox only defines a limited set of behaviors, which can only
-access a limited set of resources.&lt;/p&gt;
-&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;
-&lt;p&gt;It could be argued that any privilege problem occurs within the context of
-a sandbox.&lt;/p&gt;
-&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Taxonomy Mappings"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Taxonomy Mappings&lt;/div&gt;&lt;div name="oc_265_Taxonomy Mappings" id="oc_265_Taxonomy Mappings" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Mapped Taxonomy Name&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Node ID&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Fit&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Mapped Node Name&lt;/th&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td valign="top"&gt;PLOVER&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top"&gt;Privilege / sandbox errors&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Content History"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Content History&lt;/div&gt;&lt;div name="oc_265_Content History" id="oc_265_Content History" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Submissions&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Submission Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Submitter&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;PLOVER&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Externally Mined&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Modifications&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Modification Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Modifier&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-09-08&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Relationships, Relationship Notes,
-Taxonomy Mappings, Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-10-14&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Research Gaps,
-Theoretical Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-12-28&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Potential Mitigations&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;/html&gt;
-
-&lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
-
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2628</key><name>HTTP_Response_Splitting</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Arbitrarily change the application server&amp;rsquo;s response header to a victim&amp;rsquo;s HTTP request by manipulating headers&lt;/li&gt;
-&lt;li&gt;Arbitrarily change the application server&amp;rsquo;s response body by injecting two consecutive line breaks, which may result in Cross-Site Scripting (XSS) attacks&lt;/li&gt;
-&lt;li&gt;Cause cache poisoning, potentially controlling any site&amp;rsquo;s HTTP responses going through the same proxy as this application.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Since user input is being used in an HTTP response header, an attacker could include NewLine characters to make the header look like multiple headers with engineered content, potentially making the response look like multiple responses (for example, by engineering duplicate content-length headers). This can cause an organizational proxy server to provide the second, engineered response to a victim&amp;#8217;s subsequent request; or, if the proxy server also performs response caching, the attacker can send an immediate subsequent request to another site, causing the proxy server to cache the engineered response as a response from this second site and to later serve the response to other users.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
-&lt;li&gt;Validate all input, regardless of source (including cookies). Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;li&gt;Additionally, URL-encode all user input before including it in the response header.&lt;/li&gt;
-&lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-User input is being used in an HTTP response header, enabling an attacker to add a newline character and multiple headers
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class HTTPResponseSplitting
-{
-        public void foo(HttpResponse Response)
-        {
-                String author3 = Console.ReadLine();
-                Response.AppendHeader("Author: " + author3);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The user input is examined to contain and newline character and the input is also URL encoded
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class HTTPResponseSplittingFixed
-{
-        public void foo(HttpResponse Response)
-        {
-                String author3 = Console.ReadLine();
-                if (author3.Contains('\n') == false)
-                {
-                        author3 = HttpUtility.UrlEncode(author3);
-                        Response.AppendHeader("Author: " + author3);
-                }
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2630</key><name>Open_Redirect</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use social engineering to get a victim to click a link to the application, so that the user will be immediately redirected to another, arbitrary site. Users may think that they are still in the original application site. The second site may be offensive, contain malware, or, most commonly, be used for phishing.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application redirects the user&amp;#8217;s browser to a URL provided in a user request, without warning users that they are being redirected outside the site. An attacker could use social engineering to get a victim to click a link to the application with a parameter defining another site to which the application will redirect the user&amp;#8217;s browser, and the user may not be aware of the redirection.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
-&lt;li&gt;Ideally, do not allow arbitrary URLs for redirection. Instead, create a server-side mapping from user-provided parameter values to legitimate URLs.&lt;/li&gt;
-&lt;li&gt;If it is necessary to allow arbitrary URLs:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;For URLs inside the application site, first filter and encode the user-provided parameter, and then use it as a relative URL by prefixing it with the application site domain.&lt;/li&gt;
-&lt;li&gt;For URLs outside the application (if necessary), use an intermediate disclaimer page to provide users with a clear warning that they are leaving your site.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
-PageReference pageRef;
-if(redirsite != null)
-{
-    pageRef = new PageReference(redirsite);
-    pageRef.setRedirect(true);
-    return pageRef;
-}
-pageRef = ApexPages.currentPage();
-return pageRef;&lt;/pre&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
-PageReference pageRef;
-if(redirsite != null)
-{
-    pageRef = new PageReference('http://domain.com/page.jsp?' + redirsite);
-    pageRef.setRedirect(true);
-    return pageRef;
-}
-pageRef = ApexPages.currentPage();
-return pageRef;&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Response.Redirect(getUrlById(targetUrlId));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Response.Redirect(getUrlById(targetUrlId));
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2634</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2634</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application places user input, which is untrusted data, in the server-side Session folder, which is considered a trusted location. This could lead developers to treat untrusted data as trusted.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -1287,7 +1228,7 @@ public class TrustBoundaryViolationFixed
 
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2629</key><name>Improper_Privilege_Management</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2629</key><name>Improper_Privilege_Management</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Privilege Management&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -1351,7 +1292,66 @@ Management&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid 
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2627</key><name>DoS_By_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2646</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
+&lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;/ol&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The application creates an SQL query using string obtained from the user
+      &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
+{
+        public void foo(TextBox tbUserName, SqliteConnection connection)
+        {	
+                string user = tbUserName.Text;
+                string sql = "insert into users(name) VALUES (user)"
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                connection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+        }
+}&lt;/pre&gt;&lt;h4&gt;
+The string obtained from the user is checked for potentially malicious characters
+      &lt;/h4&gt;&lt;pre&gt;
+class SqlInjectionFixed
+{
+        public void foo(TextBox tbUserName, SqliteConnection connection)
+        {
+                string user = tbUserName.Text;
+                string sql = "insert into users(name) VALUES (@param1)";
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue(@param1, user);
+                connection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+        }
+}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = " + user;
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
+	public static void getUserId(Connection con) {
+		System.out.println("enter user name");
+		Scanner in = new Scanner(System.in);
+		String user = in.nextLine();
+		String query = "select user_id from User where user = ?";
+		PreparedStatement stmt = con.createStatement(query);
+		stmt.setString(1, user);
+		ResultSet rs = stmt.executeQuery(query);
+	}
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2627</key><name>DoS_By_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a user-provided value to set its sleep period, without enforcing a limited range for this value.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;

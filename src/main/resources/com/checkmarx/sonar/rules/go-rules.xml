@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><rules><rule><key>checkmarx_4603</key><name>Find_Methods</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4627</key><name>Find_Imports</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4618</key><name>Find_Console_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4628</key><name>Find_Members_By_Import</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4630</key><name>Find_General_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4655</key><name>Find_Log_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4664</key><name>Find_Not_In_Range</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4668</key><name>Find_Command_Injection_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4672</key><name>Find_Byte_Slices</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4674</key><name>Find_Randomized_Slices</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4680</key><name>Find_Loop_Conditions</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4604</key><name>Find_DB</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4631</key><name>Find_Integers</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4757</key><name>Find_File_Read</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4619</key><name>Find_Interactive_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4694</key><name>Find_DB_In</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4651</key><name>Find_DB_Out</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4756</key><name>Find_File_Write</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4764</key><name>Find_DB_In_Cassandra</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4761</key><name>Find_DB_Out_Cassandra</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4629</key><name>Find_DB_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4765</key><name>Find_DB_Sanitize_Cassandra</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4654</key><name>Find_Interactive_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4606</key><name>Find_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4738</key><name>Find_Exec_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4605</key><name>Find_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4652</key><name>Find_Passwords</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4601</key><name>CxDefaultQuery</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4602</key><name>CxDefaultQuery</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4632</key><name>Find_UnknownReferences</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4673</key><name>Find_Slices</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4676</key><name>Find_Weak_Salt_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4679</key><name>Denial_Of_Service_Resource_Exhaustion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Denial-of-Service (DoS)&amp;nbsp;will result in&amp;nbsp;inaccessibility to some, if not all, facets of an application.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><rules><rule><key>checkmarx_4679</key><name>Denial_Of_Service_Resource_Exhaustion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Denial-of-Service (DoS)&amp;nbsp;will result in&amp;nbsp;inaccessibility to some, if not all, facets of an application.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Computing resources are limited by server specifications, be it memory, storage, CPU, bandwidth and more. Failure to ensure that these resources are properly generated, managed and released may result in a system failing in unexpected ways, which may result in Denial-of-Service.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Practice caution when handling system resources, from pointers in memory to files in the file system, to prevent potential abuse of available resources.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Memory Leak Example&lt;/h4&gt;&lt;pre&gt;// Memory leak
@@ -102,17 +102,7 @@ func main() {
             bs,_ := bcrypt.GenerateFromPassword([]byte(password),1) //1 is lower than MinCost, so cost will default to MinCost: 4
             fmt.Printf("Hash: %s\n",bs)
     }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4706</key><name>Find_Web_Inputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4685</key><name>Overly_Permissive_Cross_Origin_Resource_Sharing_Policy</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A Cross-Origin Resource Sharing (CORS) header,&amp;nbsp;"Access-Control-Allow-Origin", that is overly permissive may allow scripts from other web-sites to access, and often manipulate, resources on the affected web-application. These resources may include page contents, tokens and more, allowing potential Cross-Site Reference Forgery (CSRF) or Cross-Site Scripting (XSS) attacks, performing actions on a user's behalf such as changing their password, or allow breach of user privacy.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Modern browsers, by default, disallow resource sharing between different domains from accessing one another's DOM contents, cookie jars and other resources, specifically to prevent malicious web-applications from attacking legitimate web-applications and their users as part of the Same-Origin Policy (SOP). For example - website A cannot retrieve contents of website B by default, as that is a breach of the SOP. The Cross-Origin Resource Sharing (CORS) policy, defined by specific headers, allows loosening this strict default behavior to enable cross-site communications. However, when used incorrectly, CORS may enable&amp;nbsp;unintended and potentially malicious behavior by allowing an overly broad trust of web-applications that may submit requests and retrieve responses from the web-application.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Where not explicitly required, do not set any CORS headers. Where required, consider business needs for setting these headers, and opt for the most restrictive configuration possible, such as white-listing trusted, secure and allowed domains access, while&amp;nbsp;utilizing other CORS headers to strictly provide required and expected functionality.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;PHP&lt;/h3&gt;&lt;h4&gt;Wildcard Access-Control-Allow-Origin&lt;/h4&gt;&lt;pre&gt;&lt;?php
-	header(‘Access-Control-Allow-Origin: * ’);
-?&gt;&lt;/pre&gt;&lt;h4&gt;Access-Control-Allow-Origin Being Set for a Trusted Domain&lt;/h4&gt;&lt;pre&gt;&lt;?php
-  	//assuming https://www.example.com is a trusted domain
-	header(‘Access-Control-Allow-Origin: https://www.example.com ’);
-?&gt;&lt;/pre&gt;&lt;h4&gt;Dynamically Determine Access-Control-Allow-Origin from Origin Header&lt;/h4&gt;&lt;pre&gt;&lt;?php
-   header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
-?&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4621</key><name>Find_Remote_Requests</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4743</key><name>Find_Weak_Encryptors</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4620</key><name>Find_Read</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4656</key><name>Find_Write</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4670</key><name>Insecure_Scrypt_Parameters</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4670</key><name>Insecure_Scrypt_Parameters</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
 &lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
 
 &lt;p&gt;Modern hash functions usually have a cost (or similar) parameter the user can set to determine how much computational power should be used in hashing the password. A higher value means a slower computation, but also makes it slower to attack, as each attempt will take longer to perform.&lt;/p&gt;
@@ -180,70 +170,7 @@ func main() {
             fmt.Printf("Hash: %x\n",bs)
     }
 }
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4744</key><name>Insufficient_Output_Length</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
-&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
-
-&lt;p&gt;In this instance, the key derivation function's output length is too low. This can cause collisions where different passwords will hash to the same value, causing successful authentication where it should not happen.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
-
-
-&lt;p&gt;The output length of the key derivation function is too low.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
-&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
-&lt;li&gt;scrypt&lt;/li&gt;
-&lt;li&gt;bcrypt&lt;/li&gt;
-&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;Using these functions, however, is not enough to guarantee a secure credential storage mechanism. In order to avoid collisions, the safe length of the key derivation function's output should be 32 bytes or higher.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Sufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
-
-import (
-        "fmt"
-        "golang.org/x/crypto/scrypt"
-        "crypto/rand"
-        "bufio"
-        "os"
-)
-
-
-func main() {
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Enter password: ")
-    password, _ := reader.ReadString('\n')
-    salt := make([]byte, 32)
-    result,_ := rand.Read(salt)
-    if result == 32{
-            fmt.Printf("Salt: %x\n",salt)
-            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32) //32 bytes is enough as output length
-            fmt.Printf("Hash: %x\n",bs)
-    }
-}&lt;/pre&gt;&lt;h4&gt;Insufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
-
-import (
-        "fmt"
-        "golang.org/x/crypto/scrypt"
-        "crypto/rand"
-        "bufio"
-        "os"
-)
-
-
-func main() {
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Enter password: ")
-    password, _ := reader.ReadString('\n')
-    salt := make([]byte, 32)
-    result,_ := rand.Read(salt)
-    if result == 32{
-            fmt.Printf("Salt: %x\n",salt)
-            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 2) //2 bytes is not enough for output length!
-            fmt.Printf("Hash: %x\n",bs)
-    }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4675</key><name>Scrypt_Weak_Salt_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4675</key><name>Scrypt_Weak_Salt_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
 &lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
 
 
@@ -442,7 +369,7 @@ func main() {
             bs := pbkdf2.Key([]byte(password), salt, 1, sha256.Size, sha256.New)
             fmt.Printf("Hash: %x\n",bs)
     }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4758</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4763</key><name>Find_Strings</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4762</key><name>Find_Sql_Strings</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4624</key><name>Find_Template_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4633</key><name>Find_XSS_Sanitize</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4767</key><name>Find_XSS_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4766</key><name>Find_Web_Outputs</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4693</key><name>Stored_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4758</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4693</key><name>Stored_XSS_All_Clients</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from the application&amp;#8217;s database. The data is embedded directly in the page's HTML, causing the browser to display it as part of the web page. This data may have originated in input from another user. If the data includes HTML fragments or Javascript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary database data without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all dynamic data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -463,27 +390,7 @@ func main() {
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
 {
         public string foo(Label lblOutput, SqlConnection connection, int id)
         {
@@ -507,6 +414,26 @@ The outputed string is Html encoded before it is displayed in the label
                 string output = (string)cmd.ExecuteScalar()
                 lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
         }
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
 }&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
@@ -661,6 +588,7 @@ print "You entered ", HTML::Entities::encode($text);&lt;/pre&gt;&lt;div style="d
 &lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
 &lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
 &lt;li&gt;Start and stop system services&lt;/li&gt;
+&lt;li&gt;Modify the running application&lt;/li&gt;
 &lt;li&gt;Complete server takeover&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -713,7 +641,134 @@ print "You entered ", HTML::Entities::encode($text);&lt;/pre&gt;&lt;div style="d
         self.send_response(302)
         self.send_header('Location', url)
         self.end_headers()
-        &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4755</key><name>Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
+        &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4650</key><name>Insecure_Credential_Storage_Mechanism</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;Not using a standardized, publicly known solution for credential storage that has been under scrutiny by the security researcher community, will reduce the security of the credential storage used to access the application.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;The application is not storing credentials via a known secure mechanism.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Other means of credential storage are unsafe to use because they have either not been subject to cryptanalysis by security researchers or they have been broken or weakened.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Scrypt as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}
+&lt;/pre&gt;&lt;h4&gt;SHA-1 as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "crypto/sha1"
+	"io"
+)
+
+
+func main() {
+    password := "correcthorsebatterystaple"
+    e := sha1.New()
+    io.WriteString(e, password)
+    fmt.Printf("Hash: %x\n",e.Sum(nil))
+}
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4744</key><name>Insufficient_Output_Length</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
+&lt;p&gt;Even if the application is using a secure&amp;nbsp;credential storage mechanism, it's still possible to implement the solution in an insecure manner and reduce the security of the credentials stored.&lt;/p&gt;
+
+&lt;p&gt;In this instance, the key derivation function's output length is too low. This can cause collisions where different passwords will hash to the same value, causing successful authentication where it should not happen.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
+
+
+&lt;p&gt;The output length of the key derivation function is too low.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
+&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
+&lt;li&gt;scrypt&lt;/li&gt;
+&lt;li&gt;bcrypt&lt;/li&gt;
+&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Using these functions, however, is not enough to guarantee a secure credential storage mechanism. In order to avoid collisions, the safe length of the key derivation function's output should be 32 bytes or higher.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Sufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32) //32 bytes is enough as output length
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;h4&gt;Insufficient Output Length&lt;/h4&gt;&lt;pre&gt;package main
+
+import (
+        "fmt"
+        "golang.org/x/crypto/scrypt"
+        "crypto/rand"
+        "bufio"
+        "os"
+)
+
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    fmt.Print("Enter password: ")
+    password, _ := reader.ReadString('\n')
+    salt := make([]byte, 32)
+    result,_ := rand.Read(salt)
+    if result == 32{
+            fmt.Printf("Salt: %x\n",salt)
+            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 2) //2 bytes is not enough for output length!
+            fmt.Printf("Hash: %x\n",bs)
+    }
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4685</key><name>Overly_Permissive_Cross_Origin_Resource_Sharing_Policy</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A Cross-Origin Resource Sharing (CORS) header,&amp;nbsp;"Access-Control-Allow-Origin", that is overly permissive may allow scripts from other web-sites to access, and often manipulate, resources on the affected web-application. These resources may include page contents, tokens and more, allowing potential Cross-Site Reference Forgery (CSRF) or Cross-Site Scripting (XSS) attacks, performing actions on a user's behalf such as changing their password, or allow breach of user privacy.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Modern browsers, by default, disallow resource sharing between different domains from accessing one another's DOM contents, cookie jars and other resources, specifically to prevent malicious web-applications from attacking legitimate web-applications and their users as part of the Same-Origin Policy (SOP). For example - website A cannot retrieve contents of website B by default, as that is a breach of the SOP. The Cross-Origin Resource Sharing (CORS) policy, defined by specific headers, allows loosening this strict default behavior to enable cross-site communications. However, when used incorrectly, CORS may enable&amp;nbsp;unintended and potentially malicious behavior by allowing an overly broad trust of web-applications that may submit requests and retrieve responses from the web-application.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Where not explicitly required, do not set any CORS headers. Where required, consider business needs for setting these headers, and opt for the most restrictive configuration possible, such as white-listing trusted, secure and allowed domains access, while&amp;nbsp;utilizing other CORS headers to strictly provide required and expected functionality.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;PHP&lt;/h3&gt;&lt;h4&gt;Wildcard Access-Control-Allow-Origin&lt;/h4&gt;&lt;pre&gt;&lt;?php
+	header(‘Access-Control-Allow-Origin: * ’);
+?&gt;&lt;/pre&gt;&lt;h4&gt;Access-Control-Allow-Origin Being Set for a Trusted Domain&lt;/h4&gt;&lt;pre&gt;&lt;?php
+  	//assuming https://www.example.com is a trusted domain
+	header(‘Access-Control-Allow-Origin: https://www.example.com ’);
+?&gt;&lt;/pre&gt;&lt;h4&gt;Dynamically Determine Access-Control-Allow-Origin from Origin Header&lt;/h4&gt;&lt;pre&gt;&lt;?php
+   header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
+?&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4755</key><name>Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
 &lt;ol&gt;
 &lt;ul&gt;
 &lt;li&gt;Stealing sensitive files, such as configuration or system files&lt;/li&gt;
@@ -784,58 +839,4 @@ Potentially hazardous characters are removed from the user input before use
             e.printStackTrace();
         }
     }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4650</key><name>Insecure_Credential_Storage_Mechanism</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using an insecure form of credential storage could expose&amp;nbsp;users' and/or administrators' credentials to brute-force, rainbow-table and other types of attacks.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;Not using a standardized, publicly known solution for credential storage that has been under scrutiny by the security researcher community, will reduce the security of the credential storage used to access the application.&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The method used to store the credentials is insecure.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;The application is not storing credentials via a known secure mechanism.&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Credential storage, namely passwords, should be carefully done by using a password hashing function. Most hashing functions have been created with speed as a pre-requisite, to create cryptographically secure hashes for file integrity and other purposes, making them ill fit for direct use with passwords; other functions&amp;nbsp;have been broken in the past due to collisions or other security problems (MD5, SHA-1, etc...) .&lt;/p&gt;
-&lt;p&gt;Our recommendations for secure credential storage functions include:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Argon2 (winner of the latest password hashing competition)&lt;/li&gt;
-&lt;li&gt;scrypt&lt;/li&gt;
-&lt;li&gt;bcrypt&lt;/li&gt;
-&lt;li&gt;PBKDF2 (for legacy compatibility only; currently on its "sunset phase")&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Other means of credential storage are unsafe to use because they have either not been subject to cryptanalysis by security researchers or they have been broken or weakened.&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Go&lt;/h3&gt;&lt;h4&gt;Scrypt as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
-
-import (
-        "fmt"
-        "golang.org/x/crypto/scrypt"
-        "crypto/rand"
-        "bufio"
-        "os"
-)
-
-
-func main() {
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Enter password: ")
-    password, _ := reader.ReadString('\n')
-    salt := make([]byte, 32)
-    result,_ := rand.Read(salt)
-    if result == 32{
-            fmt.Printf("Salt: %x\n",salt)
-            bs,_ := scrypt.Key([]byte(password), salt, 32768, 8, 2, 32)
-            fmt.Printf("Hash: %x\n",bs)
-    }
-}
-&lt;/pre&gt;&lt;h4&gt;SHA-1 as Credential Storage Mechanism&lt;/h4&gt;&lt;pre&gt;package main
-
-import (
-        "fmt"
-        "crypto/sha1"
-	"io"
-)
-
-
-func main() {
-    password := "correcthorsebatterystaple"
-    e := sha1.New()
-    io.WriteString(e, password)
-    fmt.Printf("Hash: %x\n",e.Sum(nil))
-}
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>
