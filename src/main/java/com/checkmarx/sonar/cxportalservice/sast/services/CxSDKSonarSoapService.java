@@ -7,10 +7,10 @@ import com.checkmarx.soap.client.CxWSResponseLoginData;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
-import sun.net.www.protocol.http.HttpURLConnection;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.rmi.RemoteException;
 
@@ -105,28 +105,41 @@ abstract class CxSDKSonarSoapService {
                 throw logErrorAndCreateConnectionException("Checkmarx server url must not contain path: " + serverUrl);
             }
             return url;
-        }catch (MalformedURLException e) {
-            if (e.getLocalizedMessage().startsWith("no protocol:")) {
+        }catch (Exception e) {
+            if(e.getLocalizedMessage().startsWith("no protocol:")) {
                 throw logErrorAndCreateConnectionException(e.getLocalizedMessage() + ". Server URL syntax is: http(s)://servername(:port)", e);
             } else {
-                throw logErrorAndCreateConnectionException(e.getLocalizedMessage(),e);
+                throw logErrorAndCreateConnectionException("URL form validation failed: "+e.getLocalizedMessage(), e);
             }
         }
     }
 
     private void validateLiveServer(URL url) throws ConnectionException {
-        HttpURLConnection huc = null;
         try {
-            huc = (HttpURLConnection) url.openConnection();
-            //HEAD minimize loaded data in response
-            huc.setRequestMethod("HEAD");
-            huc.setConnectTimeout(7000);
-            int responseCode = huc.getResponseCode();
-            if (responseCode != 200) {
-                throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: "+responseCode);
+           try {
+               HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+               //HEAD minimize loaded data in response
+               httpURLConnection.setRequestMethod("HEAD");
+               httpURLConnection.setConnectTimeout(7000);
+               int responseCode = httpURLConnection.getResponseCode();
+               if (responseCode != 200) {
+                   throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: "+responseCode);
+               }
+           }catch (ClassCastException e){
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                httpsURLConnection.setRequestMethod("HEAD");
+                httpsURLConnection.setConnectTimeout(7000);
+                int responseCode = httpsURLConnection.getResponseCode();
+                if (responseCode != 200) {
+                    throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: " + responseCode);
+                }
+           }
+        } catch (Exception e) {
+            if(e instanceof IOException) {
+                throw logErrorAndCreateConnectionException("Could not access Server URL: " + e.getLocalizedMessage(), e);
+            } else {
+                throw logErrorAndCreateConnectionException("Live server validation failed: "+ e.getLocalizedMessage(), e);
             }
-        } catch (IOException e) {
-            throw logErrorAndCreateConnectionException("Could not access Server URL: "+e.getLocalizedMessage(), e);
         }
     }
 

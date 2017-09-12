@@ -63,7 +63,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .prop("sessionId", sessionId)
                                     .endObject()
                                     .close();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             logger.error("Login failed due to Exception: " + e.getMessage());
                             response.newJsonWriter()
                                     .beginObject()
@@ -99,7 +99,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .prop("isSuccessful", true)
                                     .endObject()
                                     .close();
-                        } catch (IOException | JSONException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                             logger.error("Projects retrieval failed due to Exception: " + e.getMessage());
                             response.newJsonWriter()
@@ -133,7 +133,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .endObject()
                                     .close();
 
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             logger.error("Logging out of Checkmarx failed due to Exception: " + e.getMessage());
                             response.newJsonWriter()
                                     .beginObject()

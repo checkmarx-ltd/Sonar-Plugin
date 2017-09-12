@@ -199,17 +199,38 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         clearButtonsAndProjectListMsgs();
         createSpanSpinner('testConBtn');
 
-        var credentialsToSend = getInputCredentialsAndValidateValues();
-        if (credentialsToSend != "") {
-            connectWithInputCredentialsAndGetResponse(credentialsToSend).then(function (res2) {
-                return getCxProjectsFromServerResponse(res2)
-            }).then(function (res3) {
+        try {
+            var credentialsToSend = getInputCredentialsAndValidateValues();
+            if (credentialsToSend != "") {
+                connectWithInputCredentialsAndGetResponse(credentialsToSend).then(function (res2) {
+                    return getCxProjectsFromServerResponse(res2)
+                }).then(function (res3) {
+                    deleteSpanSpinner('testConBtn');
+                    return cleanUpAndUpdateUI(res3);
+                }).catch(function(err){
+                    terminateFailedTestConnection();
+                });
+            } else {//err msg appears in projects form
                 deleteSpanSpinner('testConBtn');
-                return cleanUpAndUpdateUI(res3);
-            });
-        } else {//err msg appears in projects form
-            deleteSpanSpinner('testConBtn');
+            }
+        }catch (err){
+            terminateFailedTestConnection();
         }
+    }
+
+
+    function terminateFailedTestConnection() {
+       try {
+           projectsIn = "";
+           var select = document.getElementById('projectSelect');
+           select.innerHTML = createOptions();
+       }catch (ignored){}
+        try {
+            deleteSpanSpinner('testConBtn');
+        }catch (ignored){}
+        try {
+            createFailureMsg('testConBtn', 'Connection Failed');
+        }catch (ignored){}
     }
 
 

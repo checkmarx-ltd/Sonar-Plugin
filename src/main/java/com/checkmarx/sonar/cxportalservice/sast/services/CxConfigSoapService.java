@@ -34,7 +34,7 @@ public class CxConfigSoapService extends CxSDKSonarSoapService {
             if (!projectsDisplayData.isIsSuccesfull()) {
                 throw logErrorAndCreateConnectionException(errMsg + projectsDisplayData.getErrorMessage());
             }
-            if (projectsDisplayData.getProjectList() != null){
+            if (projectsDisplayData.getProjectList() != null && projectsDisplayData.getProjectList().getProjectDisplayData() != null){
                 return Arrays.asList(projectsDisplayData.getProjectList().getProjectDisplayData());
             }
         } catch (javax.xml.ws.WebServiceException | RemoteException e) {
