@@ -762,18 +762,7 @@ function storeUserData() {
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
-let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
-withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
-    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
-})
-    
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -787,7 +776,18 @@ byte sessBytes[] = new byte[32];
 random.nextBytes(sessBytes);
 
 String sessionId = new String(sessBytes);
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2911</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
+&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
+let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
+withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
+    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
+})
+    
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2911</key><name>Heap_Inspection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;All variables stored by the application in unencrypted memory can potentially be retrieved by an unauthorized user, with privlieged access to the&amp;#160;machine. For example, a privileged attacker could attach a debugger to the running process, or retrieve the process's memory from the swapfile or crash dump file.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker&amp;#160;finds the user passwords in memory, these can be reused to easily impersonate the user to the system.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;String variables are immutable - in other words, once a string variable is assigned, its value cannot be changed or removed. Thus, these strings may remain&amp;#160;around in memory, possibly in multiple locations, for an indefinite period of time until the garbage collector happens to remove it. Sensitive data, such as passwords, will remain exposed in memory as plaintext with no control over their lifetime.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
@@ -818,7 +818,32 @@ String sessionId = new String(sessBytes);
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
+class Heap_Inspection 
+{
+  private string password;
+	
+  void setPassword()
+  {	
+	password = System.console().readLine("Enter your password: ");
+  }
+}
+&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
+{
+  private SealedObject password;
+	
+  void setPassword()
+  {	
+	byte[] sKey = getKeyFromConfig();
+	Cipher c = Cipher.getInstance("AES");
+	c.init(Cipher.ENCRYPT_MODE, sKey);
+
+	char[] input = System.console().readPassword("Enter your password: ");
+	password = new SealedObject(Arrays.asList(input), c);
+  }
+}
+
+&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
 
 #include &lt;stdio.h&gt;
 
@@ -897,31 +922,6 @@ int main()
 			break;
 	}
 }
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
-class Heap_Inspection 
-{
-  private string password;
-	
-  void setPassword()
-  {	
-	password = System.console().readLine("Enter your password: ");
-  }
-}
-&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
-{
-  private SealedObject password;
-	
-  void setPassword()
-  {	
-	byte[] sKey = getKeyFromConfig();
-	Cipher c = Cipher.getInstance("AES");
-	c.init(Cipher.ENCRYPT_MODE, sKey);
-
-	char[] input = System.console().readPassword("Enter your password: ");
-	password = new SealedObject(Arrays.asList(input), c);
-  }
-}
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3633</key><name>Buffer_Size_Literal_Condition</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;
 
 &lt;div&gt;An attacker can exploit the buffer overflow to execute an arbitrary code with the privileges of the vulnerable application.&lt;/div&gt;
@@ -1913,7 +1913,32 @@ void f() {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
+class Heap_Inspection 
+{
+  private string password;
+	
+  void setPassword()
+  {	
+	password = System.console().readLine("Enter your password: ");
+  }
+}
+&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
+{
+  private SealedObject password;
+	
+  void setPassword()
+  {	
+	byte[] sKey = getKeyFromConfig();
+	Cipher c = Cipher.getInstance("AES");
+	c.init(Cipher.ENCRYPT_MODE, sKey);
+
+	char[] input = System.console().readPassword("Enter your password: ");
+	password = new SealedObject(Arrays.asList(input), c);
+  }
+}
+
+&lt;/pre&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Vulnerable C code&lt;/h4&gt;&lt;pre&gt;/* Vulnerable to heap inspection */
 
 #include &lt;stdio.h&gt;
 
@@ -1992,31 +2017,6 @@ int main()
 			break;
 	}
 }
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Plaintext Password in Immutable String&lt;/h4&gt;&lt;pre&gt;
-class Heap_Inspection 
-{
-  private string password;
-	
-  void setPassword()
-  {	
-	password = System.console().readLine("Enter your password: ");
-  }
-}
-&lt;/pre&gt;&lt;h4&gt;Password Protected in Memory&lt;/h4&gt;&lt;pre&gt;class Heap_Inspection_Fixed 
-{
-  private SealedObject password;
-	
-  void setPassword()
-  {	
-	byte[] sKey = getKeyFromConfig();
-	Cipher c = Cipher.getInstance("AES");
-	c.init(Cipher.ENCRYPT_MODE, sKey);
-
-	char[] input = System.console().readPassword("Enter your password: ");
-	password = new SealedObject(Arrays.asList(input), c);
-  }
-}
-
 &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3588</key><name>Unsecure_Deserialization</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;If an archive is manipulated in transit by an attacker and then deserialized with unsecure deserialization method decodeObjectForKey:, unexpected behavior may occur. In this way, an attacker could potentially cause a buffer overflow or trigger another vulnerability and possibly seize control of the system. Not conforming to NSSecureCoding protocol, does not guarantee absence of unsecure deserialization methods.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker manipulates the archive on transit, and replaces one of the NSString objects with an object of a different class. The received archive is deserialized. A property of type NSString* is initialized with an object of different type. Buffer overflow or other unexpected behavior occurs when the NSString selectors are called on a substituted object. For more information see section &amp;#8220;Modifications to Archived Data&amp;#8221; in &amp;#8220;Apple Secure Coding Guide&amp;#8221; document: https://developer.apple.com/library/ios/documentation/Security/Conceptual/SecureCodingGuide/&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Deserialize only objects of classes conforming to the NSSecureCoding protocol when the archive is received from an untrusted input.&lt;/div&gt;            
@@ -2951,26 +2951,6 @@ The outputed string is Html encoded before it is displayed in the label
                 string output = (string)cmd.ExecuteScalar()
                 lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
         }
-}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
 }&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
@@ -2997,12 +2977,36 @@ function renderUserProfileTable(res, connection, user_id) {
 		}
 		label.setText("Mickey last names are: " + lastNames + " ");
 	}
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4732</key><name>App_Transport_Security_Bypass</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;App Transport Security (ATS) enforces best practices in the secure connections between an app and its back end.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;ATS prevents accidental disclosures, provides secure default behavior, and is easy to adopt.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;You should adopt ATS as soon as possible, regardless of whether you're creating a new app or updating an existing one.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;ATS shouldn't be disabled in order to make sure that the application traffic is encrypted and secured.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;Use as fewer as possible domain exceptions, only if it's not possible to use a secure transport (HTTPS), otherwise it is always prefered to use HTTPS.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;Disables ATS altogether&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;This is available from iOS 10&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+&lt;dict&gt;
+    &lt;key&gt;NSAllowsArbitraryLoadsInWebContent&lt;/key&gt;
+    &lt;true/&gt;
+&lt;/dict&gt;&lt;/pre&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;Disables ATS altogether&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
 &lt;dict&gt;
   &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;
       &lt;true/&gt;
@@ -3037,10 +3041,6 @@ function renderUserProfileTable(res, connection, user_id) {
       &lt;string&gt;TLSv1.2&lt;/string&gt;
     &lt;/dict&gt;
   &lt;/dict&gt;
-&lt;/dict&gt;&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;This is available from iOS 10&lt;/h4&gt;&lt;pre&gt;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
-&lt;dict&gt;
-    &lt;key&gt;NSAllowsArbitraryLoadsInWebContent&lt;/key&gt;
-    &lt;true/&gt;
 &lt;/dict&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2221</key><name>Use_of_Broken_or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application code specifies the name of the selected cryptographic algorithm, either via a String argument, a factory method, or a specific implementation class. These algorithms have fatal cryptographic weaknesses, that make it trivial to break in a reasonable timeframe. Strong algorithms should withstand attacks far beyond the realm of possible.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
@@ -3290,7 +3290,35 @@ Before Removing Last Reference (aka 'Memory Leak')&lt;/td&gt;&lt;/tr&gt;&lt;tr&g
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2795</key><name>Information_Exposure_Through_an_Error_Message</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Exposed details about the application&amp;#8217;s environment, users, or associated data (for example, stack trace) could enable an attacker to find another flaw and help the attacker to mount an attack.&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2906</key><name>Format_String_Attack</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;
+&lt;p&gt;In environments with unmanaged memory, allowing attackers to control format strings could enable them to access areas of memory to which they should not have access, including reading other restricted variables, misrepresenting data, and possibly even overwriting unauthorized areas of memory. It is even possible this could further lead to buffer overflows and arbitrary code execution under certain circumstance.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application allows user input to influence the string argument used for formatted print functions. This family of functions expects the first argument to designate the relative format of dynamically constructed output string, including how to represent each of the other arguments.&lt;/div&gt;
+&lt;p&gt;Allowing an external user or attacker to control this string, allows them to control the functioning of the printing function, and thus to access unexpected areas of memory.&lt;/p&gt;
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not allow user input or any other external data to influence the format strings.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Ensure that all string format functions are called with a static string as the format parameter, and that the correct number of arguments are passed to the function, according to the static format string.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Alternatively, validate all user input before using it in the format string parameter to print format functions, and ensure formatting tokens are not included in the input.&amp;nbsp;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div&gt;Specific Recommendations:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not include user input directly in the format string parameter (often the first or second argument) to formatting functions.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Alternatively, use controlled information derived from the input, such as size or length, in the format string - but not the actual contents of the input itself.&amp;nbsp;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Dynamic Format String into NSLog&lt;/h4&gt;&lt;pre&gt;NSLog(self.textField); // If textField is set to %@, the application will crash.&lt;/pre&gt;&lt;h4&gt;Static Format String into NSLog&lt;/h4&gt;&lt;pre&gt;NSLog("%@", self.textField);&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4787</key><name>Missing_Device_Lock_Verification</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2795</key><name>Information_Exposure_Through_an_Error_Message</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Exposed details about the application&amp;#8217;s environment, users, or associated data (for example, stack trace) could enable an attacker to find another flaw and help the attacker to mount an attack.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application generates an error message including raw exceptions, either by not being handled, by explicit returning of the object, or by configuration. Exception details may include sensitive information that could leak out of the exception to the users.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -4399,38 +4427,38 @@ Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" r
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
-&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
 
 
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2798</key><name>Expression_is_Always_False</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2798</key><name>Expression_is_Always_False</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Expression is Always False&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -4651,36 +4679,4 @@ Quality&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2906</key><name>Format_String_Attack</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;
-&lt;p&gt;In environments with unmanaged memory, allowing attackers to control format strings could enable them to access areas of memory to which they should not have access, including reading other restricted variables, misrepresenting data, and possibly even overwriting unauthorized areas of memory. It is even possible this could further lead to buffer overflows and arbitrary code execution under certain circumstance.&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application allows user input to influence the string argument used for formatted print functions. This family of functions expects the first argument to designate the relative format of dynamically constructed output string, including how to represent each of the other arguments.&lt;/div&gt;
-&lt;p&gt;Allowing an external user or attacker to control this string, allows them to control the functioning of the printing function, and thus to access unexpected areas of memory.&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not allow user input or any other external data to influence the format strings.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Ensure that all string format functions are called with a static string as the format parameter, and that the correct number of arguments are passed to the function, according to the static format string.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Alternatively, validate all user input before using it in the format string parameter to print format functions, and ensure formatting tokens are not included in the input.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div&gt;Specific Recommendations:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not include user input directly in the format string parameter (often the first or second argument) to formatting functions.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Alternatively, use controlled information derived from the input, such as size or length, in the format string - but not the actual contents of the input itself.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;div&gt;&amp;nbsp;&lt;/div&gt;
-&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Improper use of formatting string&lt;/h4&gt;&lt;pre&gt;
-printf(name + " has the following id: %d", id); 
-&lt;/pre&gt;&lt;h4&gt;Safe use of formatting string&lt;/h4&gt;&lt;pre&gt;
-printf("%s has the following id: %d", name, id); 
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Dynamic Format String into NSLog&lt;/h4&gt;&lt;pre&gt;NSLog(self.textField); // If textField is set to %@, the application will crash.&lt;/pre&gt;&lt;h4&gt;Static Format String into NSLog&lt;/h4&gt;&lt;pre&gt;NSLog("%@", self.textField);&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4787</key><name>Missing_Device_Lock_Verification</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>

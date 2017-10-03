@@ -268,18 +268,7 @@ public class XSRFFixed
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
-let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
-withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
-    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
-})
-    
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -293,7 +282,18 @@ byte sessBytes[] = new byte[32];
 random.nextBytes(sessBytes);
 
 String sessionId = new String(sessBytes);
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3977</key><name>Improper_Restriction_of_XXE_Ref</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An&amp;#160;application that will parse and replace DTD entity references, in an XML document that the user controls, can allow an attacker to craft an XML document to read arbitrary server files. This XML document could contain an XML entity reference, which refers to an embedded DTD entity definition that points to any local file. This would enable the attacker to retrieve any arbitrary system file on the server.&amp;#160;&lt;/div&gt;      
+&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
+let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
+withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
+    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
+})
+    
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3977</key><name>Improper_Restriction_of_XXE_Ref</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An&amp;#160;application that will parse and replace DTD entity references, in an XML document that the user controls, can allow an attacker to craft an XML document to read arbitrary server files. This XML document could contain an XML entity reference, which refers to an embedded DTD entity definition that points to any local file. This would enable the attacker to retrieve any arbitrary system file on the server.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;An attacker could upload an XML document that contains a DTD declaration, in particular an entity defintion that refers to a local file on the server's disk, e.g. &lt;code&gt;&amp;lt;!ENTITY xxe SYSTEM "file:///c:/boot.ini"&amp;gt;&lt;/code&gt;. The attacker would then include an XML entity reference that refers back to that entity definition, e.g. &lt;code&gt;&amp;lt;div&amp;gt;&amp;amp;xxe;&amp;lt;/div&amp;gt;&lt;/code&gt; . If the parsed XML document is then returned to the user, the result will include the contents of the sensitive system file.&amp;#160;&lt;/div&gt;
 &lt;div&gt;This is caused by the XML parser, which is configured to automatically parse DTD declarations and resolve entity references, instead of disabling both DTD and external references altogether.&amp;#160;&lt;/div&gt;
@@ -426,40 +426,7 @@ Response.Write("Error occurred.");
                         + "; path=/myApp/" 
                         + "; secure;"
     }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3572</key><name>Header_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;li&gt;Hijack session, performing session fixation in which a cookie or other authenticated header is injected into the request.&lt;/li&gt;
-&lt;li&gt;Cause web cache poisoning, via a Response Splitting attack or by tricking the cache server into unintentionally associating a URL with another URL&amp;#8217;s page (content), and caching this content for the URL.&lt;/li&gt;
-&lt;li&gt;Bypass CSRF protection which relies on the referrer header.&lt;/li&gt;
-&lt;li&gt;Bypass Firewall/IPS/IDS protection, via a Request smuggling attack, by sending a second, unnoticed request.&lt;/li&gt;
-&lt;li&gt;Executing arbitrary Javascript code, via Cross-Site Scripting (XSS), by changing headers like Content-Type or overriding headers like x-xss-protection.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;p class="MsoNormal"&gt;HTTP header injection vulnerabilities occur when an HTTP request header is influenced by an input received from the client without being validated. This attack usually occurs by injecting CRLF (newline) characters (i.e. \r, \n, %0a, %0d) into a HTTP request header, breaking out of the headers into the message body and writing a second arbitrary request. Alternatively, it is possible to perform other attacks by influencing the request authentication headers, security header and bypass. This attack makes it possible to exploit other attacks, like Cache Poisoning, Session Hijacking, Cross-site Scripting (XSS) and the ability to bypass web application firewall protection.&lt;/p&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p class="MsoNormal"&gt;Perform URL encoding on all inputs before adding them to the request, such as CRLF characters, to avoid dealing with malicious data.&lt;/p&gt;
-&lt;h5&gt;Secure Code Approach&lt;/h5&gt;
-&lt;p class="MsoNormal"&gt;Validate all input, regardless of source on the server side. Validation should be based on a whitelist. Accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&amp;#160;&lt;/li&gt;
-&lt;/ul&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;User input is being used in a HTTP request header, enabling an attacker to add a newline character and multiple headers:&lt;/h4&gt;&lt;pre&gt;var xmlhttp = new XmlHttpRequest();
-xmlhttp.open("GET", url, true);
-var username = location.search.split('user=')[1];
-xmlhttp.setRequestHeader("x-user:", username);
-xmlhttp.send();&lt;/pre&gt;&lt;h4&gt;The user input is examined to contain and newline character and the input is also URL encoded:&lt;/h4&gt;&lt;pre&gt;var xmlhttp = new XmlHttpRequest();
-xmlhttp.open("GET", url, true);
-var username = location.search.split('user=')[1];
-var safeUsername = encodeURIComponent(username).replace(/[\n\r]/g, '');
-xmlhttp.setRequestHeader("x-user:", safeUsername);
-xmlhttp.send();
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3114</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3114</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
 &lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -715,11 +682,14 @@ class SqlInjectionFixed
 &lt;p&gt;&amp;nbsp;- Avoid implementing special "test code", "debugging-time" functionality, or "secret" interfaces or parameters in the application code itself.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Define and implement a standard and automatic build / deployment process, using dedicated CI / CD tools, that can automatically configure the deployed application, exclude all temporary code, and include only intended application code.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Debug Configuration&lt;/h4&gt;&lt;pre&gt;&lt;configuration&gt;
-	&lt;system.web&gt;
-    	&lt;compilation debug="false" /&gt;
-    &lt;/system.web&gt;
-&lt;/configuration&gt;&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Main in Servlet&lt;/h4&gt;&lt;pre&gt;public class AppServlet extends HttpServlet { 
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Ruby&lt;/h3&gt;&lt;h4&gt;Internal Test Method&lt;/h4&gt;&lt;pre&gt;class AppClass
+	def run_app
+      # Run the app
+    end
+  	def test_app
+      # Test and debug the app
+    end
+end&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Main in Servlet&lt;/h4&gt;&lt;pre&gt;public class AppServlet extends HttpServlet { 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
       				throws ServletException, IOException {
       	// handle request
@@ -730,14 +700,11 @@ class SqlInjectionFixed
       	// initialize app for debugging and testing
       	MODE = "DEBUGGING";
     }
-}&lt;/pre&gt;&lt;h3&gt;Ruby&lt;/h3&gt;&lt;h4&gt;Internal Test Method&lt;/h4&gt;&lt;pre&gt;class AppClass
-	def run_app
-      # Run the app
-    end
-  	def test_app
-      # Test and debug the app
-    end
-end&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4463</key><name>Unsafe_Deserialization</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker could prepare serialized data which when de-serialized would cause execution of the attacker python code on the server.&amp;nbsp;&lt;/p&gt;
+}&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Debug Configuration&lt;/h4&gt;&lt;pre&gt;&lt;configuration&gt;
+	&lt;system.web&gt;
+    	&lt;compilation debug="false" /&gt;
+    &lt;/system.web&gt;
+&lt;/configuration&gt;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4463</key><name>Unsafe_Deserialization</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker could prepare serialized data which when de-serialized would cause execution of the attacker python code on the server.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;Arbitrary code execution on the server might lead to data loss, denial of service, or data security compromise.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The Pickle module implements generic and powerful serialization and de-serialization of arbitrary Python objects. Pickle supports serialization of acyclic and cyclic object graphs. If an object is referenced several times, only one master copy is serialized, and the other references are preserved as the references to the master copy.&lt;/p&gt;
 &lt;p&gt;The Pickle module is not intended to be used in untrusted environment, and it is not secure against invalid of maliciously constructed data.&lt;/p&gt;
@@ -1010,55 +977,127 @@ bool validateInput(HttpServletRequest req) {
     else 
         return true;
 }
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3116</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ol&gt;
-&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
-&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The user's password is written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3102</key><name>Connection_String_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;If an attacker could manipulate the application&amp;rsquo;s connection string to the database server, they might be able do any of the following:&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Damage application performance (by increasing the MIN POOL SIZE)&lt;/li&gt;
+&lt;li&gt;Tamper with the network connection (for example, via TRUSTED CONNECTION)&lt;/li&gt;
+&lt;li&gt;Direct the application to the attacker&amp;rsquo;s bogus database&lt;/li&gt;
+&lt;li&gt;Discover the password to the system account on the database (by a brute-force attack).&lt;/li&gt;
+&lt;/ul&gt;
 
-class PrivacyViolation
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                insert_sql = insert_sql.Replace("$password", password);
-                System.Console.WriteLine(insert_sql);
-        } 
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;In order to communicate with the database, or with another external server (for example, Active Directory), the application dynamically constructs a connection string. This connection string includes untrusted data, which may be controlled by a malicious user. Since it is not constrained or properly sanitized, the untrusted data could be used to maliciously manipulate the connection string.&lt;/div&gt;
+
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;Do not allow users to control the database connection string. Avoid dynamically building connection strings based on untrusted data, especially user input.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Store all connection strings in appropriate configuration mechanisms.&amp;nbsp;If it is necessary to dynamically construct a connection string at runtime,&amp;nbsp;do not include untrusted data directly in the connection string; instead, allow users to select from pre-defined connection strings.&amp;nbsp;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Connect to Database using User Input&lt;/h4&gt;&lt;pre&gt;def open_connection_unsafe(): 
+    db_server = request.args.get('Server')
+    db_name = request.args.get('Database')
+    
+    conn_string = 'driver=%s;server=%s;database=%s;uid=%s;pwd=%s' % (DB_DRIVER, db_server, db_name, DB_USER, DB_PASSWORD)
+    
+    conn = pyodbc.connect(conn_string)
+    
+    return conn
+&lt;/pre&gt;&lt;h4&gt;Select Pre-Configured Database Connection by User Input&lt;/h4&gt;&lt;pre&gt;defined_conn_strings = {
+    APP_ID1: CONN_STRING_APP1,
+    APP_ID2: CONN_STRING_APP2,
+    APP_ID3: CONN_STRING_APP3	
 }
 
+def open_connection_safe_selection(): 
+    app_id = int(request.args.get('AppId'))
+    
+    conn_string = defined_conn_strings.get(app_id, CONN_STRING_DEFAULT)
+    
+    conn = pyodbc.connect(conn_string)
+    
+    return conn
+&lt;/pre&gt;&lt;h4&gt;Load Connection String from Configuration by User Input&lt;/h4&gt;&lt;pre&gt;import configparser
+
+def open_connection_safe_config(): 
+    app_name = request.args.get('AppName')
+    
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILENAME)
+    
+    conn_string = config.get("database_connection", app_name)
+    
+    conn = pyodbc.connect(conn_string)
+    
+    return conn
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3100</key><name>Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
+&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
+&lt;li&gt;Changing the website;&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
+&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Start and stop system services;&lt;/li&gt;
+&lt;li&gt;Complete server takeover.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 
 
-      &lt;/pre&gt;&lt;h4&gt;
-the user's password is MD5 coded before being written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolationFixed
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
-                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-        StringBuilder md5Password = new StringBuilder();
-
-                for (int i = 0; i &lt; data.Length; i++)
-		{
-			md5Password.Append(data[i].ToString("x2"));
-		}
-		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
-                System.Console.WriteLine(insert_sql);
-        } 
-}
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
 
 
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
+&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;/ul&gt;
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3110</key><name>Log_Forging</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could engineer audit logs of security-sensitive actions and lay a false audit trail, potentially implicating an innocent user or hiding an incident.&lt;/div&gt;      
+&lt;ul&gt;
+&lt;li&gt;Prefer passing user data to pre-implemented script, e.g. in another isolated application.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If the provided user data consists only of Python literals and literal containers, consider using&amp;nbsp;&lt;code&gt;ast.literal_eval()&lt;/code&gt; instead, or even the &lt;code&gt;json&lt;/code&gt; object.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Dynamically Execute User Code&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
+def execute_user_code_unsafe(): 
+    user_code = request.args.get('code')
+	result = eval(user_code)
+	
+	return result['value']&lt;/pre&gt;&lt;h4&gt;Safely Parse User's Literals&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
+def parse_literals_safe(): 
+    user_code = request.args.get('code')
+	result = ast.literal_eval(user_code)
+	
+	return result['value']
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3578</key><name>Hardcoded_Password_in_Connection_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded database passwords expose the application to password leakage, and the database to unauthorized access. If an attacker gains access to the source code (or can decompile the application binaries), she will be able to steal the embedded passwords, and use them to directly access the database. This would enable the attacker to steal secret information, modify sensitive records, or delete important data.&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;In addition, the password cannot be easily changed when required. In the eventual situation wherein it is a necessity to update the password, a new version of the application would need to be built and deployed to production systems.&amp;nbsp;&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application has the database password hardcoded in the source code files, and uses this password in a connection string to the database or other server. This password is visible to anyone with access to source code, and cannot be changed without rebuilding or recompiling the application. Even after compilation or deployment, the password and connection string are still present in the binary program files or production environment.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;&amp;nbsp;- Never hardcode sensitive data, such as database passwords.&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;- Prefer to avoid requiring an explicit database password at all, instead using OS-integrated system authentication.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;- Alternatively, store the password in an encrypted configuration file, and implement a mechanism enabling administrators to change the password. Ensure the file permissions are configured to restrict access to administrators only.&amp;nbsp;&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3110</key><name>Log_Forging</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could engineer audit logs of security-sensitive actions and lay a false audit trail, potentially implicating an innocent user or hiding an incident.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application writes audit logs upon security-sensitive actions. Since the audit log includes user input that is neither checked for data type validity nor subsequently sanitized, the input could contain false information made to look like legitimate audit log data,&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -1072,113 +1111,38 @@ class PrivacyViolationFixed
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
-&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
 
 
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3107</key><name>XPath_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Depending on the type of information contained in the queried XML document, an attacker could cause any effect of selecting the wrong information from the XML document, such as stealing unauthorized data or impersonating another user.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application queries an XML document by using a textual XPath query. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could be maliciously crafted to cause the application to select the wrong information from the XML document.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;li&gt;Ideally, avoid making the xpath query dependent on user input. If it is necessary to make the query dependent on user input, preferably map XPath queries to user parameters, maintaining separation between data and code. If it is necessary to include the user input in the query, the input must be first properly validated as above.&lt;/li&gt;
-&lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application uses a user inputed string to construct an XPath query&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import xpath
-print 'Insert item number: '
-userInput = stdin.readline()	
-xpath.find('//item' + userInput, doc)&lt;/pre&gt;&lt;h4&gt;The user inputed string is turned into an integer before usage in the XPath query&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import xpath
-print 'Insert item number: '
-userInput = stdin.readline()	
-xpath.find('//item' + str(int(userInput)), doc)&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application uses a user inputed string to construct an XPath query
-      &lt;/h4&gt;&lt;pre&gt;class XPathInjection
-    {
-        static void foo(XPathDocument document)
-        {
-            XPathNavigator navigator = document.CreateNavigator();
-            string input = Console.ReadLine();
-            XPathNodeIterator nodes = navigator.Select(input);
-        }
-    }&lt;/pre&gt;&lt;h4&gt;
-The user inputed string is encoded before usage in the XPath query
-      &lt;/h4&gt;&lt;pre&gt;class XPathInjectionFixed
-    {
-        static void foo(XPathDocument document)
-        {
-            XPathNavigator navigator = document.CreateNavigator();
-            string input = Console.ReadLine();
-                        byte[] fileName = md5.ComputeHash(System.Text.Encoding.ASCII.GetBytes(input));
-                        input = System.Text.Encoding.Default.GetString(fileName);
-            XPathNodeIterator nodes = navigator.Select(input);
-        }
-    }&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application uses a user inputed string to construct an XPath query&lt;/h4&gt;&lt;pre&gt;public class XPath_Injection {
-	public static void main(String[] args) {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter xpath expression: ");
-		String expression = userInputScanner.nextLine();
-
-		// read a string value
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		try {
-			XPathExpression email = xPath.compile(expression);
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-	}
-}&lt;/pre&gt;&lt;h4&gt;The user inputed string is encoded before usage in the XPath query&lt;/h4&gt;&lt;pre&gt;public class XPath_Injection_Fixed {
-	public static void main(String[] args) {
-		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
-		sanitize.put("student", "/class/student");
-		sanitize.put("graduate", "/class/graduate");
-		sanitize.put("professor", "/class/professor");
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter xpath expression: ");
-		String expression = userInputScanner.nextLine();
-
-		// read a string value
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		try {
-			XPathExpression email = xPath.compile(sanitize.get(expression));
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3576</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3576</key><name>Trust_Boundary_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Application developers may treat user input as trusted data, potentially creating an input-based vulnerability such as SQL Injection or Cross-Site Scripting.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application places user input, which is untrusted data, in the server-side Session folder, which is considered a trusted location. This could lead developers to treat untrusted data as trusted.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -1234,25 +1198,7 @@ public class TrustBoundaryViolationFixed
 &lt;li&gt;For URLs outside the application (if necessary), use an intermediate disclaimer page to provide users with a clear warning that they are leaving your site.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
-PageReference pageRef;
-if(redirsite != null)
-{
-    pageRef = new PageReference(redirsite);
-    pageRef.setRedirect(true);
-    return pageRef;
-}
-pageRef = ApexPages.currentPage();
-return pageRef;&lt;/pre&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
-PageReference pageRef;
-if(redirsite != null)
-{
-    pageRef = new PageReference('http://domain.com/page.jsp?' + redirsite);
-    pageRef.setRedirect(true);
-    return pageRef;
-}
-pageRef = ApexPages.currentPage();
-return pageRef;&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
 Avoid redirecting to arbitrary URLs, instead map the parameter to a list of static URLs.
 
       &lt;/h4&gt;&lt;pre&gt;
@@ -1271,7 +1217,25 @@ Avoid redirecting to arbitrary URLs, instead map the parameter to a list of stat
 Response.Redirect(getUrlById(targetUrlId));
 
 
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3106</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
+      &lt;/pre&gt;&lt;h3&gt;Apex&lt;/h3&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
+PageReference pageRef;
+if(redirsite != null)
+{
+    pageRef = new PageReference(redirsite);
+    pageRef.setRedirect(true);
+    return pageRef;
+}
+pageRef = ApexPages.currentPage();
+return pageRef;&lt;/pre&gt;&lt;h4&gt;&lt;/h4&gt;&lt;pre&gt;String redirsite = ApexPages.currentPage().getParameters().get('redirlocation');
+PageReference pageRef;
+if(redirsite != null)
+{
+    pageRef = new PageReference('http://domain.com/page.jsp?' + redirsite);
+    pageRef.setRedirect(true);
+    return pageRef;
+}
+pageRef = ApexPages.currentPage();
+return pageRef;&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3106</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from the application&amp;#8217;s database. The data is embedded directly in the page's HTML, causing the browser to display it as part of the web page. This data may have originated in input from another user. If the data includes HTML fragments or Javascript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary database data without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all dynamic data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -1316,26 +1280,6 @@ The outputed string is Html encoded before it is displayed in the label
                 string output = (string)cmd.ExecuteScalar()
                 lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
         }
-}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
 }&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
 	public static void XSSExample(Statement stmt) throws SQLException {
 		Label label = new Label();
@@ -1362,6 +1306,26 @@ function renderUserProfileTable(res, connection, user_id) {
 		}
 		label.setText("Mickey last names are: " + lastNames + " ");
 	}
+}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
+}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
+
+function renderUserProfileTable(res, connection, user_id) {
+	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
+		var table = "&lt;table&gt;"
+		table += "&lt;table class='profile-html-table'&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
+		table += "&lt;/table&gt;"
+		res.render("profile", table)
+	});
 }&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3105</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including data obtained from the database. Since that data may have been previously obtained from user input, and is neither checked for data type validity nor subsequently sanitized, the data could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
@@ -1424,225 +1388,7 @@ The data obtained from the database is checked for potentially malicious charact
 			e.printStackTrace();
 		}
 	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3104</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application opens a network socket, for listening to incoming network connections. However, the application uses user input to define the socket, enabling an attacker to control it.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Don&amp;#8217;t allow a user to define parameters of network sockets.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import socket
-import sys
-
-userInput = stdin.readline()
-
-HOST = userInput 
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
-import sys
-
-HOST = ''   # Symbolic name, meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application opens a network socket using a port number inputed by the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1)
-        {
-                        long address = Convert.ToInt32(textBox1.Text);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The application opens a hard-coded port number and does receive it from the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1, long address)
-        {
-            IPEndPoint endpoint = new IPEndPoint(address, 15551);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
-	public static void main(String[] args) {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter port number: ");
-		int portNumber = Integer.parseInt(userInputScanner.nextLine());
-		try {
-			ServerSocket serverSocket = new ServerSocket(portNumber);
-		} catch (Exception e) {
-			System.err.println("Caught Exception: " + e.getMessage());
-		}
-
-	}
-}&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded port number according to the user input&lt;/h4&gt;&lt;pre&gt;public class ResourceInjectionFixed {
-	public static void main(String[] args) {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter port name: ");
-		String portName = userInputScanner.nextLine();
-		int portNum;
-		switch (portName) {
-		case "ftps":
-			portNum = 989;
-			break;
-		case "ftp":
-			portNum = 20;
-			break;
-		case "smtp":
-			portNum = 25;
-			break;
-		default:
-			portNum = 80;
-		}
-		try {
-			ServerSocket serverSocket = new ServerSocket(portNum);
-		} catch (Exception e) {
-			System.err.println("Caught Exception: " + e.getMessage());
-		}
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3564</key><name>LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could arbitrarily engineer the application&amp;#8217;s LDAP queries. Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Log in as another user&lt;/li&gt;
-&lt;li&gt;Escalate privileges&lt;/li&gt;
-&lt;li&gt;Steal information&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application uses the "user" field string from an HttpRequest to communicate with an LDAP server
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class LDAPInjection
-{
-        public void foo(HttpRequest Request, DirectorySearcher searcher)
-        {
-                string userName = Request.QueryString["user"];
-                searcher.Filter = "(&amp;(samAccountName=" + userName + "))";
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters in the "user" string are removed
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class LDAPInjectionFixed
-{
-        public void foo(HttpRequest Request, DirectorySearcher searcher)
-        {
-                string userName = Request.QueryString["user"];
-                userName = Regex.Replace(userName, "^\\d{3}-\\d{3}-\\d{4}$", "");
-                searcher.Filter = "(&amp;(samAccountName=" + userName + "))";
-        }
-}
-
-
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3577</key><name>Stored_LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could arbitrarily engineer the application&amp;#8217;s LDAP queries. Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Log in as another user&lt;/li&gt;
-&lt;li&gt;Escalate privileges&lt;/li&gt;
-&lt;li&gt;Steal information&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application uses the "user" field string from an HttpRequest to communicate with an LDAP server
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class LDAPInjection
-{
-        public void foo(HttpRequest Request, DirectorySearcher searcher)
-        {
-                string userName = Request.QueryString["user"];
-                searcher.Filter = "(&amp;(samAccountName=" + userName + "))";
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters in the "user" string are removed
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class LDAPInjectionFixed
-{
-        public void foo(HttpRequest Request, DirectorySearcher searcher)
-        {
-                string userName = Request.QueryString["user"];
-                userName = Regex.Replace(userName, "^\\d{3}-\\d{3}-\\d{4}$", "");
-                searcher.Filter = "(&amp;(samAccountName=" + userName + "))";
-        }
-}
-
-
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3112</key><name>DoS_by_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3112</key><name>DoS_by_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a user-provided value to set its sleep period, without enforcing a limited range for this value.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -1799,20 +1545,105 @@ database then the passwords wont be sent to the database as clear text and wont 
 top&lt;/a&gt;&lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3102</key><name>Connection_String_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;If an attacker could manipulate the application&amp;rsquo;s connection string to the database server, they might be able do any of the following:&lt;/div&gt;
+&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3572</key><name>Header_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could:&lt;/div&gt;
+&lt;div&gt;
 &lt;ul&gt;
-&lt;li&gt;Damage application performance (by increasing the MIN POOL SIZE)&lt;/li&gt;
-&lt;li&gt;Tamper with the network connection (for example, via TRUSTED CONNECTION)&lt;/li&gt;
-&lt;li&gt;Direct the application to the attacker&amp;rsquo;s bogus database&lt;/li&gt;
-&lt;li&gt;Discover the password to the system account on the database (by a brute-force attack).&lt;/li&gt;
+&lt;li&gt;Hijack session, performing session fixation in which a cookie or other authenticated header is injected into the request.&lt;/li&gt;
+&lt;li&gt;Cause web cache poisoning, via a Response Splitting attack or by tricking the cache server into unintentionally associating a URL with another URL&amp;#8217;s page (content), and caching this content for the URL.&lt;/li&gt;
+&lt;li&gt;Bypass CSRF protection which relies on the referrer header.&lt;/li&gt;
+&lt;li&gt;Bypass Firewall/IPS/IDS protection, via a Request smuggling attack, by sending a second, unnoticed request.&lt;/li&gt;
+&lt;li&gt;Executing arbitrary Javascript code, via Cross-Site Scripting (XSS), by changing headers like Content-Type or overriding headers like x-xss-protection.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;p class="MsoNormal"&gt;HTTP header injection vulnerabilities occur when an HTTP request header is influenced by an input received from the client without being validated. This attack usually occurs by injecting CRLF (newline) characters (i.e. \r, \n, %0a, %0d) into a HTTP request header, breaking out of the headers into the message body and writing a second arbitrary request. Alternatively, it is possible to perform other attacks by influencing the request authentication headers, security header and bypass. This attack makes it possible to exploit other attacks, like Cache Poisoning, Session Hijacking, Cross-site Scripting (XSS) and the ability to bypass web application firewall protection.&lt;/p&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p class="MsoNormal"&gt;Perform URL encoding on all inputs before adding them to the request, such as CRLF characters, to avoid dealing with malicious data.&lt;/p&gt;
+&lt;h5&gt;Secure Code Approach&lt;/h5&gt;
+&lt;p class="MsoNormal"&gt;Validate all input, regardless of source on the server side. Validation should be based on a whitelist. Accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;User input is being used in a HTTP request header, enabling an attacker to add a newline character and multiple headers:&lt;/h4&gt;&lt;pre&gt;var xmlhttp = new XmlHttpRequest();
+xmlhttp.open("GET", url, true);
+var username = location.search.split('user=')[1];
+xmlhttp.setRequestHeader("x-user:", username);
+xmlhttp.send();&lt;/pre&gt;&lt;h4&gt;The user input is examined to contain and newline character and the input is also URL encoded:&lt;/h4&gt;&lt;pre&gt;var xmlhttp = new XmlHttpRequest();
+xmlhttp.open("GET", url, true);
+var username = location.search.split('user=')[1];
+var safeUsername = encodeURIComponent(username).replace(/[\n\r]/g, '');
+xmlhttp.setRequestHeader("x-user:", safeUsername);
+xmlhttp.send();
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3116</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;ol&gt;
+&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
+&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The user's password is written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolation
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                insert_sql = insert_sql.Replace("$password", password);
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+the user's password is MD5 coded before being written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolationFixed
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
+                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+        StringBuilder md5Password = new StringBuilder();
+
+                for (int i = 0; i &lt; data.Length; i++)
+		{
+			md5Password.Append(data[i].ToString("x2"));
+		}
+		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3564</key><name>LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker that is able to alter the&amp;nbsp;application&amp;rsquo;s LDAP query with arbitrary data would have control over the results returned from the User Directory server. Most commonly, this would enable an attacker to bypass authentication, or impersonate another user. &amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Furthermore, this flaw can have various additional effects, depending on the architecture and usage model of the Directory service.&amp;nbsp;Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bypass authentication&lt;/li&gt;
+&lt;li&gt;Impersonate another user&lt;/li&gt;
+&lt;li&gt;Subvert authorization&lt;/li&gt;
+&lt;li&gt;Escalate privileges&lt;/li&gt;
+&lt;li&gt;Modify user attributes and group membership&lt;/li&gt;
+&lt;li&gt;Access sensitive data&lt;/li&gt;
 &lt;/ul&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;In order to communicate with the database, or with another external server (for example, Active Directory), the application dynamically constructs a connection string. This connection string includes untrusted data, which may be controlled by a malicious user. Since it is not constrained or properly sanitized, the untrusted data could be used to maliciously manipulate the connection string.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings, including untrusted data that may be controlled by an attacker. Since the data is neither validated nor properly sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;Validate all external data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
 &lt;li&gt;Size&lt;/li&gt;
@@ -1820,71 +1651,108 @@ top&lt;/a&gt;&lt;/div&gt;
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;li&gt;Do not allow users to control the database connection string. Avoid dynamically building connection strings based on untrusted data, especially user input.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Store all connection strings in appropriate configuration mechanisms.&amp;nbsp;If it is necessary to dynamically construct a connection string at runtime,&amp;nbsp;do not include untrusted data directly in the connection string; instead, allow users to select from pre-defined connection strings.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Connect to Database using User Input&lt;/h4&gt;&lt;pre&gt;def open_connection_unsafe(): 
-    db_server = request.args.get('Server')
-    db_name = request.args.get('Database')
-    
-    conn_string = 'driver=%s;server=%s;database=%s;uid=%s;pwd=%s' % (DB_DRIVER, db_server, db_name, DB_USER, DB_PASSWORD)
-    
-    conn = pyodbc.connect(conn_string)
-    
-    return conn
-&lt;/pre&gt;&lt;h4&gt;Select Pre-Configured Database Connection by User Input&lt;/h4&gt;&lt;pre&gt;defined_conn_strings = {
-    APP_ID1: CONN_STRING_APP1,
-    APP_ID2: CONN_STRING_APP2,
-    APP_ID3: CONN_STRING_APP3	
-}
-
-def open_connection_safe_selection(): 
-    app_id = int(request.args.get('AppId'))
-    
-    conn_string = defined_conn_strings.get(app_id, CONN_STRING_DEFAULT)
-    
-    conn = pyodbc.connect(conn_string)
-    
-    return conn
-&lt;/pre&gt;&lt;h4&gt;Load Connection String from Configuration by User Input&lt;/h4&gt;&lt;pre&gt;import configparser
-
-def open_connection_safe_config(): 
-    app_name = request.args.get('AppName')
-    
-    config = configparser.ConfigParser()
-    config.read(CONFIG_FILENAME)
-    
-    conn_string = config.get("database_connection", app_name)
-    
-    conn = pyodbc.connect(conn_string)
-    
-    return conn
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3100</key><name>Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
-&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
-&lt;li&gt;Changing the website;&lt;/li&gt;
-&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
-&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Start and stop system services;&lt;/li&gt;
-&lt;li&gt;Complete server takeover.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Avoid creating LDAP queries that are directly dependent on untrusted external data, if possible. For example, retrieve the user object from the LDAP server, and examine it's attributes in application code.&amp;nbsp;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Read LDAP if Input Username is Member of AppAdmins Group&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_user_is_member_unsafe(): 
+	is_member = False
+
+	user_name = request.args.get('UserName')
+	user_filter = "(&amp;(objectCategory=user)(CN={0})(memberOf={1}))".format(user_name, APPADMIN_GROUP_DN)
+	attribute_names = ["sAMAccountName", "memberOf"]
+	
+	try:
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, user_filter, attribute_names)
+		if search_results is not None: 
+			if len(search_results) &gt; 0: 
+				is_member = True
+	except Exception as ex: 
+		handle_except(ex)
+	
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;h4&gt;Read LDAP for Membership of AppAdmins Group with Sanitized Username&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_user_is_member_safe_sanitized(): 
+	is_member = False
+
+	user_name = request.args.get('UserName')
+	
+	# Sanitize user_name with Regular Expression before embedding in LDAP query
+	sanitized_user_name = encode_for_ldap(user_name)
+	
+	user_filter = "(&amp;(objectCategory=user)(CN={0})(memberOf={1}))".format(sanitized_user_name, APPADMIN_GROUP_DN)
+	attribute_names = ["sAMAccountName", "memberOf"]
+	
+	try:
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, user_filter, attribute_names)
+		if search_results is not None: 
+			if len(search_results) &gt; 0: 
+				is_member = True
+	except Exception as ex: 
+		handle_except(ex)
+	
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;h4&gt;Read All Members of AppAdmins Group with No Query Concatenation&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_user_is_member_safe_group_members(): 
+	is_member = False
+
+	user_name = request.args.get('UserName')
+
+	group_filter = "(&amp;(objectCategory=group)(CN={0}))".format(APPADMIN_GROUP_DN)
+	attribute_names = ["member"]
+	
+	try:
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, group_filter, attribute_names)
+		if search_results is not None: 
+			group_dn, group_attributes = search_results[0]
+			
+			for member in group_attributes['member']:
+				if member == user_name:
+					is_member = True
+					break
+	except Exception as ex: 
+		handle_except(ex)
+	
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3577</key><name>Stored_LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker that is able to alter the&amp;nbsp;application&amp;rsquo;s LDAP query with arbitrary data would have control over the results returned from the User Directory server. Most commonly, this would enable an attacker to bypass authentication, or impersonate another user. &amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Furthermore, this flaw can have various additional effects, depending on the architecture and usage model of the Directory service.&amp;nbsp;Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bypass authentication&lt;/li&gt;
+&lt;li&gt;Impersonate another user&lt;/li&gt;
+&lt;li&gt;Subvert authorization&lt;/li&gt;
+&lt;li&gt;Escalate privileges&lt;/li&gt;
+&lt;li&gt;Modify user attributes and group membership&lt;/li&gt;
+&lt;li&gt;Access sensitive data&lt;/li&gt;
+&lt;/ul&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings, including untrusted data that may be controlled by an attacker. Since the data is neither validated nor properly sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;
+
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;Validate all external data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
 &lt;li&gt;Size&lt;/li&gt;
@@ -1892,27 +1760,191 @@ def open_connection_safe_config():
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
-&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;/li&gt;
+&lt;li&gt;Avoid creating LDAP queries that are directly dependent on untrusted external data, if possible. For example, retrieve the user object from the LDAP server, and examine it's attributes in application code.&amp;nbsp;&lt;/li&gt;
 &lt;/ul&gt;
+&lt;/div&gt;
 
-&lt;ul&gt;
-&lt;li&gt;Prefer passing user data to pre-implemented script, e.g. in another isolated application.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If the provided user data consists only of Python literals and literal containers, consider using&amp;nbsp;&lt;code&gt;ast.literal_eval()&lt;/code&gt; instead, or even the &lt;code&gt;json&lt;/code&gt; object.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Dynamically Execute User Code&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
-def execute_user_code_unsafe(): 
-    user_code = request.args.get('code')
-	result = eval(user_code)
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Read LDAP if User is Member of AppAdmins Group With Arbitrary Data&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_stored_user_is_member_unsafe(): 
+	is_member = False
+	attribute_names = ["sAMAccountName", "memberOf"]
+
+	try:
+		user_id = int(request.args.get('UserID'))
+		
+		user_properties = read_user_props_from_db(user_id)
+		username_from_db = user_properties.user_name
+
+		user_filter = "(&amp;(objectCategory=user)(CN={0})(memberOf={1}))".format(username_from_db, APPADMIN_GROUP_DN)
+		
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, user_filter, attribute_names)
+		if search_results is not None: 
+			if len(search_results) &gt; 0: 
+				is_member = True
+	except Exception as ex: 
+		handle_except(ex)
 	
-	return result['value']&lt;/pre&gt;&lt;h4&gt;Safely Parse User's Literals&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
-def parse_literals_safe(): 
-    user_code = request.args.get('code')
-	result = ast.literal_eval(user_code)
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;h4&gt;Read LDAP for Membership of AppAdmins Group with Sanitized Username&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_stored_user_is_member_safe_sanitized(): 
+	is_member = False
+	attribute_names = ["sAMAccountName", "memberOf"]
+
+	try:
+		user_id = int(request.args.get('UserID'))
+		
+		user_properties = read_user_props_from_db(user_id)
+		username_from_db = user_properties.user_name
+
+		# Sanitize user_name with Regular Expression before embedding in LDAP query
+		sanitized_user_name = encode_for_ldap(username_from_db)
+		user_filter = "(&amp;(objectCategory=user)(CN={0})(memberOf={1}))".format(sanitized_user_name, APPADMIN_GROUP_DN)
+
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, user_filter, attribute_names)
+		if search_results is not None: 
+			if len(search_results) &gt; 0: 
+				is_member = True
+	except Exception as ex: 
+		handle_except(ex)
 	
-	return result['value']
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3101</key><name>Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;h4&gt;Read All Members of AppAdmins Group with No Query Concatenation&lt;/h4&gt;&lt;pre&gt;@app.route('/group')
+def check_stored_user_is_member_safe_group_members(): 
+	is_member = False
+
+	group_filter = "(&amp;(objectCategory=group)(CN={0}))".format(APPADMIN_GROUP_DN)
+	attribute_names = ["member"]
+	
+	try:
+		user_id = int(request.args.get('UserID'))
+		
+		user_properties = read_user_props_from_db(user_id)
+		username_from_db = user_properties.user_name
+
+		ldap_server = ldap.initialize(LDAP_SERVER)
+		ldap_server.simple_bind_s(LDAP_AUTH_USER, LDAP_AUTH_PASS)
+
+		search_results = ldap_server.search_s(LDAP_SEARCH_BASE, ldap.SCOPE_SUBTREE, group_filter, attribute_names)
+		if search_results is not None: 
+			group_dn, group_attributes = search_results[0]
+			
+			for member in group_attributes['member']:
+				if member == username_from_db:
+					is_member = True
+					break
+	except Exception as ex: 
+		handle_except(ex)
+	
+	if ldap_server is not None: 
+		ldap_server.unbind_s()
+
+	return is_member
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3104</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
+&lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Control of Resource Identifiers ('Resource Injection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
+
+&lt;span class="tool"&gt;&lt;/span&gt;
+
+&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="status"&gt;&lt;table width="100%" border="0" cellpadding="0" cellspacing="0"&gt;&lt;tr&gt;&lt;td valign="top" align="left" width="33%" nowrap=""&gt;&lt;b&gt;Weakness ID: &lt;/b&gt;99&lt;span style="font-style:italic; font-size:80%"&gt; (Weakness Base)&lt;/span&gt;&lt;/td&gt;&lt;td valign="top" align="center" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top" align="right" nowrap=""&gt;&lt;b&gt;Status: &lt;/b&gt;&lt;span class="Draft"&gt;Draft&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div id="Description"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Description&lt;/div&gt;&lt;div name="oc_99_Description" id="oc_99_Description" class="expandblock"&gt;&lt;div class="detail"&gt;
+&lt;p class="subheading"&gt;Description Summary&lt;/p&gt;&lt;div class="indent"&gt;The software receives input from an upstream component, but it
+does not restrict or incorrectly restricts the input before it is used as an
+identifier for a resource that may be outside the intended sphere of
+control.&lt;/div&gt;
+&lt;p class="subheading"&gt;Extended Description&lt;/p&gt;&lt;div class="indent"&gt;
+&lt;p&gt;This may enable an attacker to access or modify otherwise protected system
+resources.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Time of Introduction"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Time of Introduction&lt;/div&gt;&lt;div name="oc_99_Time of Introduction" id="oc_99_Time of Introduction" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;ul&gt;
+&lt;li&gt;Architecture and Design&lt;/li&gt;
+&lt;li&gt;Implementation&lt;/li&gt;
+&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Applicable Platforms"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Applicable Platforms&lt;/div&gt;&lt;div name="oc_99_Applicable Platforms" id="oc_99_Applicable Platforms" class="expandblock"&gt;&lt;div class="detail"&gt;
+&lt;p class="subheading"&gt;Languages&lt;/p&gt;&lt;div class="indent"&gt;
+&lt;p&gt;All&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Likelihood of Exploit"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Likelihood of Exploit&lt;/div&gt;&lt;div name="oc_99_Likelihood of Exploit" id="oc_99_Likelihood of Exploit" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;p class="indent"&gt;High&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Demonstrative Examples"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Demonstrative Examples&lt;/div&gt;&lt;div name="oc_99_Demonstrative Examples" id="oc_99_Demonstrative Examples" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;p class="subheading"&gt;Example 1&lt;/p&gt;&lt;p&gt;The following Java code uses input from an HTTP request to create a
+file name. The programmer has not considered the possibility that an
+attacker could provide a file name such as "../../tomcat/conf/server.xml",
+which causes the application to delete one of its own configuration
+files.&lt;/p&gt;&lt;div class="indent Bad_Code"&gt;&lt;div id="ExampleCode" style="clear:both"&gt;&lt;div class="shadow"&gt;&lt;div class="CodeHead"&gt;&lt;div style="float:right; font-style:italic; font-size:10px; color:#98A9B7"&gt;(Bad Code)&lt;/div&gt;&lt;div class="optheading smaller"&gt;&lt;span style="font-weight:normal; font-style:italic"&gt;Example
+Language: &lt;/span&gt;Java&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div class="top"&gt;&lt;div style="font-size:90%;"&gt;String rName = request.getParameter("reportName");&lt;/div&gt;&lt;div style="font-size:90%;"&gt;File rFile = new File("/usr/local/apfr/reports/" + rName);&lt;/div&gt;&lt;div style="font-size:90%;"&gt;...&lt;/div&gt;&lt;div style="font-size:90%;"&gt;rFile.delete();&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;p class="subheading"&gt;Example 2&lt;/p&gt;&lt;p&gt;The following code uses input from the command line to determine
+which file to open and echo back to the user. If the program runs with
+privileges and malicious users can create soft links to the file, they can
+use the program to read the first part of any file on the
+system.&lt;/p&gt;&lt;div class="indent Bad_Code"&gt;&lt;div id="ExampleCode" style="clear:both"&gt;&lt;div class="shadow"&gt;&lt;div class="CodeHead"&gt;&lt;div style="float:right; font-style:italic; font-size:10px; color:#98A9B7"&gt;(Bad Code)&lt;/div&gt;&lt;div class="optheading smaller"&gt;&lt;span style="font-weight:normal; font-style:italic"&gt;Example
+Language: &lt;/span&gt;C++&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div class="top"&gt;&lt;div style="font-size:90%;"&gt;ifstream ifs(argv[0]);&lt;/div&gt;&lt;div style="font-size:90%;"&gt;string s;&lt;/div&gt;&lt;div style="font-size:90%;"&gt;ifs &amp;gt;&amp;gt; s;&lt;/div&gt;&lt;div style="font-size:90%;"&gt;cout &amp;lt;&amp;lt; s;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;The kind of resource the data affects indicates the kind of content
+that may be dangerous. For example, data containing special characters
+like period, slash, and backslash, are risky when used in methods that
+interact with the file system. (Resource injection, when it is related
+to file system resources, sometimes goes by the name "path
+manipulation.") Similarly, data that contains URLs and URIs is risky for
+functions that create remote connections.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Potential Mitigations"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Potential Mitigations&lt;/div&gt;&lt;div name="oc_99_Potential Mitigations" id="oc_99_Potential Mitigations" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Assume all input is malicious. Use an appropriate combination of black
+lists and white lists to ensure only valid and expected input is
+processed by the system.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Other Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Other Notes&lt;/div&gt;&lt;div name="oc_99_Other Notes" id="oc_99_Other Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;A resource injection issue occurs when the following two conditions are
+met: 1. An attacker can specify the identifier used to access a system
+resource. For example, an attacker might be able to specify part of the name
+of a file to be opened or a port number to be used. 2. By specifying the
+resource, the attacker gains a capability that would not otherwise be
+permitted. For example, the program may give the attacker the ability to
+overwrite the specified file, run with a configuration controlled by the
+attacker, or transmit sensitive information to a third-party server. Note:
+Resource injection that involves resources stored on the filesystem goes by
+the name path manipulation and is reported in separate category. See the
+path manipulation description for further details of this vulnerability.
+&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Weakness Ordinalities"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Weakness Ordinalities&lt;/div&gt;&lt;div name="oc_99_Weakness Ordinalities" id="oc_99_Weakness Ordinalities" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Ordinality&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Description&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;&lt;div style="font-size:90%;"&gt;Primary&lt;/div&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div style="font-size:90%; font-style:italic; padding:5px;"&gt;(where
+the weakness exists independent of other weaknesses)&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationships"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationships&lt;/div&gt;&lt;div name="oc_99_Relationships" id="oc_99_Relationships" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" id="Detail"&gt;&lt;tr&gt;&lt;th valign="top"&gt;Nature&lt;/th&gt;&lt;th valign="top"&gt;Type&lt;/th&gt;&lt;th valign="top"&gt;ID&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Name&lt;/th&gt;&lt;th valign="middle" class="left" style="text-align:center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;View(s) this relationship pertains to&lt;/span&gt;&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;ChildOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;20&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=20" target="_blank"&gt;Improper Input Validation&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Seven Pernicious Kingdoms &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;700&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;ChildOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;74&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=74" target="_blank"&gt;Failure to Sanitize Data into a Different Plane ('Injection')&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;1000&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;706&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=706" target="_blank"&gt;Use of Incorrectly-Resolved Name or Reference&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;CanAlsoBe&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Class&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;73&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=73" target="_blank"&gt;External Control of File Name or Path&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;ParentOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Variant&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;641&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=641" target="_blank"&gt;Insufficient Filtering of File and Other Resource Names for Executable Content&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;1000&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;MemberOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;View&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;630&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=630" target="_blank"&gt;Weaknesses Examined by SAMATE&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weaknesses Examined by SAMATE &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;630&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;tbody&gt;&lt;tr class="foreign"&gt;&lt;td valign="top"&gt;PeerOf&lt;/td&gt;&lt;td valign="middle" nowrap="" class="right" align="center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;621&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=621" target="_blank"&gt;Variable Extraction Error&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts&lt;/span&gt;1000&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Causal Nature"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt;&lt;a href="javascript:toggleblocksOC('99_Causal Nature');"&gt;f&lt;/a&gt; &lt;/span&gt;Causal Nature&lt;/div&gt;&lt;div name="oc_99_Causal Nature" id="oc_99_Causal Nature" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;p class="indent"&gt;Explicit&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Taxonomy Mappings"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Taxonomy Mappings&lt;/div&gt;&lt;div name="oc_99_Taxonomy Mappings" id="oc_99_Taxonomy Mappings" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Mapped Taxonomy Name&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Node ID&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Fit&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Mapped Node Name&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;7 Pernicious Kingdoms&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top"&gt;Resource Injection&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Related Attack Patterns"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Related Attack Patterns&lt;/div&gt;&lt;div name="oc_99_Related Attack Patterns" id="oc_99_Related Attack Patterns" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;CAPEC-ID&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Attack Pattern Name&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;&lt;div style="font-weight:normal; font-size:85%; font-style:italic; color:#000000"&gt;(CAPEC Version: 1.5)&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;&lt;a href="http://capec.mitre.org10.html" target="_blank"&gt;10&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;Buffer Overflow via Environment Variables&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;&lt;a href="http://capec.mitre.org75.html" target="_blank"&gt;75&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;Manipulating Writeable Configuration Files&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="White Box Definitions"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;White Box Definitions&lt;/div&gt;&lt;div name="oc_99_White Box Definitions" id="oc_99_White Box Definitions" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;A weakness where the code path has:&lt;/p&gt;
+&lt;div class="indent "&gt;
+&lt;p&gt;1. start statement that accepts input followed by&lt;/p&gt;
+&lt;p&gt;2. a statement that allocates a System Resource using name where the
+input is part of the name&lt;/p&gt;
+&lt;p&gt;3. end statement that accesses the System Resource where&lt;/p&gt;
+&lt;div class="indent "&gt;
+&lt;p&gt;a. the name of the System Resource violates protection&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Content History"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Content History&lt;/div&gt;&lt;div name="oc_99_Content History" id="oc_99_Content History" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Submissions&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Submission Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Submitter&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;7 Pernicious Kingdoms&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Externally Mined&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Modifications&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Modification Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Modifier&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-07-01&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Eric Dalci&lt;/td&gt;&lt;td valign="top"&gt;Cigital&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;External&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Time of Introduction&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-08-01&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top"&gt;KDM Analytics&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;External&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;added/updated white box definitions&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-09-08&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Relationships, Other Notes, Taxonomy Mappings,
+Weakness Ordinalities&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-05-27&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Name&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-07-17&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;KDM Analytics&lt;/td&gt;&lt;td valign="top"&gt;&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;External&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;Improved the White Box Definition&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-07-27&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated White Box Definitions&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Previous Entry Names&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Change Date&lt;/th&gt;&lt;th valign="top" nowrap="" colspan="3"&gt;Previous Entry
+Name&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2008-04-11&lt;/td&gt;&lt;td valign="top" colspan="3"&gt;Resource
+Injection&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BAC5E3" colspan="4"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2009-05-27&lt;/td&gt;&lt;td valign="top" colspan="3"&gt;Insufficient Control of
+Resource Identifiers (aka 'Resource Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BAC5E3" colspan="4"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;/html&gt;
+
+&lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
+
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3101</key><name>Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
 &lt;div&gt;
 &lt;ul&gt;
 &lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
@@ -1922,7 +1954,11 @@ def parse_literals_safe():
 &lt;li&gt;Complete server takeover&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious, system-level commands engineered by an attacker, which would be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+
+
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via the application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious system-level commands engineered by an attacker, which could be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+&lt;p&gt;In this case, the application receives data from the user input, and passes it as a string to the Operating System. This unvalidated data is then executed by the OS as a system command, running with the same system privileges as the application.&amp;nbsp;&lt;/p&gt;
+
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
 &lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
 &lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
@@ -1935,13 +1971,126 @@ def parse_literals_safe():
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
 &lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all OS commands to use a separate, dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all OS commands to use a separate dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3578</key><name>Hardcoded_Password_in_Connection_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded database passwords expose the application to password leakage, and the database to unauthorized access. If an attacker gains access to the source code (or can decompile the application binaries), she will be able to steal the embedded passwords, and use them to directly access the database. This would enable the attacker to steal secret information, modify sensitive records, or delete important data.&amp;nbsp;&lt;/div&gt;
-&lt;div&gt;&amp;nbsp;&lt;/div&gt;
-&lt;div&gt;In addition, the password cannot be easily changed when required. In the eventual situation wherein it is a necessity to update the password, a new version of the application would need to be built and deployed to production systems.&amp;nbsp;&lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application has the database password hardcoded in the source code files, and uses this password in a connection string to the database or other server. This password is visible to anyone with access to source code, and cannot be changed without rebuilding or recompiling the application. Even after compilation or deployment, the password and connection string are still present in the binary program files or production environment.&lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;&amp;nbsp;- Never hardcode sensitive data, such as database passwords.&amp;nbsp;&lt;/div&gt;
-&lt;div&gt;&amp;nbsp;- Prefer to avoid requiring an explicit database password at all, instead using OS-integrated system authentication.&lt;/div&gt;
-&lt;div&gt;&amp;nbsp;- Alternatively, store the password in an encrypted configuration file, and implement a mechanism enabling administrators to change the password. Ensure the file permissions are configured to restrict access to administrators only.&amp;nbsp;&lt;/div&gt;
-&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>
+
+&lt;ul&gt;
+&lt;li&gt;If absolutely necessary to call a system command or execute an external program with user input, do not use unsafe methods that call the system shell, such as &lt;code&gt;os.system()&lt;/code&gt; or &lt;code&gt;popen2.popen4()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Instead, use safer methods such as &lt;code&gt;subprocess.run()&lt;/code&gt;, with the &lt;code&gt;shell&lt;/code&gt; parameter set to &lt;code&gt;False&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Always pass the user input as the 2nd element in the &lt;code&gt;args&lt;/code&gt; list, with the first element in the list set to a hard-coded (or application-controlled) system command or program path.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Do not pass the user argument as a string parameter, or as the first element in the &lt;code&gt;args&lt;/code&gt; list.&amp;nbsp;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;Execute System (Shell) Command With User Input&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
+def execute_user_command_unsafe(): 
+    user_command = request.args.get('command')
+	
+	output = os.system(user_command)
+	
+	return output
+&lt;/pre&gt;&lt;h4&gt;Call External Program with Safe Parameters&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
+def execute_command_with_user_argument_safe(): 
+    user_param = request.args.get('Parameter')
+	user_param = shlex.quote(user_param)
+	
+	proc = subprocess.run( [PATH_TO_EXTERNAL_PROGRAM, user_param], shell=False)
+	
+	return proc.returncode
+&lt;/pre&gt;&lt;h4&gt;Refactor Code to Call Method in External Package&lt;/h4&gt;&lt;pre&gt;@app.route('/execute')
+def perform_specific_action_package_api(): 
+    user_param = request.args.get('Parameter')
+
+	api = OpenSysLibrary()
+	output = api.specific_action(user_param)
+	
+	return output
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_3107</key><name>XPath_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
+&lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Neutralization of Data within XPath Expressions ('XPath injection')&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
+
+&lt;span class="tool"&gt;&lt;/span&gt;
+
+&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div class="status"&gt;&lt;table width="100%" border="0" cellpadding="0" cellspacing="0"&gt;&lt;tr&gt;&lt;td valign="top" align="left" width="33%" nowrap=""&gt;&lt;b&gt;Weakness ID: &lt;/b&gt;643&lt;span style="font-style:italic; font-size:80%"&gt; (Weakness Base)&lt;/span&gt;&lt;/td&gt;&lt;td valign="top" align="center" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top" align="right" nowrap=""&gt;&lt;b&gt;Status: &lt;/b&gt;&lt;span class="Incomplete"&gt;Incomplete&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;div id="Description"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Description&lt;/div&gt;&lt;div name="oc_643_Description" id="oc_643_Description" class="expandblock"&gt;&lt;div class="detail"&gt;
+&lt;p class="subheading"&gt;Description Summary&lt;/p&gt;&lt;div class="indent"&gt;The software uses external input to dynamically construct an
+XPath expression used to retrieve data from an XML database, but it does not
+neutralize or incorrectly neutralizes that input. This allows an attacker to
+control the structure of the query.&lt;/div&gt;
+&lt;p class="subheading"&gt;Extended Description&lt;/p&gt;&lt;div class="indent"&gt;
+&lt;p&gt;The net effect is that the attacker will have control over the information
+selected from the XML database and may use that ability to control
+application flow, modify logic, retrieve unauthorized data, or bypass
+important checks (e.g. authentication).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Time of Introduction"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Time of Introduction&lt;/div&gt;&lt;div name="oc_643_Time of Introduction" id="oc_643_Time of Introduction" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;ul&gt;
+&lt;li&gt;Implementation&lt;/li&gt;
+&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Applicable Platforms"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Applicable Platforms&lt;/div&gt;&lt;div name="oc_643_Applicable Platforms" id="oc_643_Applicable Platforms" class="expandblock"&gt;&lt;div class="detail"&gt;
+&lt;p class="subheading"&gt;Languages&lt;/p&gt;&lt;div class="indent"&gt;
+&lt;p&gt;All&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Common Consequences"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Common Consequences&lt;/div&gt;&lt;div name="oc_643_Common Consequences" id="oc_643_Common Consequences" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Scope&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Effect&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;&lt;div style="font-size:90%;"&gt;Integrity&lt;/div&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;p&gt;Controlling application flow (e.g. bypassing authentication)&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;&lt;div style="font-size:90%;"&gt;Confidentiality&lt;/div&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;p&gt;Information disclosure&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Likelihood of Exploit"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Likelihood of Exploit&lt;/div&gt;&lt;div name="oc_643_Likelihood of Exploit" id="oc_643_Likelihood of Exploit" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;p class="indent"&gt;High&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Enabling Factors for Exploitation"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Enabling Factors for Exploitation&lt;/div&gt;&lt;div name="oc_643_Enabling Factors for Exploitation" id="oc_643_Enabling Factors for Exploitation" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;XPath queries are constructed dynamically using user supplied input&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;The application does not perform sufficient validation or sanitization of
+user supplied input&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Demonstrative Examples"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Demonstrative Examples&lt;/div&gt;&lt;div name="oc_643_Demonstrative Examples" id="oc_643_Demonstrative Examples" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;p class="subheading"&gt;Example 1&lt;/p&gt;&lt;p&gt;Consider the following simple XML document that stores
+authentication information and a snippet of Java code that uses XPath query
+to retrieve authentication information:&lt;/p&gt;&lt;div class="indent "&gt;&lt;div id="ExampleCode" style="clear:both"&gt;&lt;div class="shadow"&gt;&lt;div class="CodeHead"&gt;&lt;div class="optheading smaller"&gt;&lt;span style="font-weight:normal; font-style:italic"&gt;Example
+Language: &lt;/span&gt;XML&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div class="top"&gt;&lt;div style="font-size:90%;"&gt;&amp;lt;users&amp;gt;&lt;/div&gt;&lt;div class="indent "&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;user&amp;gt;&lt;/div&gt;
+&lt;div class="indent "&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;login&amp;gt;john&amp;lt;/login&amp;gt;&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;password&amp;gt;abracadabra&amp;lt;/password&amp;gt;&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;home_dir&amp;gt;/home/john&amp;lt;/home_dir&amp;gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;/user&amp;gt;&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;user&amp;gt;&lt;/div&gt;
+&lt;div class="indent "&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;login&amp;gt;cbc&amp;lt;/login&amp;gt;&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;password&amp;gt;1mgr8&amp;lt;/password&amp;gt;&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;home_dir&amp;gt;/home/cbc&amp;lt;/home_dir&amp;gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div style="font-size:90%;"&gt;&amp;lt;/user&amp;gt;&lt;/div&gt;
+&lt;/div&gt;&lt;div style="font-size:90%;"&gt;&amp;lt;/users&amp;gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;The Java code used to retrieve the home directory based on the
+provided credentials is:&lt;/p&gt;&lt;div class="indent Bad_Code"&gt;&lt;div id="ExampleCode" style="clear:both"&gt;&lt;div class="shadow"&gt;&lt;div class="CodeHead"&gt;&lt;div style="float:right; font-style:italic; font-size:10px; color:#98A9B7"&gt;(Bad Code)&lt;/div&gt;&lt;div class="optheading smaller"&gt;&lt;span style="font-weight:normal; font-style:italic"&gt;Example
+Language: &lt;/span&gt;Java&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div class="top"&gt;&lt;div style="font-size:90%;"&gt;XPath xpath = XPathFactory.newInstance().newXPath();&lt;/div&gt;&lt;div style="font-size:90%;"&gt;XPathExpression xlogin =
+xpath.compile("//users/user[login/text()='" + login.getUserName() +
+"' and password/text() = '" + login.getPassword() +
+"']/home_dir/text()");&lt;/div&gt;&lt;div style="font-size:90%;"&gt;Document d =
+DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new
+File("db.xml"));&lt;/div&gt;&lt;div style="font-size:90%;"&gt;String homedir = xlogin.evaluate(d);&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;Assume that user "john" wishes to leverage XPath Injection and login
+without a valid password. By providing a username "john" and password "'
+or ''='" the XPath expression now becomes&lt;/p&gt;&lt;div class="indent Attack"&gt;&lt;div id="ExampleCode" style="clear:both"&gt;&lt;div class="shadow"&gt;&lt;div class="CodeHead"&gt;&lt;div style="float:right; font-style:italic; font-size:10px; color:#98A9B7"&gt;(Attack)&lt;/div&gt;&lt;div class="optheading smaller"&gt;&lt;span style="font-weight:normal; font-style:italic"&gt;&lt;/span&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;&lt;div class="top"&gt;&lt;div style="font-size:90%;"&gt;//users/user[login/text()='john' or ''='' and password/text() = ''
+or ''='']/home_dir/text()&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;which, of course, lets user "john" login without a valid password,
+thus bypassing authentication.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Potential Mitigations"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Potential Mitigations&lt;/div&gt;&lt;div name="oc_643_Potential Mitigations" id="oc_643_Potential Mitigations" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Use parameterized XPath queries (e.g. using XQuery). This will help
+ensure separation between data plane and control plane.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;&lt;p&gt;Properly validate user input. Reject data where appropriate, filter
+where appropriate and escape where appropriate. Make sure input that
+will be used in XPath queries is safe in that context.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationships"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationships&lt;/div&gt;&lt;div name="oc_643_Relationships" id="oc_643_Relationships" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" id="Detail"&gt;&lt;tr&gt;&lt;th valign="top"&gt;Nature&lt;/th&gt;&lt;th valign="top"&gt;Type&lt;/th&gt;&lt;th valign="top"&gt;ID&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Name&lt;/th&gt;&lt;th valign="middle" class="left" style="text-align:center"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;View(s) this relationship pertains to&lt;/span&gt;&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tbody&gt;&lt;tr class="primary"&gt;&lt;td valign="top"&gt;ChildOf&lt;/td&gt;&lt;td valign="top" nowrap="" class="right" align="center" style="padding-top:1px"&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Weakness Base&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td valign="top"&gt;91&lt;/td&gt;&lt;td valign="top"&gt;&lt;a href="cwe.aspx?cweid=91" target="_blank"&gt;XML Injection (aka Blind XPath Injection)&lt;/a&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Development Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;699&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;div class="left"&gt;&lt;b&gt;&lt;span class="tool"&gt;&lt;span class="tip"&gt;Research Concepts &lt;b&gt;(primary)&lt;/b&gt;&lt;/span&gt;1000&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Relationship Notes"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Relationship Notes&lt;/div&gt;&lt;div name="oc_643_Relationship Notes" id="oc_643_Relationship Notes" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;p&gt;This weakness is similar to other weaknesses that enable injection style
+attacks, such as SQL injection, command injection and LDAP injection. The
+main difference is that the target of attack here is the XML
+database.&lt;/p&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Taxonomy Mappings"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Taxonomy Mappings&lt;/div&gt;&lt;div name="oc_643_Taxonomy Mappings" id="oc_643_Taxonomy Mappings" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Mapped Taxonomy Name&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Node ID&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Fit&lt;/th&gt;&lt;th valign="top" width="100%"&gt;Mapped Node Name&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;WASC&lt;/td&gt;&lt;td valign="top"&gt;39&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;&lt;/td&gt;&lt;td valign="top"&gt;XPath Injection &lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="References"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;References&lt;/div&gt;&lt;div name="oc_643_References" id="oc_643_References" class="expandblock"&gt;&lt;div class="detail"&gt;&lt;div id="Grouped"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;
+&lt;tr&gt;&lt;td valign="top"&gt;Web Application Security Consortium. "XPath Injection". &amp;lt;&lt;a href="http://www.webappsec.org/projects/threat/classes/xpath_injection.shtml" target="_blank"&gt;http://www.webappsec.org/projects/threat/classes/xpath_injection.shtml&lt;/a&gt;&amp;gt;.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id="Content History"&gt;&lt;div class="heading"&gt;&lt;span id="script"&gt; &lt;/span&gt;Content History&lt;/div&gt;&lt;div name="oc_643_Content History" id="oc_643_Content History" class="expandblock"&gt;&lt;div class="tabledetail"&gt;&lt;table width="100%" cellpadding="0" cellspacing="0" border="0" class="Detail"&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Submissions&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Submission Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Submitter&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-01-30&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Evgeny Lebanidze&lt;/td&gt;&lt;td valign="top"&gt;Cigital&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;External Submission&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Modifications&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Modification Date&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Modifier&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Organization&lt;/th&gt;&lt;th valign="top" nowrap=""&gt;Source&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-09-08&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Common Consequences,
+Relationships&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2008-10-14&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Name, References,
+Relationship Notes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-03-10&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Demonstrative Examples&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-05-27&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Name&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2009-10-29&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Common Consequences&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2010-02-16&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Taxonomy Mappings&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan="2" style="border-bottom:1px solid #BAC5E3"&gt;2010-04-05&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;CWE Content Team&lt;/td&gt;&lt;td valign="top"&gt;MITRE&lt;/td&gt;&lt;td valign="top" nowrap=""&gt;Internal&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" colspan="3" style="border-bottom:1px solid #BAC5E3; font-size:90%; background-color:#eeeeee"&gt;updated Description, Name&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" colspan="5" class="title"&gt;Previous Entry Names&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th valign="top" nowrap=""&gt;Change Date&lt;/th&gt;&lt;th valign="top" nowrap="" colspan="3"&gt;Previous Entry
+Name&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2008-10-14&lt;/td&gt;&lt;td valign="top" colspan="3"&gt;Unsafe Treatment of XPath
+Input&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BAC5E3" colspan="4"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2009-05-27&lt;/td&gt;&lt;td valign="top" colspan="3"&gt;Failure to Sanitize Data
+within XPath Expressions (aka 'XPath injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BAC5E3" colspan="4"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap=""&gt;2010-04-05&lt;/td&gt;&lt;td valign="top" colspan="3"&gt;Failure to Sanitize Data within XPath Expressions ('XPath injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BAC5E3" colspan="4"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;/html&gt;
+
+&lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
+
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>

@@ -21,18 +21,7 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
-let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
-withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
-    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
-    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
-})
-    
-let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
-NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
-SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
-    
-NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;
 Random random = new Random();
 
 long sessNum = random.nextLong();
@@ -46,7 +35,18 @@ byte sessBytes[] = new byte[32];
 random.nextBytes(sessBytes);
 
 String sessionId = new String(sessBytes);
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4122</key><name>TEST_Yotam</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1107</key><name>Heuristic_Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;let sessNum = rand();
+let sessionId = String(format:"%ld", sessNum)&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;var sessBytes: UInt32 = 0
+withUnsafeMutablePointer(&amp;sessBytes, { (sessBytesPointer) -&gt; Void in
+    let castedPointer = unsafeBitCast(sessBytesPointer, UnsafeMutablePointer&lt;UInt8&gt;.self)
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(UInt32), castedPointer)
+})
+    
+let sessionId = String(format:"%llu", sessBytes)&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Use of a weak pseudo-random number generator&lt;/h4&gt;&lt;pre&gt;long sessNum = rand();
+NSString* sessionId = [NSString stringWithFormat:@"%ld", sessNum];&lt;/pre&gt;&lt;h4&gt;Cryptographically secure random number generator&lt;/h4&gt;&lt;pre&gt;UInt32 sessBytes;
+SecRandomCopyBytes(kSecRandomDefault, sizeof(sessBytes), (uint8_t*)&amp;sessBytes);
+    
+NSString* sessionId = [NSString stringWithFormat:@"%llu", sessBytes];&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4122</key><name>TEST_Yotam</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;No available description for this rule.&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1107</key><name>Heuristic_Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
 &lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -196,55 +196,7 @@ String sessionId = new String(sessBytes);
     }
     
     return adminPrivs;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2122</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ol&gt;
-&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
-&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The user's password is written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolation
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                insert_sql = insert_sql.Replace("$password", password);
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-the user's password is MD5 coded before being written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolationFixed
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
-                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-        StringBuilder md5Password = new StringBuilder();
-
-                for (int i = 0; i &lt; data.Length; i++)
-		{
-			md5Password.Append(data[i].ToString("x2"));
-		}
-		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1117</key><name>Hardcoded_password_in_Connection_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded database passwords expose the application to password leakage, and the database to unauthorized access. If an attacker gains access to the source code (or can decompile the application binaries), she will be able to steal the embedded passwords, and use them to directly access the database. This would enable the attacker to steal secret information, modify sensitive records, or delete important data.&amp;nbsp;&lt;/div&gt;
+}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1117</key><name>Hardcoded_password_in_Connection_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded database passwords expose the application to password leakage, and the database to unauthorized access. If an attacker gains access to the source code (or can decompile the application binaries), she will be able to steal the embedded passwords, and use them to directly access the database. This would enable the attacker to steal secret information, modify sensitive records, or delete important data.&amp;nbsp;&lt;/div&gt;
 &lt;div&gt;&amp;nbsp;&lt;/div&gt;
 &lt;div&gt;In addition, the password cannot be easily changed when required. In the eventual situation wherein it is a necessity to update the password, a new version of the application would need to be built and deployed to production systems.&amp;nbsp;&lt;/div&gt;
 
@@ -406,8 +358,8 @@ End Function&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</descript
 &lt;/div&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious, system-level commands engineered by an attacker, which would be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
-&lt;p&gt;In this case, the application receives data from the user input, and passes that as a string to the Operating System. This unvalidated data is then executed by the OS as a system command, running with the same system privileges as the application.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via the application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious system-level commands engineered by an attacker, which could be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+&lt;p&gt;In this case, the application receives data from the user input, and passes it as a string to the Operating System. This unvalidated data is then executed by the OS as a system command, running with the same system privileges as the application.&amp;nbsp;&lt;/p&gt;
 
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
 &lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
@@ -421,7 +373,7 @@ End Function&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</descript
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
 &lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all OS commands to use a separate, dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all OS commands to use a separate dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;ul&gt;
@@ -544,7 +496,55 @@ End Function&lt;/pre&gt;&lt;h4&gt;Select Pre-Configured Database Connection by U
 	
 	Error_Handler:
 		Call HandleExceptions Err.Number, Err.Description
-End Function&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1108</key><name>Heuristic_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
+End Function&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2122</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;ol&gt;
+&lt;li&gt;Personal data should be removed before writing to logs or other files.&lt;/li&gt;
+&lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+The user's password is written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolation
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                insert_sql = insert_sql.Replace("$password", password);
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;h4&gt;
+the user's password is MD5 coded before being written to the screen
+      &lt;/h4&gt;&lt;pre&gt;
+
+class PrivacyViolationFixed
+{
+        static void foo(string insert_sql)
+        {
+                string password = "unsafe_password";
+                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
+                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+        StringBuilder md5Password = new StringBuilder();
+
+                for (int i = 0; i &lt; data.Length; i++)
+		{
+			md5Password.Append(data[i].ToString("x2"));
+		}
+		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
+                System.Console.WriteLine(insert_sql);
+        } 
+}
+
+
+
+      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1108</key><name>Heuristic_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -725,38 +725,38 @@ The data obtained from the database is checked for potentially malicious charact
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+
+      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
+Ensure you encode any special delimiter characters before writing to a log file.
+
+      &lt;/h4&gt;&lt;pre&gt;
+
+
+Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
+
+
+      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
 
 
-&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
+&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
 
 
 NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
 
 
-&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1114</key><name>Insufficiently_Protected_Credentials</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could steal user credentials, enabling access to user accounts and confidential data.&lt;/div&gt;      
+&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_1114</key><name>Insufficiently_Protected_Credentials</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could steal user credentials, enabling access to user accounts and confidential data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;User passwords are written to the database without being properly encrypted with a cryptographic hash. The application reads clear passwords straight from the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Store passwords using a cryptographic hash designed as a password protection scheme, such as:&lt;/div&gt;
 &lt;div&gt;

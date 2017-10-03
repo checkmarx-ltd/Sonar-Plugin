@@ -20,6 +20,7 @@
 package com.checkmarx.sonar;
 
 import com.checkmarx.sonar.cxportalservice.sast.services.CxConfigSoapService;
+import com.checkmarx.sonar.cxpropfiles.*;
 import com.checkmarx.sonar.cxrules.CxRulesDefinition;
 import com.checkmarx.sonar.measures.ComputeSastMeasures;
 import com.checkmarx.sonar.measures.SastMetrics;
@@ -36,6 +37,20 @@ public class CheckmarxPlugin implements Plugin {
 
     context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CxConfigSoapService.class, CheckmarxSensor.class,
                    CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class, CxRulesDefinition.class);
+
+    context.addExtensions(CxCppProfile.class,
+                          CxCsharpProfile.class,
+                          CxGoProfile.class,
+                          CxGroovyProfile.class,
+                          CxJavaProfile.class,
+                          CxJavaScriptProfile.class,
+                          CxObjcProfile.class,
+                          CxPerlProfile.class,
+                          CxPhpProfile.class,
+                          CxPlSqlProfile.class,
+                          CxPythonProfile.class,
+                          CxVb6Profile.class,
+                          CxVbNetProfile.class);
 
   }
 }
