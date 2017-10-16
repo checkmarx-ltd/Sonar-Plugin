@@ -663,6 +663,9 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
                 var div = document.createElement('div');
                 div.className = "cxCompleteReport";
+                div.id = "cxReport";
+
+
               div.innerHTML =
 
                   "  <div class=\"report-title\">"+
@@ -688,12 +691,14 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   ""+
                   ""+
                   "        <table class=\"summary-section\">"+
-                  ""+
                   "             <tr class=\"summary-report-diagram-section\">"+
-                  "            <div class=\"sast-summary\" id=\"sast-summary\">"+
-                  "                <div class=\"summary-report-title sast\">"+
-                  "                    <div class=\"summary-title-text sast\">CxSAST Vulnerabilities Status<\/div>"+
-                  ""+
+                        "<div class=\"summary-table-row cxsast-full\">"+
+                  ""+   "<div class=\"title-column\">"+
+                  "                    <div class=\"summary-title\">"+
+                  "                        <div class=\"sum1\">CxSAST<\/div>"+
+                  "                        <div class=\"sum1\">Vulnerabilities<\/div>"+
+                  "                        <div class=\"sum1\">Status<\/div>"+
+                  "                    <\/div>"+
                   "                    <div class=\"summary-title-links\">"+
                   "                        <a class=\"html-report\" id=\"sast-summary-html-link\">"+
                   "                            <div class=\"results-link summary-link\">"+
@@ -709,6 +714,12 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                            <\/div>"+
                   "                        <\/a>"+
                   "                    <\/div>"+
+                        "<\/div>"+
+
+                  ""+
+                  "            <div class=\"sast-summary\" id=\"sast-summary\">"+
+                  "                <div class=\"summary-report-title sast\">"+
+                  "                    <div class=\"summary-title-text sast\">CxSAST Vulnerabilities Status<\/div>"+
                   ""+
                   ""+
                   "                <\/div>"+
@@ -1329,183 +1340,180 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                <\/div>"+
                   "                <hr class = separator>" +
                   "";
-
-
-                div.id = "cxReport";
-                /*+
-                 ""+
-                 "        <div class=\"osa-full full-results-section\">"+
-                 "            <div class=\"summary-table-row cxosa-full\" id=\"osa-full\">"+
-                 "                <div class=\"title-column\">"+
-                 "                    <div class=\"summary-title\">"+
-                 "                        <div class=\"sum1\">CxOSA<\/div>"+
-                 "                        <div class=\"sum1\">Full Report<\/div>"+
-                 "                    <\/div>"+
-                 "                    <div class=\"detailed-report\">"+
-                 "                        <div class=\"sast-downloads osa-downloads\">"+
-                 "                            <div class=\"report-link\">"+
-                 "                                <a class=\"html-report\" id=\"osa-html-link\">"+
-                 "                                    <div class=\"summary-title-links\">"+
-                 "                                        <div class=\"results-link summary-link\">"+
-                 "                                            <div class=\"results-link-icon link-icon\">"+
-                 "                                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" width=\"12\" height=\"14\""+
-                 "                                                     viewBox=\"0 0 12 14\"><title>analize<\/title>"+
-                 "                                                    <g fill=\"none\" fill-rule=\"evenodd\">"+
-                 "                                                        <circle stroke=\"#4A90E2\" stroke-width=\"2\" cx=\"5\" cy=\"5\" r=\"4\"\/>"+
-                 "                                                        <path fill=\"#4A90E2\""+
-                 "                                                              d=\"M6.366 8.366l1.732-1 3.268 5.66-1.732 1z\"\/>"+
-                 "                                                    <\/g>"+
-                 "                                                <\/svg>"+
-                 "                                            <\/div>"+
-                 "                                            <div class=\"summary-link-text\">Analyze Results<\/div>"+
-                 "                                        <\/div>"+
-                 "                                    <\/div>"+
-                 "                                <\/a>"+
-                 "                            <\/div>"+
-                 "                        <\/div>"+
-                 "                    <\/div>"+
-                 "                <\/div>"+
-                 "                <div class=\"main-column\">"+
-                 "                    <div class=\"full-start-end\">"+
-                 ""+
-                 "                        <!--osa start-->"+
-                 "                        <div class=\"full-start\">"+
-                 "                            <div class=\"full-start-end-icon\">"+
-                 "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\""+
-                 "                                     height=\"26px\" version=\"1.1\" viewBox=\"0 0 23 26\" width=\"23px\">"+
-                 "                                    <title>"+
-                 "                                        Icon<\/title>"+
-                 "                                    <desc>Created with Sketch.<\/desc>"+
-                 "                                    <defs>"+
-                 "                                        <rect height=\"23\" rx=\"1.6\" id=\"full-start-path\" width=\"23\" x=\"0\" y=\"2\"\/>"+
-                 "                                        <mask height=\"23\" maskUnits=\"objectBoundingBox\" id=\"full-start-mask\" width=\"23\""+
-                 "                                              maskContentUnits=\"userSpaceOnUse\" fill=\"white\" x=\"0\""+
-                 "                                              y=\"0\">"+
-                 "                                            <use xlink:href=\"#full-start-path\"\/>"+
-                 "                                        <\/mask>"+
-                 "                                    <\/defs>"+
-                 "                                    <g stroke-width=\"1\" fill-rule=\"evenodd\" id=\"Page-1\" stroke=\"none\" fill=\"none\">"+
-                 "                                        <g transform=\"translate(-684.000000, -708.000000)\" id=\"Jenkins\""+
-                 "                                           stroke=\"#373050\">"+
-                 "                                            <g transform=\"translate(273.000000, 695.000000)\" id=\"CxSAST\">"+
-                 "                                                <g transform=\"translate(411.000000, 9.000000)\" id=\"Group-2-Copy\">"+
-                 "                                                    <g transform=\"translate(0.000000, 5.000000)\" id=\"Icon\">"+
-                 "                                                        <use mask=\"url(#full-start-mask)\" stroke-width=\"4\""+
-                 "                                                             id=\"Rectangle-22\" xlink:href=\"#full-start-path\"\/>"+
-                 "                                                        <path stroke-width=\"2\" id=\"Line\" d=\"M5,0 L5,2.99971994\""+
-                 "                                                              stroke-linecap=\"square\"\/>"+
-                 "                                                        <path stroke-width=\"2\" id=\"Line-Copy\" d=\"M18,0 L18,2.99971994\""+
-                 "                                                              stroke-linecap=\"square\"\/>"+
-                 "                                                    <\/g>"+
-                 "                                                <\/g>"+
-                 "                                            <\/g>"+
-                 "                                        <\/g>"+
-                 "                                    <\/g>"+
-                 "                                <\/svg>"+
-                 "                            <\/div>"+
-                 "                            <div class=\"full-start-end-text-date\">"+
-                 "                                <div class=\"full-start-end-text\">"+
-                 "                                    Start:"+
-                 "                                <\/div>"+
-                 "                                <div class=\"full-start-end-date\" id=\"osa-full-start-date\">"+
-                 ""+
-                 "                                <\/div>"+
-                 "                            <\/div>"+
-                 "                        <\/div>"+
-                 ""+
-                 "                        <!--osa end-->"+
-                 "                        <div class=\"full-end\">"+
-                 "                            <div class=\"full-start-end-icon\">"+
-                 "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\""+
-                 "                                     height=\"26px\" version=\"1.1\" viewBox=\"0 0 23 26\" width=\"23px\">"+
-                 "                                    <title>"+
-                 "                                        Icon<\/title>"+
-                 "                                    <desc>Created with Sketch.<\/desc>"+
-                 "                                    <defs>"+
-                 "                                        <rect height=\"23\" rx=\"1.6\" id=\"full-start-path\" width=\"23\" x=\"0\" y=\"2\"\/>"+
-                 "                                        <mask height=\"23\" maskUnits=\"objectBoundingBox\" id=\"full-start-mask\" width=\"23\""+
-                 "                                              maskContentUnits=\"userSpaceOnUse\" fill=\"white\" x=\"0\""+
-                 "                                              y=\"0\">"+
-                 "                                            <use xlink:href=\"#full-start-path\"\/>"+
-                 "                                        <\/mask>"+
-                 "                                    <\/defs>"+
-                 "                                    <g stroke-width=\"1\" fill-rule=\"evenodd\" id=\"Page-1\" stroke=\"none\" fill=\"none\">"+
-                 "                                        <g transform=\"translate(-684.000000, -708.000000)\" id=\"Jenkins\""+
-                 "                                           stroke=\"#373050\">"+
-                 "                                            <g transform=\"translate(273.000000, 695.000000)\" id=\"CxSAST\">"+
-                 "                                                <g transform=\"translate(411.000000, 9.000000)\" id=\"Group-2-Copy\">"+
-                 "                                                    <g transform=\"translate(0.000000, 5.000000)\" id=\"Icon\">"+
-                 "                                                        <use mask=\"url(#full-start-mask)\" stroke-width=\"4\""+
-                 "                                                             id=\"Rectangle-22\" xlink:href=\"#full-start-path\"\/>"+
-                 "                                                        <path stroke-width=\"2\" id=\"Line\" d=\"M5,0 L5,2.99971994\""+
-                 "                                                              stroke-linecap=\"square\"\/>"+
-                 "                                                        <path stroke-width=\"2\" id=\"Line-Copy\" d=\"M18,0 L18,2.99971994\""+
-                 "                                                              stroke-linecap=\"square\"\/>"+
-                 "                                                    <\/g>"+
-                 "                                                <\/g>"+
-                 "                                            <\/g>"+
-                 "                                        <\/g>"+
-                 "                                    <\/g>"+
-                 "                                <\/svg>"+
-                 "                            <\/div>"+
-                 "                            <div class=\"full-start-end-text-date\">"+
-                 "                                <div class=\"full-start-end-text\">"+
-                 "                                    End:"+
-                 "                                <\/div>"+
-                 "                                <div class=\"full-start-end-date\" id=\"osa-full-end-date\">"+
-                 ""+
-                 "                                <\/div>"+
-                 "                            <\/div>"+
-                 "                        <\/div>"+
-                 ""+
-                 "                        <!--osa files-->"+
-                 "                        <div class=\"full-files\">"+
-                 "                            <div class=\"full-start-end-icon\">"+
-                 "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:svgjs=\"http:\/\/svgjs.com\/svgjs\""+
-                 "                                     xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\" height=\"27\""+
-                 "                                     id=\"SvgjsSvg1029\""+
-                 "                                     version=\"1.1\" viewBox=\"0 0 32 27\" width=\"32\"><title>Combined Shape<\/title>"+
-                 "                                    <desc>Created with Avocode.<\/desc>"+
-                 "                                    <defs id=\"SvgjsDefs1030\">"+
-                 "                                        <clipPath id=\"SvgjsClipPath1033\">"+
-                 "                                            <path id=\"SvgjsPath1032\""+
-                 "                                                  d=\"M848 2095C848 2094.82964 848.0142 2094.6626 848.04148 2094.5C848.0142 2094.3374 848 2094.17036 848 2094V2091C848 2089.34315 849.34315 2088 851 2088H857C858.65685 2088 860.29137 2089.31116 860.65079 2090.92856L860.8888900000001 2092H877.0000000000001C878.6568500000001 2092 880.0000000000001 2093.34315 880.0000000000001 2095V2112C880.0000000000001 2113.65685 878.6568500000001 2115 877.0000000000001 2115H851.0000000000001C849.3431500000002 2115 848.0000000000001 2113.65685 848.0000000000001 2112Z \""+
-                 "                                                  fill=\"#ffffff\"\/>"+
-                 "                                        <\/clipPath>"+
-                 "                                    <\/defs>"+
-                 "                                    <path stroke-dasharray=\"0\""+
-                 "                                          d=\"M848 2095C848 2094.82964 848.0142 2094.6626 848.04148 2094.5C848.0142 2094.3374 848 2094.17036 848 2094V2091C848 2089.34315 849.34315 2088 851 2088H857C858.65685 2088 860.29137 2089.31116 860.65079 2090.92856L860.8888900000001 2092H877.0000000000001C878.6568500000001 2092 880.0000000000001 2093.34315 880.0000000000001 2095V2112C880.0000000000001 2113.65685 878.6568500000001 2115 877.0000000000001 2115H851.0000000000001C849.3431500000002 2115 848.0000000000001 2113.65685 848.0000000000001 2112Z \""+
-                 "                                          stroke-opacity=\"1\" stroke=\"#373050\" stroke-linecap=\"butt\""+
-                 "                                          stroke-linejoin=\"miter\" stroke-miterlimit=\"50\""+
-                 "                                          transform=\"matrix(1,0,0,1,-848,-2088)\""+
-                 "                                          stroke-width=\"4\" id=\"SvgjsPath1031\" fill-opacity=\"0\" fill=\"#ffffff\""+
-                 "                                          clip-path=\"url(&quot;#SvgjsClipPath1033&quot;)\"\/>"+
-                 "                                <\/svg>"+
-                 "                            <\/div>"+
-                 "                            <div class=\"full-start-end-text-date\">"+
-                 "                                <div class=\"full-start-end-text\">"+
-                 "                                    Libraries:"+
-                 "                                <\/div>"+
-                 "                                <div class=\"full-start-end-date\" id=\"osa-full-files\">"+
-                 ""+
-                 "                                <\/div>"+
-                 "                            <\/div>"+
-                 "                        <\/div>"+
-                 "                    <\/div>"+
-                 "                    <div id=\"osa-cve-table-high-container\">"+
-                 ""+
-                 "                    <\/div>"+
-                 "                    <div id=\"osa-cve-table-med-container\">"+
-                 ""+
-                 "                    <\/div>"+
-                 "                    <div id=\"osa-cve-table-low-container\">"+
-                 ""+
-                 "                    <\/div>"+
-                 "                <\/div>"+
-                 "            <\/div>"+
-                 "        <\/div>"+
-                 ""+
-                 "    <\/div>"+*/
+              /*+
+               ""+
+               "        <div class=\"osa-full full-results-section\">"+
+               "            <div class=\"summary-table-row cxosa-full\" id=\"osa-full\">"+
+               "                <div class=\"title-column\">"+
+               "                    <div class=\"summary-title\">"+
+               "                        <div class=\"sum1\">CxOSA<\/div>"+
+               "                        <div class=\"sum1\">Full Report<\/div>"+
+               "                    <\/div>"+
+               "                    <div class=\"detailed-report\">"+
+               "                        <div class=\"sast-downloads osa-downloads\">"+
+               "                            <div class=\"report-link\">"+
+               "                                <a class=\"html-report\" id=\"osa-html-link\">"+
+               "                                    <div class=\"summary-title-links\">"+
+               "                                        <div class=\"results-link summary-link\">"+
+               "                                            <div class=\"results-link-icon link-icon\">"+
+               "                                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" width=\"12\" height=\"14\""+
+               "                                                     viewBox=\"0 0 12 14\"><title>analize<\/title>"+
+               "                                                    <g fill=\"none\" fill-rule=\"evenodd\">"+
+               "                                                        <circle stroke=\"#4A90E2\" stroke-width=\"2\" cx=\"5\" cy=\"5\" r=\"4\"\/>"+
+               "                                                        <path fill=\"#4A90E2\""+
+               "                                                              d=\"M6.366 8.366l1.732-1 3.268 5.66-1.732 1z\"\/>"+
+               "                                                    <\/g>"+
+               "                                                <\/svg>"+
+               "                                            <\/div>"+
+               "                                            <div class=\"summary-link-text\">Analyze Results<\/div>"+
+               "                                        <\/div>"+
+               "                                    <\/div>"+
+               "                                <\/a>"+
+               "                            <\/div>"+
+               "                        <\/div>"+
+               "                    <\/div>"+
+               "                <\/div>"+
+               "                <div class=\"main-column\">"+
+               "                    <div class=\"full-start-end\">"+
+               ""+
+               "                        <!--osa start-->"+
+               "                        <div class=\"full-start\">"+
+               "                            <div class=\"full-start-end-icon\">"+
+               "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\""+
+               "                                     height=\"26px\" version=\"1.1\" viewBox=\"0 0 23 26\" width=\"23px\">"+
+               "                                    <title>"+
+               "                                        Icon<\/title>"+
+               "                                    <desc>Created with Sketch.<\/desc>"+
+               "                                    <defs>"+
+               "                                        <rect height=\"23\" rx=\"1.6\" id=\"full-start-path\" width=\"23\" x=\"0\" y=\"2\"\/>"+
+               "                                        <mask height=\"23\" maskUnits=\"objectBoundingBox\" id=\"full-start-mask\" width=\"23\""+
+               "                                              maskContentUnits=\"userSpaceOnUse\" fill=\"white\" x=\"0\""+
+               "                                              y=\"0\">"+
+               "                                            <use xlink:href=\"#full-start-path\"\/>"+
+               "                                        <\/mask>"+
+               "                                    <\/defs>"+
+               "                                    <g stroke-width=\"1\" fill-rule=\"evenodd\" id=\"Page-1\" stroke=\"none\" fill=\"none\">"+
+               "                                        <g transform=\"translate(-684.000000, -708.000000)\" id=\"Jenkins\""+
+               "                                           stroke=\"#373050\">"+
+               "                                            <g transform=\"translate(273.000000, 695.000000)\" id=\"CxSAST\">"+
+               "                                                <g transform=\"translate(411.000000, 9.000000)\" id=\"Group-2-Copy\">"+
+               "                                                    <g transform=\"translate(0.000000, 5.000000)\" id=\"Icon\">"+
+               "                                                        <use mask=\"url(#full-start-mask)\" stroke-width=\"4\""+
+               "                                                             id=\"Rectangle-22\" xlink:href=\"#full-start-path\"\/>"+
+               "                                                        <path stroke-width=\"2\" id=\"Line\" d=\"M5,0 L5,2.99971994\""+
+               "                                                              stroke-linecap=\"square\"\/>"+
+               "                                                        <path stroke-width=\"2\" id=\"Line-Copy\" d=\"M18,0 L18,2.99971994\""+
+               "                                                              stroke-linecap=\"square\"\/>"+
+               "                                                    <\/g>"+
+               "                                                <\/g>"+
+               "                                            <\/g>"+
+               "                                        <\/g>"+
+               "                                    <\/g>"+
+               "                                <\/svg>"+
+               "                            <\/div>"+
+               "                            <div class=\"full-start-end-text-date\">"+
+               "                                <div class=\"full-start-end-text\">"+
+               "                                    Start:"+
+               "                                <\/div>"+
+               "                                <div class=\"full-start-end-date\" id=\"osa-full-start-date\">"+
+               ""+
+               "                                <\/div>"+
+               "                            <\/div>"+
+               "                        <\/div>"+
+               ""+
+               "                        <!--osa end-->"+
+               "                        <div class=\"full-end\">"+
+               "                            <div class=\"full-start-end-icon\">"+
+               "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\""+
+               "                                     height=\"26px\" version=\"1.1\" viewBox=\"0 0 23 26\" width=\"23px\">"+
+               "                                    <title>"+
+               "                                        Icon<\/title>"+
+               "                                    <desc>Created with Sketch.<\/desc>"+
+               "                                    <defs>"+
+               "                                        <rect height=\"23\" rx=\"1.6\" id=\"full-start-path\" width=\"23\" x=\"0\" y=\"2\"\/>"+
+               "                                        <mask height=\"23\" maskUnits=\"objectBoundingBox\" id=\"full-start-mask\" width=\"23\""+
+               "                                              maskContentUnits=\"userSpaceOnUse\" fill=\"white\" x=\"0\""+
+               "                                              y=\"0\">"+
+               "                                            <use xlink:href=\"#full-start-path\"\/>"+
+               "                                        <\/mask>"+
+               "                                    <\/defs>"+
+               "                                    <g stroke-width=\"1\" fill-rule=\"evenodd\" id=\"Page-1\" stroke=\"none\" fill=\"none\">"+
+               "                                        <g transform=\"translate(-684.000000, -708.000000)\" id=\"Jenkins\""+
+               "                                           stroke=\"#373050\">"+
+               "                                            <g transform=\"translate(273.000000, 695.000000)\" id=\"CxSAST\">"+
+               "                                                <g transform=\"translate(411.000000, 9.000000)\" id=\"Group-2-Copy\">"+
+               "                                                    <g transform=\"translate(0.000000, 5.000000)\" id=\"Icon\">"+
+               "                                                        <use mask=\"url(#full-start-mask)\" stroke-width=\"4\""+
+               "                                                             id=\"Rectangle-22\" xlink:href=\"#full-start-path\"\/>"+
+               "                                                        <path stroke-width=\"2\" id=\"Line\" d=\"M5,0 L5,2.99971994\""+
+               "                                                              stroke-linecap=\"square\"\/>"+
+               "                                                        <path stroke-width=\"2\" id=\"Line-Copy\" d=\"M18,0 L18,2.99971994\""+
+               "                                                              stroke-linecap=\"square\"\/>"+
+               "                                                    <\/g>"+
+               "                                                <\/g>"+
+               "                                            <\/g>"+
+               "                                        <\/g>"+
+               "                                    <\/g>"+
+               "                                <\/svg>"+
+               "                            <\/div>"+
+               "                            <div class=\"full-start-end-text-date\">"+
+               "                                <div class=\"full-start-end-text\">"+
+               "                                    End:"+
+               "                                <\/div>"+
+               "                                <div class=\"full-start-end-date\" id=\"osa-full-end-date\">"+
+               ""+
+               "                                <\/div>"+
+               "                            <\/div>"+
+               "                        <\/div>"+
+               ""+
+               "                        <!--osa files-->"+
+               "                        <div class=\"full-files\">"+
+               "                            <div class=\"full-start-end-icon\">"+
+               "                                <svg xmlns=\"http:\/\/www.w3.org\/2000\/svg\" xmlns:svgjs=\"http:\/\/svgjs.com\/svgjs\""+
+               "                                     xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\" height=\"27\""+
+               "                                     id=\"SvgjsSvg1029\""+
+               "                                     version=\"1.1\" viewBox=\"0 0 32 27\" width=\"32\"><title>Combined Shape<\/title>"+
+               "                                    <desc>Created with Avocode.<\/desc>"+
+               "                                    <defs id=\"SvgjsDefs1030\">"+
+               "                                        <clipPath id=\"SvgjsClipPath1033\">"+
+               "                                            <path id=\"SvgjsPath1032\""+
+               "                                                  d=\"M848 2095C848 2094.82964 848.0142 2094.6626 848.04148 2094.5C848.0142 2094.3374 848 2094.17036 848 2094V2091C848 2089.34315 849.34315 2088 851 2088H857C858.65685 2088 860.29137 2089.31116 860.65079 2090.92856L860.8888900000001 2092H877.0000000000001C878.6568500000001 2092 880.0000000000001 2093.34315 880.0000000000001 2095V2112C880.0000000000001 2113.65685 878.6568500000001 2115 877.0000000000001 2115H851.0000000000001C849.3431500000002 2115 848.0000000000001 2113.65685 848.0000000000001 2112Z \""+
+               "                                                  fill=\"#ffffff\"\/>"+
+               "                                        <\/clipPath>"+
+               "                                    <\/defs>"+
+               "                                    <path stroke-dasharray=\"0\""+
+               "                                          d=\"M848 2095C848 2094.82964 848.0142 2094.6626 848.04148 2094.5C848.0142 2094.3374 848 2094.17036 848 2094V2091C848 2089.34315 849.34315 2088 851 2088H857C858.65685 2088 860.29137 2089.31116 860.65079 2090.92856L860.8888900000001 2092H877.0000000000001C878.6568500000001 2092 880.0000000000001 2093.34315 880.0000000000001 2095V2112C880.0000000000001 2113.65685 878.6568500000001 2115 877.0000000000001 2115H851.0000000000001C849.3431500000002 2115 848.0000000000001 2113.65685 848.0000000000001 2112Z \""+
+               "                                          stroke-opacity=\"1\" stroke=\"#373050\" stroke-linecap=\"butt\""+
+               "                                          stroke-linejoin=\"miter\" stroke-miterlimit=\"50\""+
+               "                                          transform=\"matrix(1,0,0,1,-848,-2088)\""+
+               "                                          stroke-width=\"4\" id=\"SvgjsPath1031\" fill-opacity=\"0\" fill=\"#ffffff\""+
+               "                                          clip-path=\"url(&quot;#SvgjsClipPath1033&quot;)\"\/>"+
+               "                                <\/svg>"+
+               "                            <\/div>"+
+               "                            <div class=\"full-start-end-text-date\">"+
+               "                                <div class=\"full-start-end-text\">"+
+               "                                    Libraries:"+
+               "                                <\/div>"+
+               "                                <div class=\"full-start-end-date\" id=\"osa-full-files\">"+
+               ""+
+               "                                <\/div>"+
+               "                            <\/div>"+
+               "                        <\/div>"+
+               "                    <\/div>"+
+               "                    <div id=\"osa-cve-table-high-container\">"+
+               ""+
+               "                    <\/div>"+
+               "                    <div id=\"osa-cve-table-med-container\">"+
+               ""+
+               "                    <\/div>"+
+               "                    <div id=\"osa-cve-table-low-container\">"+
+               ""+
+               "                    <\/div>"+
+               "                <\/div>"+
+               "            <\/div>"+
+               "        <\/div>"+
+               ""+
+               "    <\/div>"+*/
 
                 options.el.appendChild(div);
           }

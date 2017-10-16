@@ -158,7 +158,6 @@
     width: 100%;
     margin-bottom: 10%;
     margin-top: 5%;
-    margin-left: 24%;
     max-width: 709px;
 }
 
@@ -500,7 +499,7 @@ td {
 }
 
 .detailed-report {
-    margin-top: 12px;
+    /*margin-top: 12px;*/
     display: block;
     /*padding: 0 11px;*/
 }
@@ -545,6 +544,7 @@ td {
 
 a.html-report {
     color: #4A90E2;
+    border-bottom: none;
 }
 
 .report-link {
