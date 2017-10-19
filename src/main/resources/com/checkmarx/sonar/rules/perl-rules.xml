@@ -31,7 +31,31 @@ Quality&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4119</key><name>Improper_Restriction_of_XXE_Ref</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An&amp;#160;application that will parse and replace DTD entity references, in an XML document that the user controls, can allow an attacker to craft an XML document to read arbitrary server files. This XML document could contain an XML entity reference, which refers to an embedded DTD entity definition that points to any local file. This would enable the attacker to retrieve any arbitrary system file on the server.&amp;#160;&lt;/div&gt;      
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2070</key><name>Uncontrolled_Format_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Allowing attackers to control format strings could enable them&amp;#160;to access areas of memory to which they should not have access, including reading other restricted variables, misrepresenting data, and possibly even overwriting unauthorized areas of memory. It is even possible this could further lead to buffer overflows and arbitrary code execution.&amp;#160;&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application allows user input to influence the string argument used for formatted print functions. This family of functions expects the first argument to designate the relative format of dynamically constructed output string, including how to represent each of the other arguments, or special codes to access other areas of memory.&amp;#160;&lt;/div&gt;
+&lt;div&gt;Allowing an external user or attacker to control this string, allows them to control the functioning of the printing function, and thus to access unexpected areas of memory.&amp;#160;&lt;/div&gt;            
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not allow user input or any other external data to influence the format strings.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Ensure that all string format functions are called with a static string as the format parameter, and that the correct number of arguments are passed to the function, according to the static format string.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Alternatively, validate all user input before using it in the format string parameter to print format functions, and ensure formatting tokens are not included in the input.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Enable compiler settings that check for unvalidated format strings.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div&gt;Specific Recommendations:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not include user input directly in the format string parameter (often the first or second argument) to formatting functions.&amp;#160;&lt;/li&gt;
+&lt;li&gt;Alternatively, use only the input's size or length in the format string, but not the actual contents of the input itself.&amp;#160;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;div&gt;&amp;#160;&lt;/div&gt;
+&lt;/div&gt;            
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4119</key><name>Improper_Restriction_of_XXE_Ref</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An&amp;#160;application that will parse and replace DTD entity references, in an XML document that the user controls, can allow an attacker to craft an XML document to read arbitrary server files. This XML document could contain an XML entity reference, which refers to an embedded DTD entity definition that points to any local file. This would enable the attacker to retrieve any arbitrary system file on the server.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;An attacker could upload an XML document that contains a DTD declaration, in particular an entity defintion that refers to a local file on the server's disk, e.g. &lt;code&gt;&amp;lt;!ENTITY xxe SYSTEM "file:///c:/boot.ini"&amp;gt;&lt;/code&gt;. The attacker would then include an XML entity reference that refers back to that entity definition, e.g. &lt;code&gt;&amp;lt;div&amp;gt;&amp;amp;xxe;&amp;lt;/div&amp;gt;&lt;/code&gt; . If the parsed XML document is then returned to the user, the result will include the contents of the sensitive system file.&amp;#160;&lt;/div&gt;
 &lt;div&gt;This is caused by the XML parser, which is configured to automatically parse DTD declarations and resolve entity references, instead of disabling both DTD and external references altogether.&amp;#160;&lt;/div&gt;
@@ -55,47 +79,7 @@ Quality&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 &lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Vulnerable XML Parsing with XMLStreamReader&lt;/h4&gt;&lt;pre&gt;String parseXML(InputStream input) {
-    StringBuilder content = new StringBuilder();
-    
-    XMLInputFactory factory = XMLInputFactory.newFactory(); 
-    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
-    factory.setProperty(XMLInputFactory.SUPPORT_DTD, true); 
-    
-    XMLStreamReader reader = factory.createXMLStreamReader(input);
-    
-    while(reader.hasNext())
-    {
-        if(reader.hasText()
-        {
-            content.append(reader.getText());
-        }
-        reader.next();
-    }
-    
-    return content.toString();
-}
-&lt;/pre&gt;&lt;h4&gt;Disabling DTD Entities with XMLStreamReader&lt;/h4&gt;&lt;pre&gt;String parseXML(InputStream input) {
-    StringBuilder content = new StringBuilder();
-    
-    XMLInputFactory factory = XMLInputFactory.newFactory(); 
-    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-    factory.setProperty(XMLInputFactory.SUPPORT_DTD, false); 
-    
-    XMLStreamReader reader = factory.createXMLStreamReader(input);
-    
-    while(reader.hasNext())
-    {
-        if(reader.hasText()
-        {
-            content.append(reader.getText());
-        }
-        reader.next();
-    }
-    
-    return content.toString();
-}
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2066</key><name>Not_Checking_Regular_Expressions_Results</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2066</key><name>Not_Checking_Regular_Expressions_Results</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Unchecked Return Value&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -299,27 +283,7 @@ References&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td valign="top" nowrap="" rowspan=
 &lt;li&gt;Do not use or reference any method, function, property, or other element that has been declared deprecated.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/ul&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using Deprecated Methods for Security Checks&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        secManager.checkMulticast(address, 0)
-    }
-
-}&lt;/pre&gt;&lt;h4&gt;A Replacement Security Check&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        SocketPermission permission = new SocketPermission(address.getHostAddress(), "accept,connect");
-        
-        secManager.checkPermission(permission)
-    }
-
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2064</key><name>Using_Perl4_Package_Names</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2064</key><name>Using_Perl4_Package_Names</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
 &lt;div&gt;Note that the actual&amp;#160;risk involved depends on the specifics of any known vulnerabilities in older versions.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application references code elements that have been declared as deprecated. This could include functions, methods, properties, modules, or obsolete&amp;#160;library versions that are out of date. It is likely that the code that references the obsolete element was developed before it was declared as obsolete, and in the meantime the referenced code was updated.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
@@ -328,27 +292,7 @@ private void checkPermissions(InetAddress address) {
 &lt;li&gt;Do not use or reference any method, function, property, or other element that has been declared deprecated.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/ul&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using Deprecated Methods for Security Checks&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        secManager.checkMulticast(address, 0)
-    }
-
-}&lt;/pre&gt;&lt;h4&gt;A Replacement Security Check&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        SocketPermission permission = new SocketPermission(address.getHostAddress(), "accept,connect");
-        
-        secManager.checkPermission(permission)
-    }
-
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2039</key><name>Import_of_Deprecated_Modules</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2039</key><name>Import_of_Deprecated_Modules</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Referencing deprecated modules can cause an application to be exposed to known vulnerabilities, that have been publicly reported and already fixed. A common attack technique is to scan applications for these known vulnerabilities, and then exploit the application through these deprecated versions.&lt;/div&gt;
 &lt;div&gt;Note that the actual&amp;#160;risk involved depends on the specifics of any known vulnerabilities in older versions.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application references code elements that have been declared as deprecated. This could include functions, methods, properties, modules, or obsolete&amp;#160;library versions that are out of date. It is likely that the code that references the obsolete element was developed before it was declared as obsolete, and in the meantime the referenced code was updated.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
@@ -357,27 +301,7 @@ private void checkPermissions(InetAddress address) {
 &lt;li&gt;Do not use or reference any method, function, property, or other element that has been declared deprecated.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/ul&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using Deprecated Methods for Security Checks&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        secManager.checkMulticast(address, 0)
-    }
-
-}&lt;/pre&gt;&lt;h4&gt;A Replacement Security Check&lt;/h4&gt;&lt;pre&gt;
-private void checkPermissions(InetAddress address) { 
-
-    SecurityManager secManager = System.getSecurityManager();
-    
-    if (secManager != null) {
-        SocketPermission permission = new SocketPermission(address.getHostAddress(), "accept,connect");
-        
-        secManager.checkPermission(permission)
-    }
-
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4137</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_4137</key><name>Parameter_Tampering</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;div&gt;A malicious user could access other users&amp;#8217; information. By requesting information directly, such as by an account number, authorization may be bypassed and the attacker could steal confidential or restricted information (for example, a bank account balance), using a direct object reference.&amp;#160;&lt;/div&gt;
 &lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
@@ -399,31 +323,7 @@ private void checkPermissions(InetAddress address) {
 &lt;li&gt;Map the user input to an indirect reference, e.g. via a prepared list of allowable values.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Unfiltered Direct Object Reference&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
-    int accountId = Integer.parseInt(req.getParameter("accountId"));
-    
-    string sql = "select * from [Accounts] where [AccountId] = " 
-                        + accountId.toString();
-                        
-    Statement stmt = conn.createStatement();
-    ResultSet accountRS = stmt.executeQuery(sql); 
-    
-    return accountRS;
-}&lt;/pre&gt;&lt;h4&gt;Record References are Now Filtered and Indirect&lt;/h4&gt;&lt;pre&gt;public ResultSet getAccountInfo(request req)  {
-    int accountIndex = Integer.parseInt(req.getParameter("accountIndex"));
-    int realAccountId = userAccountList.get(accountIndex);
-    
-    int userId = req.getSession().getAttribute("userId"); 
-    
-    string sql = "select * from [Accounts] where [AccountId] = " 
-                        + realAccountId.toString() 
-                        + " and [UserId] = " + userId.toString();
-                        
-    Statement stmt = conn.createStatement();
-    ResultSet accountRS = stmt.executeQuery(sql); 
-    
-    return accountRS;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2043</key><name>Missing_Encryption_of_Sensitive_Data</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker that has access to a user's client computer or device, will be able to retrieve the user's&amp;#160;sensitive personal data (PII) from the client storage. This would be detrimental to the user and harm their privacy, and could&amp;#160;cause reputational damage, financial loss, and even lead to identity theft.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2043</key><name>Missing_Encryption_of_Sensitive_Data</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker that has access to a user's client computer or device, will be able to retrieve the user's&amp;#160;sensitive personal data (PII) from the client storage. This would be detrimental to the user and harm their privacy, and could&amp;#160;cause reputational damage, financial loss, and even lead to identity theft.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application stores sensitive data, such as PII (Personally Identifiable Information), on the client browser or device. The application uses insecure forms of storage, which do not inherently provide any protection from unauthorized access. This data is not encrypted or sanitized before being stored, thus a malicious entity with access to the device or browser could easily retrieve the user's data.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ul&gt;
@@ -431,22 +331,7 @@ private void checkPermissions(InetAddress address) {
 &lt;li&gt;If PII or other sensitive data must be stored on the client, ensure it is encrypted or otherwise protected.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;User Data Stored in Local Storage&lt;/h4&gt;&lt;pre&gt;function storeUserData() { 
-	var accountId = getUserAccount();
-	localStorage.setItem('accountId', accountId);
-}
-
-&lt;/pre&gt;&lt;h4&gt;User Data in Globals instead of Persistent Storage&lt;/h4&gt;&lt;pre&gt;var globalAccountId; // Cache user data for application use
-
-function storeUserData() { 
-	var accountId = getUserAccount();
-	
-	  // localStorage.setItem('accountId', accountId);
-	// Do not store user data in persistent storage
-	globalAccountId = accountId; 
-}
-
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2019</key><name>Hardcoded_Absolute_Path</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Generally, hardcoding absolute paths makes the application brittle, and will prevent the program from operating properly in some environments that do not have the identical file system structure. This will also cause software maintenance problems in future versions of the application, if the design or requirements were to change.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2019</key><name>Hardcoded_Absolute_Path</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Generally, hardcoding absolute paths makes the application brittle, and will prevent the program from operating properly in some environments that do not have the identical file system structure. This will also cause software maintenance problems in future versions of the application, if the design or requirements were to change.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;Additionally, if the application uses this path to read or write data, this can cause a breach of confidentiality or&amp;nbsp;allow malicious input into the program. In some situations, this vulnerability might even allow a malicious user to override the expected functionality, and cause the application to run any arbitrary program and execute any code the attacker deploys to the server.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Hardcoded paths are less flexible, and do not allow the application to account for changes in the environment. For example, the program might be installed in a different directory than the default. Likewise, different system languages and OS architectures can change the names of the system folders; for example, in a Spanish Windows machine there could&amp;nbsp;be&amp;nbsp;"&lt;code&gt;C:\Archivos de programa (x86)\&lt;/code&gt;" instead of "&lt;code&gt;C:\Program Files\&lt;/code&gt;".&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;Moreover, on Windows by default all directories and files created outside of the system folders and outside the user's profile, will be allow full read and write access to any authenticated user. An unauthorized, malicious user could access any sensitive data in these folders, despite the application assuming they are protected. Even worse, an attacker&amp;nbsp;could overwrite existing programs in these unprotected folders and plant malicious code, which&amp;nbsp;will be activated by the application.&amp;nbsp;&lt;/p&gt;
@@ -460,48 +345,12 @@ function storeUserData() {
 &lt;li&gt;Do not store sensitive data or configuration files in arbitrary folders. Likewise, do not store data files in the program directory. Instead, use the designated folders as intended, i.e. &lt;code&gt;%PROGRAMDATA%&lt;/code&gt; and &lt;code&gt;%APPDATA%&lt;/code&gt;&amp;nbsp;on Windows, respectively.&amp;nbsp;&lt;/li&gt;
 &lt;li&gt;Configure hardened permissions to the most restricted as possible, according to the Principle of Least Privilege. Consider implementing this automatically in the installation and setup routines.&amp;nbsp;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Hardcoded Path to Data File&lt;/h4&gt;&lt;pre&gt;public File getLogFile() { 
-	String filename = "C:\Logs\myapp.log";
-	File logFile = new File(filename); 
-
-  	return logFile; 
-}&lt;/pre&gt;&lt;h4&gt;Configured Path for Data File&lt;/h4&gt;&lt;pre&gt;public File getLogFile() { 
-	Properties props = this.Properties; 
-  	String filename = (String)props.get("logDirectory") + (String)props.get("logFilename");
-  
-	File logFile = new File(filename); 
-
-  	return logFile; 
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2042</key><name>Variables_Outside_The_Scope_of_a_Regex</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&lt;span id="docs-internal-guid-5cec9e99-8e7b-d1d3-2d05-11ebfef8cfce"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap; background-color: transparent;"&gt;Failed match for regex will not update the value of capture variables. That means that an unexpected or tampered value might be used later.&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2042</key><name>Variables_Outside_The_Scope_of_a_Regex</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&lt;span id="docs-internal-guid-5cec9e99-8e7b-d1d3-2d05-11ebfef8cfce"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap; background-color: transparent;"&gt;Failed match for regex will not update the value of capture variables. That means that an unexpected or tampered value might be used later.&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p dir="ltr" style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"&gt;&lt;span style="font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"&gt;Capture variables should be read only after a successful regex match.&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span id="docs-internal-guid-5cec9e99-8e31-af77-ee32-4f9f07f5990d"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap; background-color: transparent;"&gt;Not verifying the result of the match may result with reading a tampered value from the variable.&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&lt;span id="docs-internal-guid-5cec9e99-8e3b-ddf3-c4c4-d08cc34b580b"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap; background-color: transparent;"&gt;Read a capture variable only after a successful regex match. &lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span id="docs-internal-guid-5cec9e99-8e3b-ddf3-c4c4-d08cc34b580b"&gt;&lt;span style="font-family: Arial; vertical-align: baseline; white-space: pre-wrap; background-color: transparent;"&gt;Furthermore, the return value of the match should be checked. &lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Bad - Failed regex match without checking the result&lt;/h4&gt;&lt;pre&gt;my $data = "My Name is John";
- 
-my $name;
-my $time;
- 
-$data =~ /My Name is (.*)/;
-$name = $1;
-print "Your name is $name\n";
- 
-$data =~ /\[(\d*)\].*/;  # this regex will fail
-$time = $1;
-print "Time is $time\n";&lt;/pre&gt;&lt;h4&gt;Good - Failed regex match and checking the result&lt;/h4&gt;&lt;pre&gt;my $data = "My name is John";
- 
-my $name;
-my $time;
- 
-if ($data =~ /My name is (.*)/) {
-  $name = $1;
-  print "Your name is $name\n";
-}
- 
-if ($data =~ /\[(\d*)\].*/) {  # this regex will fail
-  $time = $1;
-  print "Time is $time\n";
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2046</key><name>Use_of_Broken_or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2046</key><name>Use_of_Broken_or_Risky_Cryptographic_Algorithm</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Using a weak or broken algorithm ruins the protection granted by using cryptographic mechanisms in the first place, harming the confidentiality or integrity of sensitive user data. This could allow an attacker to steal secret information, alter sensitive data, or forge the source of modified messages.&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application code specifies the name of the selected cryptographic algorithm, either via a String argument, a factory method, or a specific implementation class. These algorithms have fatal cryptographic weaknesses, that make it trivial to break in a reasonable timeframe. Strong algorithms should withstand attacks far beyond the realm of possible.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
 &lt;li&gt;Only use strong, approved cryptographic algorithms, including AES, RSA, ECC, and SHA-256 respectively, amongst others.&amp;nbsp;&lt;/li&gt;
@@ -509,36 +358,7 @@ if ($data =~ /\[(\d*)\].*/) {  # this regex will fail
 &lt;li&gt;Avoid, where possible, using legacy algorithms that are not considered "future-proof" with sufficient safety margins, even though they are considered "safe enough" for today. This includes algorithms that are weaker than they should be, and have stronger replacements, even if they are not yet fatally broken - such as SHA-1, 3DES,&amp;nbsp;&lt;/li&gt;
 &lt;li&gt;Consider using a relevant official set of classifications, such as NIST or ENISA. If possible, use only FIPS 140-2 certified algorithm implementations.&amp;nbsp;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Legacy Encryption with DES&lt;/h4&gt;&lt;pre&gt;private static byte[] encrypt(String plainText) {
-	byte[] encData;
-  
-    SecretKey key = new SecretKeySpec(SECRET_KEY, "DES");
-
-  	Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-  	cipher.init(Cipher.ENCRYPT_MODE, key);
-
-  	encData = cipher.doFinal(plainText.getBytes());
-  	byte[] iv = cipher.getIV();
-      
-	return encData;
-}&lt;/pre&gt;&lt;h4&gt;Modern Encryption with AES&lt;/h4&gt;&lt;pre&gt;private static byte[] encrypt(String plainText) {
-	byte[] encData;
-  
-	try {
-        SecretKey key = new SecretKeySpec(SECRET_KEY_FROM_CONFIG, "AES");
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			// Consider a stronger mode, such as GCM / CCM / or other AEAD mode, if required
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-
- 		encData = cipher.doFinal(plainText.getBytes("UTF-8"));
-        byte[] iv = cipher.getIV();
-
-    } catch (GeneralSecurityException e) {
-        handleError(e);
-    }
-	return encData;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2061</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2061</key><name>Use_Of_Hardcoded_Password</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Hardcoded passwords expose the application to password leakage. If an attacker gains access to the source code, she will be able to steal the embedded passwords, and use them to impersonate a valid user. This could include impersonating end users to the application, or impersonating the application to a remote system, such as a database or a remote web service.&amp;#160;&lt;/div&gt;
 &lt;div&gt;Once the attacker succeeds in impersonating the user or application, she will have full access to the system, and be able to do anything the impersonated identity could do.&amp;#160;&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application codebase&amp;#160;has string literal passwords embedded in the source code. This hardcoded value is used either to compare to user-provided credentials, or to authenticate downstream to a remote system (such as a database or a remote web service). &amp;#160;&lt;/div&gt;
 &lt;div&gt;An attacker only needs to gain access to the source code to reveal the hardcoded password. Likewise, the attacker can reverse engineer the compiled application binaries, and easily retrieve the embedded password. Once found, the attacker can easily use the password in impersonation attacks, either directly on the application or to the remote system.&amp;#160;&lt;/div&gt;
@@ -550,391 +370,50 @@ if ($data =~ /\[(\d*)\].*/) {  # this regex will fail
 &lt;li&gt;Sytem passwords should be stored in a configuration file or the database, and protected with strong encryption (e.g. AES-256). Encryption keys should be securely managed, and not hardcoded.&amp;#160;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Hardcoded Admin Password&lt;/h4&gt;&lt;pre&gt;bool isAdmin(String username, String password) {
-    bool isMatch = false; 
-    
-    if (username.equals("admin")) {
-        if (password.equals("P@ssw0rd"))
-            return isMatch = true;
-    }
-    
-    return isMatch;
-}&lt;/pre&gt;&lt;h4&gt;No Hardcoded Credentials&lt;/h4&gt;&lt;pre&gt;bool isAdmin(String username, String password) {
-    bool adminPrivs = false;
-    
-    if (authenticateUser(username, password)) { 
-        UserPrivileges privs = getUserPrivilieges(username);
-        
-        if (privs.isAdmin)
-            adminPrivs = true;
-    }
-    
-    return adminPrivs;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2015</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2015</key><name>Resource_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could open a backdoor enabling the attacker to connect directly to the application server, potentially leading to server takeover or other direct attacks.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application opens a network socket, for listening to incoming network connections. However, the application uses user input to define the socket, enabling an attacker to control it.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Don&amp;#8217;t allow a user to define parameters of network sockets.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Python&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a host name inputed by the user&lt;/h4&gt;&lt;pre&gt;from sys import stdin
-import socket
-import sys
-
-userInput = stdin.readline()
-
-HOST = userInput 
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded host name and does receive it from the user&lt;/h4&gt;&lt;pre&gt;import socket
-import sys
-
-HOST = ''   # Symbolic name, meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
-	 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'Socket created'
-	 
-#Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error as msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
-print 'Socket bind complete'&lt;/pre&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application opens a network socket using a port number inputed by the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1)
-        {
-                        long address = Convert.ToInt32(textBox1.Text);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The application opens a hard-coded port number and does receive it from the user
-      &lt;/h4&gt;&lt;pre&gt;
-
-class ResourceInjection
-{
-            public void foo(TextBox textBox1, long address)
-        {
-            IPEndPoint endpoint = new IPEndPoint(address, 15551);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application opens a network socket using a port number inputed by the user&lt;/h4&gt;&lt;pre&gt;public class ResourceInjection {
-	public static void main(String[] args) {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter port number: ");
-		int portNumber = Integer.parseInt(userInputScanner.nextLine());
-		try {
-			ServerSocket serverSocket = new ServerSocket(portNumber);
-		} catch (Exception e) {
-			System.err.println("Caught Exception: " + e.getMessage());
-		}
-
-	}
-}&lt;/pre&gt;&lt;h4&gt;The application opens a hard-coded port number according to the user input&lt;/h4&gt;&lt;pre&gt;public class ResourceInjectionFixed {
-	public static void main(String[] args) {
-		Scanner userInputScanner = new Scanner(System.in);
-		System.out.print("\nEnter port name: ");
-		String portName = userInputScanner.nextLine();
-		int portNum;
-		switch (portName) {
-		case "ftps":
-			portNum = 989;
-			break;
-		case "ftp":
-			portNum = 20;
-			break;
-		case "smtp":
-			portNum = 25;
-			break;
-		default:
-			portNum = 80;
-		}
-		try {
-			ServerSocket serverSocket = new ServerSocket(portNum);
-		} catch (Exception e) {
-			System.err.println("Caught Exception: " + e.getMessage());
-		}
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2060</key><name>Uncontrolled_Memory_Allocation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Allowing an untrusted user to control the amount of memory allocated in the application could allow an attacker to increase memory consumption arbitrarily, eventually causing out-of-memory errors in the application or possibly even crashing the server, causing a DoS (Denial of Service) attack.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2012</key><name>Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
+&lt;li&gt;Start and stop system services&lt;/li&gt;
+&lt;li&gt;Complete server takeover&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious, system-level commands engineered by an attacker, which would be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
+&lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified format, rather than rejecting bad patterns (blacklist). Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all OS commands to use a separate, dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2060</key><name>Uncontrolled_Memory_Allocation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Allowing an untrusted user to control the amount of memory allocated in the application could allow an attacker to increase memory consumption arbitrarily, eventually causing out-of-memory errors in the application or possibly even crashing the server, causing a DoS (Denial of Service) attack.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application declares and instantiates a large object, representing a data structure containing a collection of a given type of object. The size of the collection, and the number of elements contained in it, is initially set when constructing the object. However, the application sets the initial capacity based on external, untrusted user input, e.g. via the size of data or even as an explicit value.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&amp;nbsp;- Do not allow untrusted users to control memory allocation.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Avoid instantiating collection objects based on external user input, if possible.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- If necessary, validate all input before instantiating a collection based on the value or size of data.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- In particular, constrain the maximum size of the initial capacity of the collection to a sane default.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Ensure the application fails securely even in limited memory scenarios.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User-controlled Initialization of Collection&lt;/h4&gt;&lt;pre&gt;private Map&lt;int, MyObj&gt; buildCollection(HttpServletRequest req) {
-  	int count = Integer.parseInt(req.getParameter("count"));
-  
-	HashMap&lt;int, MyObj&gt; map = new HashMap&lt;int, MyObj&gt;(count);
-
-  	for (int i = 0; i &lt; count; i++) {
-      	map.put(i, new MyObj(i));
-    }
-  
-  	return map; 
-}&lt;/pre&gt;&lt;h4&gt;Constrained Initialization of Collection&lt;/h4&gt;&lt;pre&gt;private Map&lt;int, MyObj&gt; buildCollection(HttpServletRequest req) {
-  	int count = MAX_COLLECTION_SIZE;  // e.g. static final int MAX_COLLECTION_SIZE = 16;
-  
-	HashMap&lt;int, MyObj&gt; map = new HashMap&lt;int, MyObj&gt;(count);
-
-  	for (int i = 0; i &lt; count; i++) {
-      	map.put(i, new MyObj(i));
-    }
-  
-  	return map; 
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2045</key><name>Unprotected_Transport_of_Credentials</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Sending data over the network is inherently risky, unless the communication channel is protected using a secured protocol. This is&amp;nbsp;especially true for mobile devices that are often connected to non-secure networks and&amp;nbsp;untrusted hotspots. An attacker can easily eavesdrop on the information&amp;nbsp;being sent over the air, and even manipulate the data in some scenarios.&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2045</key><name>Unprotected_Transport_of_Credentials</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Sending data over the network is inherently risky, unless the communication channel is protected using a secured protocol. This is&amp;nbsp;especially true for mobile devices that are often connected to non-secure networks and&amp;nbsp;untrusted hotspots. An attacker can easily eavesdrop on the information&amp;nbsp;being sent over the air, and even manipulate the data in some scenarios.&lt;/p&gt;
 &lt;p&gt;Thus, an attacker could steal any personal or secret data sent over unencrypted HTTP, such as passwords, credit card details, social security numbers, and other forms of PII (Personally Identifiable Information), leading to identity theft and other forms of fraud. Additionally, it may be possible for an active attacker to alter the data and inject false or malicious data, causing further damage to the application server or the client app.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The app handles various forms of sensitive data, and communicates with the remote application server. However,&amp;nbsp;the app connects using an "&lt;code&gt;http://&lt;/code&gt;" URL, which will cause the underlying channel to use straight HTTP, without securing it with SSL/TLS.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;Always use secure protocol by connecting to "&lt;code&gt;https://&lt;/code&gt;" URLs. Never send sensitive data to an "&lt;code&gt;http://&lt;/code&gt;" URL.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Sending Current Location over Exposed HTTP&lt;/h4&gt;&lt;pre&gt;private void sendLocation(Location currentLocation) {
-	HttpClient client = new DefaultHttpClient();
-
-  	HttpPost request = new HttpPost("http://my.server.io/app/submitLocation");
-  	List&lt;NameValuePair&gt; params = new ArrayList&lt;NameValuePair&gt;();
-  	params.add(new BasicNameValuePair("id", this.UserID));
-  	params.add(new BasicNameValuePair("latitude", Double.toString(currentLocation.getLatitude()));
-  	params.add(new BasicNameValuePair("longitude", Double.toString(currentLocation.getLongitude()));
-  	request.setEntity(new UrlEncodedFormEntity(params));
-  
-  	client.execute(request);
-}&lt;/pre&gt;&lt;h4&gt;Securing Location Data with HTTPS&lt;/h4&gt;&lt;pre&gt;private void sendLocation(Location currentLocation) {
-  	HttpClient client = new DefaultHttpClient();
-	
-  	// Set URI to "https://..." to use SSL/TLS
-  	HttpPost request = new HttpPost("https://my.server.io/app/submitLocation");
-
-  	try { 
-        List&lt;NameValuePair&gt; params = new ArrayList&lt;NameValuePair&gt;();
-        params.add(new BasicNameValuePair("id", this.UserID));
-        params.add(new BasicNameValuePair("latitude", Double.toString(currentLocation.getLatitude()));
-        params.add(new BasicNameValuePair("longitude", Double.toString(currentLocation.getLongitude()));
-        request.setEntity(new UrlEncodedFormEntity(params));
-	
-  		client.execute(request);
-    } catch (ClientProtocolException ex) {
-		handleErrors(ex);
-    } catch (IOException ex) {
-      	handleErrors(ex);
-    }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2058</key><name>Unchecked_Return_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A program that does not check function return values could cause the application to enter an undefined state. This could lead to unexpected behavior and unintended consequences, including inconsistent data, system crashes or other error-based exploits.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2058</key><name>Unchecked_Return_Value</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;A program that does not check function return values could cause the application to enter an undefined state. This could lead to unexpected behavior and unintended consequences, including inconsistent data, system crashes or other error-based exploits.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application calls a system function, but does not receive or check the result of this funciton. These functions often return error codes in the result, or share other status codes with it's caller. The application simply ignores this result value, losing this vital information.&amp;nbsp;&lt;/p&gt;
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;p&gt;&amp;nbsp;- Always check the result of any called function that returns a value, and verify the result is an expected value.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Ensure the calling function responds to all possible return values.&amp;nbsp;&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;- Expect runtime errors and handle them gracefully. Explicitly define a mechanism for handling unexpected errors.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CPP&lt;/h3&gt;&lt;h4&gt;Unchecked Memory Allocation&lt;/h4&gt;&lt;pre&gt;buff = (char*) malloc(size);
-strncpy(buff, source, size);&lt;/pre&gt;&lt;h4&gt;Safer Memory Allocation&lt;/h4&gt;&lt;pre&gt;buff = (char*) malloc(size+1);
-if (buff==NULL) exit(1);
-
-strncpy(buff, source, size);
-buff[size] = '\0';&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2020</key><name>Remote_File_Inclusion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;If an attacker can select the name of the library, or the location of the code file, that is loaded by the application, they would be able to cause the application to execute arbitrary code. This effectively allows the attacker to control the code run by the application.&amp;nbsp;&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application uses untrusted data to specify the library or code file, without proper sanitization. This causes the application to load any arbitrary code, as specified. The loaded code will then be executed.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;Do not dynamically load code libraries, especially not based on user input.&lt;/li&gt;
-&lt;li&gt;If it is necessary to use untrusted data to select the library to be loaded,&amp;nbsp;verify the selected library name matches a predefined&amp;nbsp;set of whitelisted library names. Alternatively, use the value as an identifier to select from the whitelisted libraries.&lt;/li&gt;
-&lt;li&gt;Validate any untrusted data used to load or process libraries or code files.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2024</key><name>Stored_Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
-&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
-&lt;li&gt;Changing the website;&lt;/li&gt;
-&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
-&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Start and stop system services;&lt;/li&gt;
-&lt;li&gt;Complete server takeover.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
-&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When using "eval", make sure it is used around code blocks ("block eval"), as opposed to strings ("string eval"). The former form is used to wrap run-time exceptions, while the latter is used to evaluate strings as Perl code; confusion between the two may lead to code injection.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Dynamically Load and Execute Arbitrary Code&lt;/h4&gt;&lt;pre&gt;sub runCodeFromStatement($stmt) {
-  my $sth = $dbh-&gt;prepare($stmt);
-  $sth-&gt;execute();
-  my ($code) = $sth-&gt;fetchrow_array()
-     and $sth-&gt;finish();
-  eval $code;
-  #...
-}&lt;/pre&gt;&lt;h4&gt;Call to Static Class from User Input&lt;/h4&gt;&lt;pre&gt;sub runMethodFromStatement($stmt) {
-  my $sth = $dbh-&gt;prepare($stmt);
-  $sth-&gt;execute();
-  my ($method) = $sth-&gt;fetchrow_array()
-     and $sth-&gt;finish();
-  if ($method eq "methodOne") {
-      methodOne();
-  }
-  #...
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2011</key><name>Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
-&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
-&lt;li&gt;Changing the website;&lt;/li&gt;
-&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
-&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Start and stop system services;&lt;/li&gt;
-&lt;li&gt;Complete server takeover.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
-&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
-&lt;/ul&gt;
-&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
-&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When using "eval", make sure it is used around code blocks ("block eval"), as opposed to strings ("string eval"). The former form is used to wrap run-time exceptions, while the latter is used to evaluate strings as Perl code; confusion between the two may lead to code injection.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Dynamically Load and Execute Arbitrary Code&lt;/h4&gt;&lt;pre&gt;use CGI;
-my $q = CGI-&gt;new();
-my $code = $q-&gt;param('code');
-eval "$code";&lt;/pre&gt;&lt;h4&gt;Call to Static Class from User Input&lt;/h4&gt;&lt;pre&gt;use CGI;
-my $q = CGI-&gt;new();
-my $method = $q-&gt;param('method');
-if ($method eq "methodOne") {
-	methodOne();
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2022</key><name>DoS_by_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a user-provided value to set its sleep period, without enforcing a limited range for this value.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ol&gt;
-&lt;li&gt;Ideally, the sleep command&amp;#8217;s duration should not be be according to user input at all. It should be either hardcoded, defined in a configuration file, or dynamically calculated at runtime.&lt;/li&gt;
-&lt;li&gt;If it is necessary to allow the user to define the sleep duration, this value MUST be checked and enforced to be within a predefined range of valid values.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application receives a timeout int from the user to be used as argument for Sleep(). This int could be a very big number.
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class DosbySleep
-{
-        public void foo()
-        {
-                int sleep = int.Parse(HttpContext.Request.QueryString["timeout"]);
-                Thread.Sleep(sleep);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The int received is varified to be in an acceptable range.
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class DosbySleep
-{
-        public void foo()
-        {
-                int sleep = int.Parse(HttpContext.Request.QueryString["timeout"]);
-                if (sleep &gt; 1000)
-		{
-			sleep = 1000;
-		}
-		else if (sleep &lt;= 10)
-                {
-                        sleep = 10;
-                }
-                Thread.Sleep(sleep);
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2070</key><name>Uncontrolled_Format_String</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;
-&lt;p&gt;In certain languages, a mismatch between the amount of provided values or their types will result in an unhandled exception being thrown, which may result in unexpected behavior. If an attacker can control the format string, they may trigger such an event at will.&lt;/p&gt;
-&lt;p&gt;In Perl, if the supplied format string contains more tokens than are provided, then an error will occur resulting in an unhandled exception. Furthermore, if the token's type is numeric and the assigned variable is not the variable will be cast into a number, which would result in its value changing, leading to potentially unexpected behavior.&lt;/p&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application allows user input to influence the string argument used for formatted print functions. This family of functions expects the first argument to designate the relative format of dynamically constructed output string, including how to represent each of the other arguments.&lt;/div&gt;
-&lt;p&gt;If the provided format string is malformed, or if it references more arguments than were passed to the function, then an exception is thrown. If this exception is not caught by the application code, the entire process might crash. Alternatively, if the exception is caught by a generic exception handler further up the stack, then only the current method will be subverted, possibly bypassing other security checks, such as a logging mechanism.&amp;nbsp;&lt;/p&gt;
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Generic Guidance:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not allow user input or any other external data to influence the format strings.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Ensure that all string format functions are called with a static string as the format parameter, and that the correct number of arguments are passed to the function, according to the static format string.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Alternatively, validate all user input before using it in the format string parameter to print format functions, and ensure formatting tokens are not included in the input.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div&gt;Specific Recommendations:&lt;/div&gt;
-&lt;div&gt;
-&lt;ul&gt;
-&lt;ul&gt;
-&lt;li&gt;Do not include user input directly in the format string parameter (often the first or second argument) to formatting functions.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Alternatively, use controlled information derived from the input, such as size or length, in the format string - but not the actual contents of the input itself.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/ul&gt;
-&lt;div&gt;&amp;nbsp;&lt;/div&gt;
-&lt;/div&gt;
-
-
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Assigning a String Variable to a Numeric Format Token&lt;/h4&gt;&lt;pre&gt;$a = "Hello"; 
-printf ("$a"); # Output is "Hello"
-printf ("$ARGV[0]", $a); # Assume $ARGV[0]="%n"
-printf ("$a"); # Output is 0&lt;/pre&gt;&lt;h4&gt;Assigning Fewer String Variables to Incorrect Numeric Tokens&lt;/h4&gt;&lt;pre&gt;$a = "Hello"; 
-printf ("$a"); # Output is "Hello"
-printf ("$ARGV[0]", $a); # Assume $ARGV[0]="%n%n"
-printf ("$a"); # Program is terminated before this line is reached&lt;/pre&gt;&lt;h4&gt;Statically Declared String Format&lt;/h4&gt;&lt;pre&gt;$a = "Hello";
-$format = "%s World";
-printf ($format, $a); # "Hello World"&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2107</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2107</key><name>Privacy_Violation</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;A user&amp;#8217;s personal information could be stolen by a malicious programmer, or an attacker that intercepts the data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application sends user information, such as passwords, account information, or credit card numbers, outside the application, such as writing it to a local text or log file or sending it to an external web service.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
 &lt;ol&gt;
@@ -942,89 +421,10 @@ printf ($format, $a); # "Hello World"&lt;/pre&gt;&lt;div style="display:none"&gt
 &lt;li&gt;Review the need and justification of sending personal data to remote web services.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The user's password is written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolation
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                insert_sql = insert_sql.Replace("$password", password);
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-the user's password is MD5 coded before being written to the screen
-      &lt;/h4&gt;&lt;pre&gt;
-
-class PrivacyViolationFixed
-{
-        static void foo(string insert_sql)
-        {
-                string password = "unsafe_password";
-                MD5 md5Hash = System.Security.Cryptography.MD5.Create();
-                byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-        StringBuilder md5Password = new StringBuilder();
-
-                for (int i = 0; i &lt; data.Length; i++)
-		{
-			md5Password.Append(data[i].ToString("x2"));
-		}
-		insert_sql = insert_sql.Replace("$password", md5Password.ToString());
-                System.Console.WriteLine(insert_sql);
-        } 
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2048</key><name>XSRF</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could cause the victim to perform any action for which the victim is authorized, such as transferring funds from the victim&amp;#8217;s account to the attacker&amp;#8217;s. The action will be logged as being performed by the victim.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2048</key><name>XSRF</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could cause the victim to perform any action for which the victim is authorized, such as transferring funds from the victim&amp;#8217;s account to the attacker&amp;#8217;s. The action will be logged as being performed by the victim.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action that modifies database contents, based purely on HTTP request content, and does not require per-request renewed authentication (such as transaction authentication or a cryptographic form token), instead relying on browser or session authentication. This means that an attacker could use social engineering to cause a victim to click a link including a transaction request, and the application would trust the victim&amp;#8217;s browser and would perform the action. This type of attack is known as Cross-Site Request Forgery (XSRF or CSRF).&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Implement a standard or library anti-CSRF mechanism: preferably a built-in platform-provided mechanism or OWASP&amp;#8217;s CSRFGuard. Selective re-authentication or transaction authentication, such as with a cryptographic form token, is also acceptable.&lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-HttpRequest content is used in a database query without any validation of that content
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class XSRF
-{
-        public void foo(SqliteConnection connection, HttpRequest Request)
-        {
-                string input = Request.QueryString["user"];
-                string sql = "insert into Comments(comment) values (@user)";
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-            	cmd.Parameters.AddwithValue(@user, input);
-            	connection.Open();
-            	SqlDataReader reader = cmd.ExecuteReader();
-        }
-}
-
-
-
-      &lt;/pre&gt;&lt;h4&gt;
-The HttpRequest content is validated using AntiXsrfTokenKey
-      &lt;/h4&gt;&lt;pre&gt;
-
-public class XSRFFixed
-{
-        public void foo(SqliteConnection connection, AntiXsrf AntiXsrfTokenKey, HttpRequest Request)
-        {
-                string input = AntiXsrfTokenKey.Validate(Request.QueryString["user"]);
-                string sql = "insert into Comments(comment) values (@user)";
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-            	cmd.Parameters.AddwithValue(@user, input);
-            	connection.Open();
-            	SqlDataReader reader = cmd.ExecuteReader();
-        }
-
-}
-
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2031</key><name>Using_Subroutine_Prototypes</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2031</key><name>Using_Subroutine_Prototypes</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Function Call with Incorrectly Specified Arguments&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -1086,15 +486,19 @@ Arguments&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2013</key><name>Connection_String_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;If an attacker could manipulate the application&amp;rsquo;s connection string to the database server, they might be able do any of the following:&lt;/div&gt;
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>INFO</severity><tag>checkmarx-info</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2013</key><name>Connection_String_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could manipulate the application&amp;#8217;s connection string to its database or other server.Using simple tools and text editing, the attacker might be able do any of the following:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
 &lt;ul&gt;
 &lt;li&gt;Damage application performance (by increasing the MIN POOL SIZE)&lt;/li&gt;
 &lt;li&gt;Tamper with the network connection (for example, via TRUSTED CONNECTION)&lt;/li&gt;
-&lt;li&gt;Direct the application to the attacker&amp;rsquo;s bogus database&lt;/li&gt;
-&lt;li&gt;Discover the password to the system account on the database (by a brute-force attack).&lt;/li&gt;
+&lt;li&gt;Direct the application to the attacker&amp;#8217;s bogus database&lt;/li&gt;
+&lt;li&gt;Discover the password to the system account on the database (by a brute-force attack)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;In order to communicate with the database, or with another external server (for example, Active Directory), the application dynamically constructs a connection string. This connection string includes untrusted data, which may be controlled by a malicious user. Since it is not constrained or properly sanitized, the untrusted data could be used to maliciously manipulate the connection string.&lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;To communicate with its database or with another server (for example, Active Directory), the application dynamically constructs a connection string. This connection string includes concatenated user input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could be used to maliciously manipulate the connection string.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
@@ -1103,9 +507,8 @@ Arguments&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;li&gt;Do not allow users to control the database connection string. Avoid dynamically building connection strings based on untrusted data, especially user input.&amp;nbsp;&lt;/li&gt;
-&lt;li&gt;Store all connection strings in appropriate configuration mechanisms.&amp;nbsp;If it is necessary to dynamically construct a connection string at runtime,&amp;nbsp;do not include untrusted data directly in the connection string; instead, allow users to select from pre-defined connection strings.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;Ideally, avoid dynamically building connection strings. If it is necessary to dynamically build a connection string, try not to include user input. In any case use platform-provided utlities, such as .NET&amp;#8217;s SqlConnectionStringBuilder, or at least encode the validated input as appropriate for your platform.&lt;/li&gt;
+&lt;/ol&gt;      
 &lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2059</key><name>Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
 &lt;ol&gt;
 &lt;ul&gt;
@@ -1130,54 +533,7 @@ Arguments&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #
 &lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
 &lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text;
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters are removed from the user input before use
-      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
-    public static void main(String[] args) {
-        Scanner userInputScanner = new Scanner(System.in);
-        System.out.print("\nEnter file name: ");
-        String name = userInputScanner.nextLine();
-        String path = "c:\files\file" + name;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}&lt;/pre&gt;&lt;h4&gt;Potentially hazardous characters are removed from the user input before use&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal_Fixed {
-    public static void main(String[] args) {
-        Scanner userInputScanner = new Scanner(System.in);
-        System.out.print("\nEnter file name: ");
-        String name = userInputScanner.nextLine();
-        name = name.replace("/", "").replace("..", "");
-        String path = "c:\files\file" + name;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2017</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2017</key><name>SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. Using simple tools and text editing, the attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -1191,52 +547,7 @@ Potentially hazardous characters are removed from the user input before use
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using string obtained from the user
-      &lt;/h4&gt;&lt;pre&gt;public class SQLInjection
-{
-        public void foo(TextBox tbUserName, SqliteConnection connection)
-        {	
-                string user = tbUserName.Text;
-                string sql = "insert into users(name) VALUES (user)"
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The string obtained from the user is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;
-class SqlInjectionFixed
-{
-        public void foo(TextBox tbUserName, SqliteConnection connection)
-        {
-                string user = tbUserName.Text;
-                string sql = "insert into users(name) VALUES (@param1)";
-                MySqlCommand cmd = new MySqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue(@param1, user);
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using string obtained from the user&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = " + user;
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;h4&gt;The string obtained from the user is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class SQL_Injection_Fixed {
-	public static void getUserId(Connection con) {
-		System.out.println("enter user name");
-		Scanner in = new Scanner(System.in);
-		String user = in.nextLine();
-		String query = "select user_id from User where user = ?";
-		PreparedStatement stmt = con.createStatement(query);
-		stmt.setString(1, user);
-		ResultSet rs = stmt.executeQuery(query);
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2068</key><name>Signifying_Inheritence_At_Runtime</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2068</key><name>Signifying_Inheritence_At_Runtime</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Indicator of Poor Code Quality&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -1281,42 +592,7 @@ Quality&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 &lt;li&gt;Configure a global handler to prevent unhandled errors from leaving the application.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Do not reveal exception details, instead always return a static message.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-try
-{
-// Database access or other potentially dangerous function
-}
-catch (SqlException ex)
-{
-LogException(ex);
-Response.Write("Error occurred.");
-}
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Do not reveal exception details, instead always return a static message.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-try
-{
-// Database access or other potentially dangerous function
-}
-catch (SqlException ex)
-{
-LogException(ex);
-Response.Write("Error occurred.");
-}
-
-
-      &lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2056</key><name>Permissive_Regular_Expression</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2056</key><name>Permissive_Regular_Expression</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Permissive Regular Expression&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -1401,38 +677,7 @@ Observed Example, Other Notes, Weakness Ordinalities&lt;/td&gt;&lt;/tr&gt;&lt;tr
 &lt;li&gt;Validation is not a replacement for encoding. Fully encode all dynamic data, regardless of source, before embedding it in logs.&lt;/li&gt;
 &lt;li&gt;Use a secure logging mechanism.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-
-      &lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;
-Ensure you encode any special delimiter characters before writing to a log file.
-
-      &lt;/h4&gt;&lt;pre&gt;
-
-
-Log.Write( logDetails.Replace(CRLF, @"\CRLF"));
-
-
-      &lt;/pre&gt;&lt;h3&gt;Swift&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
-
-
-print(logDetails.stringByReplacingOccurrencesOfString("\n", withString: "\\n"))
-
-
-&lt;/pre&gt;&lt;h3&gt;Objc&lt;/h3&gt;&lt;h4&gt;Ensure you encode any special delimiter characters before writing to a log file.&lt;/h4&gt;&lt;pre&gt;
-
-
-NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]);
-
-
-&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2057</key><name>Stored_Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2057</key><name>Stored_Path_Traversal</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could define any arbitrary file path for the application to use, potentially leading to:&lt;/div&gt;
 &lt;ol&gt;
 &lt;ul&gt;
 &lt;li&gt;Stealing sensitive files, such as configuration or system files&lt;/li&gt;
@@ -1456,54 +701,7 @@ NSLog(@"%@", [logDetails stringByReplacingOccurrencesOfString:@"\n" withString:@
 &lt;li&gt;Explicitly limit the application to using a designated folder that separate from the applications binary folder.&lt;/li&gt;
 &lt;li&gt;Restrict the privileges of the application&amp;#8217;s OS user to necessary files and folders. The application should not be able to write to the application binary folder, and should not read anything outside of the application folder and data folder.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class PathTraversal
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text;
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-Potentially hazardous characters are removed from the user input before use
-      &lt;/h4&gt;&lt;pre&gt;public class PathTraversalFixed
-{
-        private void foo(TextBox textbox1)
-        {
-                string fileNum = textbox1.Text.Replace("\", "").Replace("..", "");
-                string path = "c:\files\file" + fileNum;
-                FileStream f = new FileStream(path, FileMode.Open);
-                byte[] output = new byte[10];
-                f.Read(output,0, 10);
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Using unvalidated user input as the file name may enable the user to access arbitrary files on the server local disk&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal {
-    public static void main(String[] args) {
-        Scanner userInputScanner = new Scanner(System.in);
-        System.out.print("\nEnter file name: ");
-        String name = userInputScanner.nextLine();
-        String path = "c:\files\file" + name;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}&lt;/pre&gt;&lt;h4&gt;Potentially hazardous characters are removed from the user input before use&lt;/h4&gt;&lt;pre&gt;public class Absolute_Path_Traversal_Fixed {
-    public static void main(String[] args) {
-        Scanner userInputScanner = new Scanner(System.in);
-        System.out.print("\nEnter file name: ");
-        String name = userInputScanner.nextLine();
-        name = name.replace("/", "").replace("..", "");
-        String path = "c:\files\file" + name;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2016</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2016</key><name>Second_Order_SQL_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could directly access all of the system's data. The attacker would be able to steal any sensitive information stored by the system (such as personal user details or credit cards), and possibly change or erase existing data.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with its database by sending a textual SQL query. The application creates the query by simply concatenating strings including data obtained from the database. Since that data may have been previously obtained from user input, and is neither checked for data type validity nor subsequently sanitized, the data could contain SQL commands that would be interpreted as such by the database.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -1517,55 +715,7 @@ Potentially hazardous characters are removed from the user input before use
 &lt;li&gt;Instead of concatenating strings: a. Use secure database components such as stored procedures, parameterized queries, and object bindings (for commands and parameters). b. An even better solution is to use an ORM library, such as EntityFramework, Hibernate, or iBatis.&lt;/li&gt;
 &lt;li&gt;Restrict access to database objects and functionality, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;
-The application creates an SQL query using data obtained from a database
-      &lt;/h4&gt;&lt;pre&gt;public class SecondOrderSQLInjection
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName"); 
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + DS[0]["UserName"].ToString(), connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The data obtained from the database is checked for potentially malicious characters
-      &lt;/h4&gt;&lt;pre&gt;class SecondOrderSQLInjectionFixed
-{
-        public void foo(SqlConnection connection, SqlDataAdapter DA)
-        {
-                DataSet DS = new DataSet();
-                DA.Fill(ref DS, "UserName");
-                string userName = DS[0]["UserName"].ToString().Replace("'", "");
-                SqlCommand command = new SqlCommand("SELECT * FROM Customers " + "WHERE UserName = " + userName, connection);
-                command.ExecuteNonQuery();
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;The application creates an SQL query using data obtained from a database&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection {
-	public static void sql(Connection con, String sqlStm) {
-		try {
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(sqlStm);
-			String userName = rs.getString("USER_NAME");
-			String newSqlStm = "Update USER set PASSWORD = '1234' where userName like " + userName;
-			stmt.executeUpdate(newSqlStm);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}&lt;/pre&gt;&lt;h4&gt;The data obtained from the database is checked for potentially malicious characters&lt;/h4&gt;&lt;pre&gt;public class Second_Order_SQL_Injection_Fixed {
-	public static void sql(Connection con, String sqlStm) {
-		try {
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(sqlStm);
-			String userName = rs.getString("USER_NAME");
-			userName = userName.replaceAll("'", "");
-			String newSqlStm = "Update USER set PASSWORD = '1234' where userName like " + userName;
-			stmt.executeUpdate(newSqlStm);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2018</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2018</key><name>Stored_XSS</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could use legitimate access to the application to submit engineered data to the application&amp;#8217;s database. When another user subsequently accesses this data, web pages may be rewritten and malicious scripts may be activated.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application creates web pages that include data from the application&amp;#8217;s database. The data is embedded directly in the page's HTML, causing the browser to display it as part of the web page. This data may have originated in input from another user. If the data includes HTML fragments or Javascript, these are displayed too, and the user cannot tell that this is not the intended page. The vulnerability is the result of embedding arbitrary database data without first encoding it in a format that would prevent the browser from treating it like HTML instead of plain text.&lt;/div&gt;            
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ol&gt;
 &lt;li&gt;Validate all dynamic data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/li&gt;
@@ -1586,77 +736,7 @@ The data obtained from the database is checked for potentially malicious charact
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;            
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class StoredXss
-{
-        public string foo(Label lblOutput, SqlConnection connection, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar();
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : output;
-        }
-}&lt;/pre&gt;&lt;h4&gt;
-The outputed string is Html encoded before it is displayed in the label
-      &lt;/h4&gt;&lt;pre&gt;public class StoredXssFixed
-{
-        public string foo(Label lblOutput, SqlConnection connection, HttpServerUtility Server, int id)
-        {
-                string sql = "select email from CustomerLogin where customerNumber = @id";
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@id", id);
-                string output = (string)cmd.ExecuteScalar()
-                lblOutput.Text = String.IsNullOrEmpty(output) ? "Customer Number does not exist" : Server.HtmlEncode(output);                
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;Data obtained from the excecution of an SQL command is output to a label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS {
-	public static void XSSExample(Statement stmt) throws SQLException {
-		Label label = new Label();
-		ResultSet rs;
-		rs = stmt.executeQuery("SELECT * FROM Customers WHERE UserName = Mickey");
-		String lastNames = "";
-		while (rs.next()) {
-			lastNames += rs.getString("Lname") + ", ";
-		}
-		label.setText("Mickey last names are: " + lastNames + " ");
-	}
-}&lt;/pre&gt;&lt;h4&gt;The outputed string is encoded to hard-coded string before it is displayed in the label&lt;/h4&gt;&lt;pre&gt;public class Stored_XSS_Fix {
-	public static void XSSExample(Statement stmt) throws SQLException {
-		Label label = new Label();
-		ResultSet rs;
-		HashMap&lt;String, String&gt; sanitize = new HashMap&lt;String, String&gt;();
-		sanitize.put("A", "Cohen");
-		sanitize.put("B", "Smith");
-		sanitize.put("C", "Bond");
-		rs = stmt.executeQuery("SELECT * FROM Customers WHERE UserName = Mickey");
-		String lastNames = "";
-		while (rs.next()) {
-			lastNames += sanitize.get(rs.getString("Lname")) + ", ";
-		}
-		label.setText("Mickey last names are: " + lastNames + " ");
-	}
-}&lt;/pre&gt;&lt;h3&gt;JavaScript&lt;/h3&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].name + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + results[0].description + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;h4&gt;Data obtained from the execution of an SQL command is encoded and then rendered to a web-page template&lt;/h4&gt;&lt;pre&gt;var htmlencoder = require('htmlencode');
-
-function renderUserProfileTable(res, connection, user_id) {
-	connection.query('SELECT id,name,description from user WHERE id= ?', [user_id],function(err, results) {
-		var table = "&lt;table&gt;"
-		table += "&lt;table class='profile-html-table'&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].name) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;tr&gt;&lt;td&gt;" + htmlencoder.htmlEncode(results[0].description) + "&lt;/td&gt;&lt;/tr&gt;"
-		table += "&lt;/table&gt;"
-		res.render("profile", table)
-	});
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2054</key><name>Improper_Filtering_of_Special_Elements</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2054</key><name>Improper_Filtering_of_Special_Elements</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Improper Filtering of Special Elements&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -2073,20 +1153,20 @@ Initialization&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px so
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2762</key><name>Stored_LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker that is able to alter the&amp;nbsp;application&amp;rsquo;s LDAP query with arbitrary data would have control over the results returned from the User Directory server. Most commonly, this would enable an attacker to bypass authentication, or impersonate another user. &amp;nbsp;&lt;/p&gt;
-&lt;p&gt;Furthermore, this flaw can have various additional effects, depending on the architecture and usage model of the Directory service.&amp;nbsp;Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/p&gt;
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2044</key><name>Stored_Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+&lt;div&gt;
 &lt;ul&gt;
-&lt;li&gt;Bypass authentication&lt;/li&gt;
-&lt;li&gt;Impersonate another user&lt;/li&gt;
-&lt;li&gt;Subvert authorization&lt;/li&gt;
-&lt;li&gt;Escalate privileges&lt;/li&gt;
-&lt;li&gt;Modify user attributes and group membership&lt;/li&gt;
-&lt;li&gt;Access sensitive data&lt;/li&gt;
+&lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
+&lt;li&gt;Start and stop system services&lt;/li&gt;
+&lt;li&gt;Complete server takeover&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings, including untrusted data that may be controlled by an attacker. Since the data is neither validated nor properly sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ul&gt;
-&lt;li&gt;Validate all external data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:
+&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious, system-level commands engineered by an attacker, which would be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
+&lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified format, rather than rejecting bad patterns (blacklist). Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
 &lt;li&gt;Size&lt;/li&gt;
@@ -2094,10 +1174,32 @@ Initialization&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px so
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Avoid creating LDAP queries that are directly dependent on untrusted external data, if possible. For example, retrieve the user object from the LDAP server, and examine it's attributes in application code.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all OS commands to use a separate, dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2762</key><name>Stored_LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could arbitrarily engineer the application&amp;#8217;s LDAP queries. Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Log in as another user&lt;/li&gt;
+&lt;li&gt;Escalate privileges&lt;/li&gt;
+&lt;li&gt;Steal information&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
 &lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2041</key><name>Overloading_Reserved_Keywords_or_Subroutines</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Indicator of Poor Code Quality&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
@@ -2153,85 +1255,7 @@ Quality&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="border-bottom:1px solid #BA
 &lt;li&gt;In the Content-Type HTTP response header, explicitly define character encoding (charset) for the entire page.&lt;/li&gt;
 &lt;li&gt;Set the httpOnly flag on the session cookie, to prevent XSS exploits from stealing the cookie.&lt;/li&gt;
 &lt;/ol&gt;      
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;CSharp&lt;/h3&gt;&lt;h4&gt;Bad - The application uses the "Referer" field string to construct the HttpResponse&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClients
-{
-        public static void foo(HttpRequest Request, HttpResponse Response)
-        {
-                string Referer = Request.QueryString["Referer"];
-                Response.BinaryWrite(Referer);
-        }
-}&lt;/pre&gt;&lt;h4&gt;Good - The "Referer" field string is HTML encoded before use&lt;/h4&gt;&lt;pre&gt;public class ReflectedXssAllClientsFixed
-{
-        public static void foo(HttpRequest Request, HttpResponse Response, AntiXss.AntiXssEncoder encoder)
-        {
-                string Referer = Request.QueryString["Referer"];
-                Response.BinaryWrite(encoder.HtmlEncode(Referer, true));
-        }
-}&lt;/pre&gt;&lt;h4&gt;Bad - User input is written to a TextBox displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSSpecificClients
-{
-        public void foo(TextBox tb)
-        {
-                string input = Console.ReadLine();
-                tb.Text = input;
-        }
-}&lt;/pre&gt;&lt;h4&gt;Good - The user input is HTML encoded before being displayed on the screen&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSSpecificClientsFixed
-{
-        public void foo(TextBox tb, AntiXssEncoder encode)
-        {
-                string input = Console.ReadLine();
-                tb.Text = encode.HtmlEncode(input);
-        }
-}&lt;/pre&gt;&lt;h4&gt;Bad - The application uses the "filename" field string from an HttpRequest construct an HttpResponse&lt;/h4&gt;&lt;pre&gt;public class UTF7XSS
-{
-        public void foo(HttpRequest Request, HttpResponse Response
-        {
-                Response.Charset("UTF-7");
-                string filename = Request.QueryString["filename"];
-                Response.BinaryWrite(AntiXss.HtmlEncode(filename));
-        }
-}&lt;/pre&gt;&lt;h4&gt;Good - The "filename" string is converted to an int and using a switch case the new "filename" string is constructed&lt;/h4&gt;&lt;pre&gt;public class UTF7XSSFixed
-{
-        public static void foo(HttpRequest Request, HttpResponse Response)
-        {
-                Response.Charset("UTF-7");
-                string filename = Request.QueryString["fileNum"];
-                int fileNum = Convert.ToInt32(filename);
-                
-                switch(fileNum)
-                {
-                        case 1:
-                                filename = "File1.txt";
-                                break;
-                        default:
-                                filename = "File2.txt";
-                                break;
-                }
-                
-                Response.BinaryWrite(AntiXss.HtmlEncode(filename));
-        }
-}&lt;/pre&gt;&lt;h3&gt;Java&lt;/h3&gt;&lt;h4&gt;User input is written to a label displayed on the screen enabling a user to inject a script&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClients {
-	public static void XSSExample(TextArea name) {	
-		Label label = new Label();		
-		label.setText("Hello " + name.getText());	
-	}
-}&lt;/pre&gt;&lt;h4&gt;Switch case is used in order to assemble the label's text value and manage wrong user input&lt;/h4&gt;&lt;pre&gt;public class ReflectedXSSAllClientsFixed {
-	public static void XSSExample(TextArea name) {
-		Label label = new Label();		
-		switch (name) {
-		case "Joan":
-			label.setText("Hello Joan");	
-			break;
-		case "Jim":
-			label.setText("Hello Jim");	
-			break;
-		case "James":
-			label.setText("Hello James");	
-			break;
-		default:
-			System.out.println("Wrong Input");
-		}
-	}
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2026</key><name>Empty_Methods</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2026</key><name>Empty_Methods</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;div&gt;&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
 	&lt;link href="main.css" rel="stylesheet" type="text/css"&gt;
 &lt;div id="CWEDefinition"&gt;&lt;div class="title"&gt;&lt;table cellpadding="0" cellspacing="0" border="0" width="100%"&gt;&lt;tr&gt;&lt;td valign="top" width="20px"&gt;&lt;/td&gt;&lt;td valign="top"&gt;&lt;div align="center"&gt;&lt;span style="font-weight:bold;color:white;"&gt;Indicator of Poor Code Quality&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;td valign="top" width="20px"&gt;&lt;div class="left noprint"&gt;
 
@@ -2447,50 +1471,68 @@ a Control Plane ('Command Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td styl
 
 &lt;div align="right" style="padding-top:5px; padding-bottom:5px; clear:right" class="noprint"&gt;&lt;a class="backtop" href="#top"&gt;Back to top&lt;/a&gt;&lt;/div&gt;
 
-&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2763</key><name>LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;An attacker that is able to alter the&amp;nbsp;application&amp;rsquo;s LDAP query with arbitrary data would have control over the results returned from the User Directory server. Most commonly, this would enable an attacker to bypass authentication, or impersonate another user. &amp;nbsp;&lt;/p&gt;
-&lt;p&gt;Furthermore, this flaw can have various additional effects, depending on the architecture and usage model of the Directory service.&amp;nbsp;Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/p&gt;
+&lt;html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;/html&gt;&lt;/div&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2763</key><name>LDAP_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could arbitrarily engineer the application&amp;#8217;s LDAP queries. Depending on how the application is using LDAP, the attacker could potentially do any of the following:&lt;/div&gt;
+&lt;div&gt;
 &lt;ul&gt;
-&lt;li&gt;Bypass authentication&lt;/li&gt;
-&lt;li&gt;Impersonate another user&lt;/li&gt;
-&lt;li&gt;Subvert authorization&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Log in as another user&lt;/li&gt;
 &lt;li&gt;Escalate privileges&lt;/li&gt;
-&lt;li&gt;Modify user attributes and group membership&lt;/li&gt;
-&lt;li&gt;Access sensitive data&lt;/li&gt;
+&lt;li&gt;Steal information&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings, including untrusted data that may be controlled by an attacker. Since the data is neither validated nor properly sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application communicates with an LDAP server, such as Active Directory, by sending a textual LDAP query or command. The application creates the query by simply concatenating strings including the user's input. Since the user input is neither checked for data type validity nor subsequently sanitized, the input could contain LDAP commands that would be interpreted as such by the LDAP server.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Data type&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Range&lt;/li&gt;
+&lt;li&gt;Format&lt;/li&gt;
+&lt;li&gt;Expected values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2022</key><name>DoS_by_Sleep</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could provide a very high sleep value, effectively causing a denial of service for a long period of time.&lt;/div&gt;      
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application uses a user-provided value to set its sleep period, without enforcing a limited range for this value.&lt;/div&gt;      
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;div&gt;
-&lt;ul&gt;
-&lt;li&gt;Validate all external data, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Check for:
-&lt;ul&gt;
-&lt;li&gt;Data type&lt;/li&gt;
-&lt;li&gt;Size&lt;/li&gt;
-&lt;li&gt;Range&lt;/li&gt;
-&lt;li&gt;Format&lt;/li&gt;
-&lt;li&gt;Expected values&lt;/li&gt;
+&lt;ol&gt;
+&lt;li&gt;Ideally, the sleep command&amp;#8217;s duration should not be be according to user input at all. It should be either hardcoded, defined in a configuration file, or dynamically calculated at runtime.&lt;/li&gt;
+&lt;li&gt;If it is necessary to allow the user to define the sleep duration, this value MUST be checked and enforced to be within a predefined range of valid values.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;      
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2020</key><name>Remote_File_Inclusion</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;If an attacker can select the name of the library, or the location of the code file, that is loaded by the application, they would be able to cause the application to execute arbitrary code. This effectively allows the attacker to control the code run by the application.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;p&gt;The application uses untrusted data to specify the library or code file, without proper sanitization. This causes the application to load any arbitrary code, as specified. The loaded code will then be executed.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Do not dynamically load code libraries, especially not based on user input.&lt;/li&gt;
+&lt;li&gt;If it is necessary to use untrusted data to select the library to be loaded,&amp;nbsp;verify the selected library name matches a predefined&amp;nbsp;set of whitelisted library names. Alternatively, use the value as an identifier to select from the whitelisted libraries.&lt;/li&gt;
+&lt;li&gt;Validate any untrusted data used to load or process libraries or code files.&amp;nbsp;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Avoid creating LDAP queries that are directly dependent on untrusted external data, if possible. For example, retrieve the user object from the LDAP server, and examine it's attributes in application code.&amp;nbsp;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2044</key><name>Stored_Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MINOR</severity><tag>checkmarx-low</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2024</key><name>Stored_Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
 &lt;div&gt;
 &lt;ul&gt;
-&lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
-&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
-&lt;li&gt;Start and stop system services&lt;/li&gt;
-&lt;li&gt;Modify the running application&lt;/li&gt;
-&lt;li&gt;Complete server takeover&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
+&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
+&lt;li&gt;Changing the website;&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
+&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Start and stop system services;&lt;/li&gt;
+&lt;li&gt;Complete server takeover.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via the application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious system-level commands engineered by an attacker, which could be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
-&lt;p&gt;In this case, the application reads the command from the database, and passes it as a string to the Operating System. The attacker may be able to load the malicious payload into the database fields beforehand, causing the application to load that command.&amp;nbsp;This unvalidated data is then executed by the OS as a system command, running with the same system privileges as the application.&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
+
 
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
-&lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified format, rather than rejecting bad patterns (blacklist). Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
 &lt;li&gt;Size&lt;/li&gt;
@@ -2498,48 +1540,36 @@ a Control Plane ('Command Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td styl
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all OS commands to use a separate dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
+&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;ul style="box-sizing: border-box; margin-top: 0px; margin-bottom: 10px; color: rgba(0, 0, 0, 0.87); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px;"&gt;
-&lt;li style="box-sizing: border-box;"&gt;&lt;span style="box-sizing: border-box;"&gt;Do not call functions with one single command string, such as&amp;nbsp;&lt;/span&gt;&lt;span style="box-sizing: border-box; font-family: monospace;"&gt;&lt;span style="box-sizing: border-box; background-color: #bfe6ff;"&gt;readpipe&lt;/span&gt;&lt;/span&gt;&lt;span style="box-sizing: border-box;"&gt;. These functions prevent separation of variables into escaped arguments.&lt;/span&gt;&lt;/li&gt;
-&lt;li style="box-sizing: border-box;"&gt;Instead, use one of the functions that receive arguments separately from the command, and validates them. This includes&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;system()&lt;/code&gt;,&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;exec()&lt;/code&gt;, or one of it's variants. Do not allow inputs to affect the first parameter of these functions, as that is the raw command to be executed.&lt;/li&gt;
-&lt;li style="box-sizing: border-box;"&gt;Do not directly execute any shell or command interpreters, such as&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;bash&lt;/code&gt;,&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;cmd&lt;/code&gt;, or&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;make&lt;/code&gt;, with user-controlled input. This will allow the argument strings to potentially execute further commands on top of these commands.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Dynamically Load and Execute OS Command&lt;/h4&gt;&lt;pre&gt;sub runCmdFromStatement($stmt) {
-  my $sth = $dbh-&gt;prepare($stmt);
-  $sth-&gt;execute();
-  my ($cmd) = $sth-&gt;fetchrow_array()
-     and $sth-&gt;finish();
-  my @result = readpipe("$cmd");
-  return @result;
-}&lt;/pre&gt;&lt;h4&gt;Dynamically Load An Argument and Execute It With A Static OS Command&lt;/h4&gt;&lt;pre&gt;sub runTrustedExecutable($stmt) {
-  my $sth = $dbh-&gt;prepare($stmt);
-  $sth-&gt;execute();
-  my ($cmd) = $sth-&gt;fetchrow_array()
-     and $sth-&gt;finish();
-  my @result = system("trustedExecutable","$cmd");
-  return @result;
-}&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2012</key><name>Command_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary system-level OS commands on the application server host. Depending on the application&amp;rsquo;s OS permissions, these could include:&lt;/div&gt;
+&lt;p&gt;When using "eval", make sure it is used around code blocks ("block eval"), as opposed to strings ("string eval"). The former form is used to wrap run-time exceptions, while the latter is used to evaluate strings as Perl code; confusion between the two may lead to code injection.&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>MAJOR</severity><tag>checkmarx-medium</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule><rule><key>checkmarx_2011</key><name>Code_Injection</name><description>&lt;div style="display:none"&gt;![CDATA[&lt;/div&gt;&lt;h2&gt;Risk&lt;/h2&gt;&lt;h4&gt;What might happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;An attacker could run arbitrary code on the application server host. Depending on the application&amp;rsquo;s OS permissions,these could include:&lt;/div&gt;
 &lt;div&gt;
 &lt;ul&gt;
-&lt;li&gt;File actions (read / create / modify / delete)&lt;/li&gt;
-&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server&lt;/li&gt;
-&lt;li&gt;Start and stop system services&lt;/li&gt;
-&lt;li&gt;Modify the running application&lt;/li&gt;
-&lt;li&gt;Complete server takeover&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;Database access, such as reading or modifying sensitive data;&lt;/li&gt;
+&lt;li&gt;File actions (read / create / modify / delete);&lt;/li&gt;
+&lt;li&gt;Changing the website;&lt;/li&gt;
+&lt;li&gt;Open a network connection to the attacker&amp;rsquo;s server;&lt;/li&gt;
+&lt;li&gt;Decrypt secret data using the application's encryption keys;&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;Start and stop system services;&lt;/li&gt;
+&lt;li&gt;Complete server takeover.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
 
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application runs an OS system-level command to complete it's task, rather than via the application code. The command includes untrusted data, that may be controllable by an attacker. This untrusted string may contain malicious system-level commands engineered by an attacker, which could be executed as though the attacker were running commands directly on the application server.&lt;/div&gt;
-&lt;p&gt;In this case, the application receives data from the user input, and passes it as a string to the Operating System. This unvalidated data is then executed by the OS as a system command, running with the same system privileges as the application.&amp;nbsp;&lt;/p&gt;
+&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Cause&lt;/h2&gt;&lt;h4&gt;How does it happen&lt;/h4&gt;&lt;p&gt;&lt;div&gt;The application performs some action by creating and running code that includes untrusted data, which might be under control of a malicious user. If the data contains malicious code, the executed code could contain system-level activities engineered by an attacker, as though the attacker were running code directly on the application server.&lt;/div&gt;
+
 
 &lt;/p&gt;&lt;hr&gt;&lt;h2&gt;General Recommendations&lt;/h2&gt;&lt;h4&gt;How to avoid it&lt;/h4&gt;&lt;p&gt;&lt;ul&gt;
-&lt;li&gt;Refactor the code to avoid any direct shell command execution. Instead, use platform provided APIs or library calls.&lt;/li&gt;
-&lt;li&gt;If it is impossible to remove the command execution, execute only static commands that do not include dynamic, user-controlled data.&lt;/li&gt;
-&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified format, rather than rejecting bad patterns (blacklist). Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
+&lt;li&gt;The application should not compile, execute, or evaluate any untrusted code from any external source, including user input, uploaded files, or a database.&amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is absolutely necessary to include external&amp;nbsp;data in dynamic execution, it is permissible to pass the data as parameters to the code, but do not execute user data directly. &amp;nbsp;&lt;/li&gt;
+&lt;li&gt;If it is necessary to pass untrusted data to dynamic execution, enforce very strict data validation. For example, accept only integers between certain values.&lt;/li&gt;
+&lt;li&gt;Validate all input, regardless of source. Validation should be based on a whitelist: accept only data fitting a specified structure, rather than reject bad patterns. Parameters should be limited to an allowed character set, and non-validated input should be dropped. In addition to characters, check for:&lt;/li&gt;
 &lt;ul&gt;
 &lt;li&gt;Data type&lt;/li&gt;
 &lt;li&gt;Size&lt;/li&gt;
@@ -2547,34 +1577,10 @@ a Control Plane ('Command Injection')&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td styl
 &lt;li&gt;Format&lt;/li&gt;
 &lt;li&gt;Expected values&lt;/li&gt;
 &lt;/ul&gt;
-&lt;li&gt;In order to minimize damage as a measure of defense in depth, configure the application to run using a restricted user account that has no unnecessary OS privileges.&lt;/li&gt;
-&lt;li&gt;If possible, isolate all OS commands to use a separate dedicated user account that has minimal privileges only for the specific commands and files used by the application, according to the Principle of Least Privilege.&lt;/li&gt;
+&lt;li&gt;If possible, always prefer to whitelist known and trusted input instead of comparing to a blacklist.&lt;/li&gt;
+&lt;li&gt;Configure the application to run using a restricted user account that has no unnecessary privileges.&lt;/li&gt;
+&lt;li&gt;If possible, isolate all dynamic execution to use a separate, dedicated user account that has privileges only for the specific operations and files used by dynamic execution, according to the Principle of Least Privilege.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;ul style="box-sizing: border-box; margin-top: 0px; margin-bottom: 10px; color: rgba(0, 0, 0, 0.87); font-size: 18px;"&gt;
-&lt;li style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box;"&gt;If absolutely necessary to call a system command or execute external program with user input, do not concatenate the user input with the command. Instead, isolate the parameters from the command by using a platform function that supports this.&amp;nbsp;&lt;/li&gt;
-&lt;li style="box-sizing: border-box;"&gt;&lt;span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"&gt;Do not call functions with one single command string, such as &lt;/span&gt;&lt;span style="font-family: monospace;"&gt;&lt;span style="background-color: #bfe6ff;"&gt;readpipe&lt;/span&gt;&lt;/span&gt;&lt;span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"&gt;. These functions prevent separation of variables into escaped arguments.&lt;/span&gt;&lt;/li&gt;
-&lt;li style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box;"&gt;Instead, use one of the functions that receive arguments separately from the command, and validates them. This includes&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;system()&lt;/code&gt;,&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;exec()&lt;/code&gt;, or one of it's variants. Do not allow inputs to affect the first parameter of these functions, as that is the raw command to be executed.&lt;/li&gt;
-&lt;li style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box;"&gt;Do not directly execute any shell or command interpreters, such as&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;bash&lt;/code&gt;,&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;cmd&lt;/code&gt;, or&amp;nbsp;&lt;code style="box-sizing: border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 16.2px; padding: 2px 4px; color: #c7254e; background-color: #f9f2f4; border-radius: 4px;"&gt;make&lt;/code&gt;, with user-controlled input. This will allow the argument strings to potentially execute further commands on top of these commands.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/p&gt;&lt;hr&gt;&lt;h2&gt;Source Code Examples&lt;/h2&gt;&lt;h3&gt;Perl&lt;/h3&gt;&lt;h4&gt;Ping CGI Script That is Vulnerable to Command Injection Due to String Concatenation&lt;/h4&gt;&lt;pre&gt;#!/usr/bin/perl
-
-use CGI qw(:standard);
-use strict;
-
-my $query = new CGI;
-my $host = $query-&gt;param('host'); # host="www.example.com | cat /etc/passwd" will execute and display "cat /etc/passwd"
-
-print $query-&gt;header("text/plain");
-my @result = readpipe("/bin/ping -c 1 $host");
-print "@result";&lt;/pre&gt;&lt;h4&gt;Ping CGI Script That Escapes Argument&lt;/h4&gt;&lt;pre&gt;#!/usr/bin/perl
-
-use CGI qw(:standard);
-use strict;
-
-my $query = new CGI;
-my $host = $query-&gt;param('host');
-
-print $query-&gt;header("text/plain");
-my @result = system("/bin/ping", "-c", "1", "$host"); # $host will be passed as a string argument to /bin/ping
-print "@result";&lt;/pre&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>
+&lt;p&gt;When using "eval", make sure it is used around code blocks ("block eval"), as opposed to strings ("string eval"). The former form is used to wrap run-time exceptions, while the latter is used to evaluate strings as Perl code; confusion between the two may lead to code injection.&lt;/p&gt;
+&lt;/p&gt;&lt;div style="display:none"&gt;]]&lt;/div&gt;</description><severity>CRITICAL</severity><tag>checkmarx-high</tag><type>VULNERABILITY</type><remediationFunction>LINEAR</remediationFunction><remediationFunctionGapMultiplier>1min</remediationFunctionGapMultiplier></rule></rules>

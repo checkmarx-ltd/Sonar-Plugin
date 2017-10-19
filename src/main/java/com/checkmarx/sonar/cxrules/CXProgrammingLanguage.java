@@ -18,7 +18,8 @@ public enum CXProgrammingLanguage {
     PYTHON("Python", "py", 16384),
     VB6("VB6", "vb", 256),
     CSHARP("csharp", "cs", 1),
-    VBNET("vbnet", "vbnet", 32);
+    VBNET("vbnet", "vbnet", 32),
+    APEX("Apex","apex", 16);
 
     private String name;
     private String sonarName;

@@ -50,7 +50,8 @@ public class CheckmarxPlugin implements Plugin {
                           CxPlSqlProfile.class,
                           CxPythonProfile.class,
                           CxVb6Profile.class,
-                          CxVbNetProfile.class);
+                          CxVbNetProfile.class,
+                          CxApexProfile.class);
 
   }
 }
