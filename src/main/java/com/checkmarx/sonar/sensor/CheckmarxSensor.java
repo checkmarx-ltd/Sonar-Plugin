@@ -8,6 +8,7 @@ import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
 import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
 import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
+import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_R
 public class CheckmarxSensor implements Sensor {
 
     private CxLogger logger = new CxLogger(CheckmarxSensor.class);
+    private PluginVersionProvider versionProvider = new PluginVersionProvider();
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -44,6 +46,7 @@ public class CheckmarxSensor implements Sensor {
 
     @Override
     public void execute(SensorContext context) {
+        logger.info(versionProvider.appendVersionToMsg("Retrieving Checkmarx scan results for current module"));
         logger.info("Getting Checkmarx configuration data from sonar Database.");
 
         CxFullCredentials cxFullCredentials;
@@ -80,6 +83,7 @@ public class CheckmarxSensor implements Sensor {
         } catch (Exception e) {
             logger.error("---------------------------------------------------------------------------------------\n");
             logger.error("Sast results retrieval failed due to exception: "+e.getMessage() + "\n");
+            logger.error(versionProvider.appendVersionToMsg(""));
             logger.error("---------------------------------------------------------------------------------------");
             e.printStackTrace();
         }
@@ -111,7 +115,8 @@ public class CheckmarxSensor implements Sensor {
     }
 
     private void logErrorAndNotifyContext(String massage, SensorContext context){
-        logger.error(massage);
-        context.newAnalysisError().message(massage).save();
+        logger.error(versionProvider.appendVersionToMsg(massage));
+        context.newAnalysisError().message(versionProvider.appendVersionToMsg(massage)).save();
     }
+
 }
