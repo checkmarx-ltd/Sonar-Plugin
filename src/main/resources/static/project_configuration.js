@@ -25,21 +25,30 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var spanSpinner = getConnectingSpinner();
         options.el.appendChild(spanSpinner);
 
-        getCxCredentialsResponse().then(function (res1) {
-            return connectAndGetResponse(res1);
-        }).then(function (res2) {
-            return getCxProjectsFromServerResponse(res2);
-        }).then(function (res3) {
-            return getCxProjectFromSonarResponse(res3);
-        }).then(function (res4) {
-            return getCxRemediationEffortFromSonarResponse(res4)
-        }).then(function (res5) {
-            //Session id is no longer necessary
-            cleanConnection();
-
+        try {
+            getCxProjectFromSonarResponse().then(function (res1) {
+                return getCxRemediationEffortFromSonarResponse(res1);
+            }).then(function (res2) {
+                return getCxCredentialsResponse(res2);
+            }).then(function (res3) {
+                return connectAndGetResponse(res3);
+            }).then(function (res4) {
+                return getCxProjectsFromServerResponse(res4);
+            }).then(function (res5) {
+                try {
+                    projectsIn = JSON.parse(res5.projects);
+                }catch (err){
+                    projectsIn = "";
+                }
+                cleanConnection();
+                options.el.removeChild(spanSpinner);
+                return loadUI();
+            })
+        }catch (err){
+            console.log(err.message);
             options.el.removeChild(spanSpinner);
-            return loadUI(res5);
-        });
+            return loadUI();
+        }
     }
 
     /*********************pre loading page************************************************/
@@ -70,11 +79,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /******************************************Build UI ****************************************************/
 
     function loadUI(response) {
-        try {
+        /*try {
             securityRemediationEffortInSonarDb = response.settings[0].value;
         } catch (err) {
             securityRemediationEffortInSonarDb = 0;
-        }
+        }*/
         return new Promise(function () {
             var div = document.createElement('div');
             div.className = "configurationDiv";
@@ -572,16 +581,17 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             credentials = response.settings[0].value;
         }catch (err){
             credentials = "";
+            throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
         }
-        return window.SonarRequest.postJSON('/api/checkmarx/connect', {
-            resolved: false,
-            component: options.component.key,
-            credentials: credentials
-        })
+        return connectToCxWithCredentials();
     }
 
     function connectWithInputCredentialsAndGetResponse(inserted) {
         credentials = inserted;
+        return connectToCxWithCredentials();
+    }
+
+    function connectToCxWithCredentials() {
         return window.SonarRequest.postJSON('/api/checkmarx/connect', {
             resolved: false,
             component: options.component.key,
@@ -596,6 +606,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }catch(err){
             sessionId = "";
             isCxConnectionSuccessful = 'false';
+        }
+        if(!isCxConnectionSuccessful){
+            throw new Error("Failed to connect to checkmarx server.")
         }
         return window.SonarRequest.postJSON('/api/checkmarx/projects', {
             resolved: false,
@@ -616,12 +629,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /***********sonar DB***************/
 
-    function getCxProjectFromSonarResponse(response) {
-        try {
-            projectsIn = JSON.parse(response.projects);
-        }catch (err){
-            projectsIn = "";
-        }
+    function getCxProjectFromSonarResponse() {
         return getSonarSettingResponse("checkmarx.server.project_name.secured")
     }
 
@@ -634,7 +642,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         return getCxRemediationEffortResponse()
     }
 
-    function getCxCredentialsResponse() {
+    function getCxCredentialsResponse(response) {
+        try {
+            securityRemediationEffortInSonarDb = response.settings[0].value;
+        } catch (err) {
+            securityRemediationEffortInSonarDb = 0;
+        }
         return getSonarSettingResponse("checkmarx.server.credentials.secured")
     }
 
