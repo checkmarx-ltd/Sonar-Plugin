@@ -8,7 +8,6 @@ import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -21,7 +20,7 @@ import java.rmi.RemoteException;
  */
 abstract class CxSDKSonarSoapService {
 
-    private static final String SONAR_WS_WEB_ADDRESS =  "%s/cxwebinterface/sdk/CxSDKWebService.asmx";
+    private static final String SONAR_WS_WEB_ADDRESS = "%s/cxwebinterface/sdk/CxSDKWebService.asmx";
     private final static int LCID = 1033; // English
 
     CxSDKWebServiceSoap_PortType webServiceSoap;
@@ -34,8 +33,8 @@ abstract class CxSDKSonarSoapService {
     }
 
     public String login(CxFullCredentials cxFullCredentials) throws ConnectionException {
-
-        if( webServiceSoap == null || !cxFullCredentials.getCxServerUrl().equals(currServerUrl) ){
+        logger.info("Attempting Connection to Checkmarx server");
+        if (webServiceSoap == null || !cxFullCredentials.getCxServerUrl().equals(currServerUrl)) {
             currServerUrl = cxFullCredentials.getCxServerUrl();
             connect(currServerUrl);
             logger.info("Connected to server");
@@ -49,7 +48,6 @@ abstract class CxSDKSonarSoapService {
 
 
     private void connect(String serverUrl) throws ConnectionException {
-        CxSSLUtility.disableSSLCertificateVerification();
         logger.info("Validating server url");
         validateServerUrl(serverUrl);
 
@@ -60,10 +58,10 @@ abstract class CxSDKSonarSoapService {
             cxSdkWebServiceLocator.setCxSDKWebServiceSoapEndpointAddress(String.format(SONAR_WS_WEB_ADDRESS, serverUrl));
             webServiceSoap = cxSdkWebServiceLocator.getCxSDKWebServiceSoap();
         } catch (Exception e) {
-            throw logErrorAndCreateConnectionException("Locating Checkmarx web service failed: "+ e.getLocalizedMessage(), e);
+            throw logErrorAndCreateConnectionException("Locating Checkmarx web service failed: " + e.getLocalizedMessage(), e);
         }
 
-        if(webServiceSoap == null){
+        if (webServiceSoap == null) {
             throw logErrorAndCreateConnectionException("Could not reach Checkmarx web service.");
         }
     }
@@ -83,10 +81,10 @@ abstract class CxSDKSonarSoapService {
             }
             sessionId = cxWSResponseLoginData.getSessionId();
         } catch (javax.xml.ws.WebServiceException | RemoteException e) {
-            throw logErrorAndCreateConnectionException("error while retrieving session id: "+e.getLocalizedMessage(), e);
+            throw logErrorAndCreateConnectionException("error while retrieving session id: " + e.getLocalizedMessage(), e);
         }
 
-        if(sessionId == null){
+        if (sessionId == null) {
             throw logErrorAndCreateConnectionException("Web service did not return session id");
         }
         return sessionId;
@@ -99,46 +97,36 @@ abstract class CxSDKSonarSoapService {
     }
 
     private URL getUrlAndValidateForm(String serverUrl) throws ConnectionException {
-        try{
+        try {
             URL url = new URL(serverUrl);
             if (url.getPath().length() > 1) {
                 throw logErrorAndCreateConnectionException("Checkmarx server url must not contain path: " + serverUrl);
             }
             return url;
-        }catch (Exception e) {
-            if(e.getLocalizedMessage().startsWith("no protocol:")) {
+        } catch (Exception e) {
+            if (e.getLocalizedMessage().startsWith("no protocol:")) {
                 throw logErrorAndCreateConnectionException(e.getLocalizedMessage() + ". Server URL syntax is: http(s)://servername(:port)", e);
             } else {
-                throw logErrorAndCreateConnectionException("URL form validation failed: "+e.getLocalizedMessage(), e);
+                throw logErrorAndCreateConnectionException("URL form validation failed: " + e.getLocalizedMessage(), e);
             }
         }
     }
 
     private void validateLiveServer(URL url) throws ConnectionException {
         try {
-           try {
-               HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-               //HEAD minimize loaded data in response
-               httpURLConnection.setRequestMethod("HEAD");
-               httpURLConnection.setConnectTimeout(7000);
-               int responseCode = httpURLConnection.getResponseCode();
-               if (responseCode != 200) {
-                   throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: "+responseCode);
-               }
-           }catch (ClassCastException e){
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                httpsURLConnection.setRequestMethod("HEAD");
-                httpsURLConnection.setConnectTimeout(7000);
-                int responseCode = httpsURLConnection.getResponseCode();
-                if (responseCode != 200) {
-                    throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: " + responseCode);
-                }
-           }
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            //HEAD minimize loaded data in response
+            httpURLConnection.setRequestMethod("HEAD");
+            httpURLConnection.setConnectTimeout(7000);
+            int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode != 200) {
+                throw logErrorAndCreateConnectionException("Could not connect to Server URL, response code: " + responseCode);
+            }
         } catch (Exception e) {
-            if(e instanceof IOException) {
+            if (e instanceof IOException) {
                 throw logErrorAndCreateConnectionException("Could not access Server URL: " + e.getLocalizedMessage(), e);
             } else {
-                throw logErrorAndCreateConnectionException("Live server validation failed: "+ e.getLocalizedMessage(), e);
+                throw logErrorAndCreateConnectionException("Live server validation failed: " + e.getLocalizedMessage(), e);
             }
         }
     }
@@ -148,7 +136,7 @@ abstract class CxSDKSonarSoapService {
             try {
                 webServiceSoap.logout(sessionId);
             } catch (javax.xml.ws.WebServiceException | RemoteException e) {
-                throw logErrorAndCreateConnectionException("Could not close connection: "+e.getLocalizedMessage(), e);
+                throw logErrorAndCreateConnectionException("Could not close connection: " + e.getLocalizedMessage(), e);
             }
         }
         webServiceSoap = null;
