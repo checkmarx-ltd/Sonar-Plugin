@@ -25,30 +25,34 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var spanSpinner = getConnectingSpinner();
         options.el.appendChild(spanSpinner);
 
-        try {
-            getCxProjectFromSonarResponse().then(function (res1) {
-                return getCxRemediationEffortFromSonarResponse(res1);
-            }).then(function (res2) {
-                return getCxCredentialsResponse(res2);
-            }).then(function (res3) {
-                return connectAndGetResponse(res3);
-            }).then(function (res4) {
-                return getCxProjectsFromServerResponse(res4);
-            }).then(function (res5) {
-                try {
-                    projectsIn = JSON.parse(res5.projects);
-                }catch (err){
-                    projectsIn = "";
-                }
-                cleanConnection();
-                options.el.removeChild(spanSpinner);
-                return loadUI();
-            })
-        }catch (err){
+        getCxProjectFromSonarResponse().then(function (res1) {
+            return getCxRemediationEffortFromSonarResponse(res1);
+        }).then(function (res2) {
+            return getCxCredentialsResponse(res2);
+        }).then(function (res3) {
+            return connectAndGetResponse(res3);
+        }).then(function (res4) {
+            return getCxProjectsFromServerResponse(res4);
+        }).catch(function (err) {
             console.log(err.message);
             options.el.removeChild(spanSpinner);
             return loadUI();
-        }
+        }).then(function (res5) {
+            try {
+                projectsIn = JSON.parse(res5.projects);
+            }catch (err){
+                projectsIn = "";
+            }
+            cleanConnection();
+            options.el.removeChild(spanSpinner);
+            return loadUI();
+        }).catch(function (err) {
+            console.log(err.message);
+            try {
+                options.el.removeChild(spanSpinner);
+            }catch (ignored){}
+            return loadUI();
+        });
     }
 
     /*********************pre loading page************************************************/
@@ -206,7 +210,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         try {
             var credentialsToSend = getInputCredentialsAndValidateValues();
             if (credentialsToSend != "") {
-                connectWithInputCredentialsAndGetResponse(credentialsToSend).then(function (res2) {
+                connectWithInputCredentialsAndGetResponse(credentialsToSend)
+                    .then(function (res2) {
                     return getCxProjectsFromServerResponse(res2)
                 }).then(function (res3) {
                     deleteSpanSpinner('testConBtn');
