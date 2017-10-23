@@ -119,112 +119,120 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     }
 
   function initDataAndLoadUi() {
-           return metricRequest('cx.sast.result.high').then(function (responseHigh) {
-               highCount = getValue(responseHigh);
-               return metricRequest('cx.sast.result.medium')
-           }).then(function (responseMedium) {
-               medCount = getValue(responseMedium);
-               return metricRequest('cx.sast.result.low')
-           }).then(function (responseLow) {
-               lowCount = getValue(responseLow);
-               return metricRequest('cx.sast.result.details')
-           }).then(function (responseDetails) {
-               var details = getValue(responseDetails);
-               setDetails(details);
-           }).then(function () {
-               queryPagesCounter = 0;
-               return getQueriesRecursivelyAndLoadUiWhenDone();
-           });
+       return metricRequest('cx.sast.result.high').then(function (responseHigh) {
+           highCount = getValue(responseHigh);
+           return metricRequest('cx.sast.result.medium')
+       }).then(function (responseMedium) {
+           medCount = getValue(responseMedium);
+           return metricRequest('cx.sast.result.low')
+       }).then(function (responseLow) {
+           lowCount = getValue(responseLow);
+           return metricRequest('cx.sast.result.details')
+       }).then(function (responseDetails) {
+           var details = getValue(responseDetails);
+           setDetails(details);
+       }).then(function () {
+           queryPagesCounter = 0;
+           return getQueriesRecursivelyAndLoadUiWhenDone();
+       }).catch(function (err) {
+           console.log(err.message);
+           try {
+               options.el.removeChild(spanSpinner);
+           }catch (ignored){}
+           getHtml();
+           parseAndInsertVarToHtml();
+       });
   }
 
-        function metricRequest(metricKey) {
-            return window.SonarRequest.getJSON('/api/measures/component', {
-                resolved: false,
-                componentKey: options.component.key,
-                metricKeys: metricKey
-            })}
+    function metricRequest(metricKey) {
+        return window.SonarRequest.getJSON('/api/measures/component', {
+            resolved: false,
+            componentKey: options.component.key,
+            metricKeys: metricKey
+        })}
+    
 
-        function getValue(response) {
-            try{
-                var component = response.component;
-                var measures = component.measures[0];
-                return measures.value;
-            }catch (e){
-                return null;
-            }
+    function getValue(response) {
+        try{
+            var component = response.component;
+            var measures = component.measures[0];
+            return measures.value;
+        }catch (e){
+            return null;
         }
+    }
 
-        function setDetails(details) {
-            try {
-                var parsedDetails = JSON.parse(details);
-                sastStartDate = parsedDetails.scanStart;
-                sastEndDate = parsedDetails.scanFinish;
-                sastNumFiles = parsedDetails.numOfFiles;
-                sastLoc = parsedDetails.numOfCodeLines;
-                sastScanResultsLink = parsedDetails.viewerUri;
-            }catch (ignored){}
-        }
+    function setDetails(details) {
+        try {
+            var parsedDetails = JSON.parse(details);
+            sastStartDate = parsedDetails.scanStart;
+            sastEndDate = parsedDetails.scanFinish;
+            sastNumFiles = parsedDetails.numOfFiles;
+            sastLoc = parsedDetails.numOfCodeLines;
+            sastScanResultsLink = parsedDetails.viewerUri;
+        }catch (ignored){}
+    }
 
-        //using recursion (and not a loop) due to promises malfunctions on sonar pages
-        function getQueriesRecursivelyAndLoadUiWhenDone(){
-            ++queryPagesCounter;
-            componentTreeRequest(queryPagesCounter).then(function (response) {
-                var iii = response.components;
-                if (iii == undefined || iii.length == 0) {
-                    //for timely execution this code needs to be here
-                    return new Promise(function () {
-                        options.el.removeChild(spanSpinner);
-                        getHtml();
-                        parseAndInsertVarToHtml();
-                    })
-                } else {
-                    iii.forEach(function (element) {
-                        var par = element.measures;
-                        if (par.length > 0) {
-                            var effectivePartOfElement = par[0].value;
-                            var queriesJson = JSON.parse(effectivePartOfElement);
-                            addQueriesToSummery(queriesJson);
-                        }
-                    });
-                }
-                     getQueriesRecursivelyAndLoadUiWhenDone();
+    //using recursion (and not a loop) due to promises malfunctions on sonar pages
+    function getQueriesRecursivelyAndLoadUiWhenDone(){
+        ++queryPagesCounter;
+        componentTreeRequest(queryPagesCounter).then(function (response) {
+            var iii = response.components;
+            if (iii == undefined || iii.length == 0) {
+                //for timely execution this code needs to be here
+                return new Promise(function () {
+                    options.el.removeChild(spanSpinner);
+                    getHtml();
+                    parseAndInsertVarToHtml();
+                })
+            } else {
+                iii.forEach(function (element) {
+                    var par = element.measures;
+                    if (par.length > 0) {
+                        var effectivePartOfElement = par[0].value;
+                        var queriesJson = JSON.parse(effectivePartOfElement);
+                        addQueriesToSummery(queriesJson);
+                    }
                 });
-        }
-
-        function componentTreeRequest(pageIdx) {
-            return window.SonarRequest.getJSON('/api/measures/component_tree', {
-                resolved: false,
-                baseComponentKey: options.component.key,
-                metricKeys: 'cx.sast.result.queries',
-                qualifier: 'FIL',
-                ps : 500,
-                pageIndex: pageIdx
-            })}
-
-        function addQueriesToSummery(queriesJson) {
-            if(queriesJson.highVulnerabilityQueries.length > 0){
-                addQueriesToArray(queriesJson.highVulnerabilityQueries, highCveList);
             }
-            if(queriesJson.mediumVulnerabilityQuries.length > 0){
-                addQueriesToArray(queriesJson.mediumVulnerabilityQuries, medCveList);
-            }
-            if(queriesJson.lowVulnerabilityQueries.length > 0){
-                addQueriesToArray(queriesJson.lowVulnerabilityQueries, lowCveList);
-            }
-        }
-
-        function addQueriesToArray(queries, array) {
-            queries.forEach(function (element) {
-                //javascript hashes automatically
-                var query = array[element.name];
-                if(query == undefined){
-                    array[element.name] = element;
-                }else {
-                   query.numberOfOccurrences = query.numberOfOccurrences + element.numberOfOccurrences;
-                    array[element.name] = query;
-                }
+                 getQueriesRecursivelyAndLoadUiWhenDone();
             });
+    }
+
+    function componentTreeRequest(pageIdx) {
+        return window.SonarRequest.getJSON('/api/measures/component_tree', {
+            resolved: false,
+            baseComponentKey: options.component.key,
+            metricKeys: 'cx.sast.result.queries',
+            qualifier: 'FIL',
+            ps : 500,
+            pageIndex: pageIdx
+        })}
+
+    function addQueriesToSummery(queriesJson) {
+        if(queriesJson.highVulnerabilityQueries.length > 0){
+            addQueriesToArray(queriesJson.highVulnerabilityQueries, highCveList);
         }
+        if(queriesJson.mediumVulnerabilityQuries.length > 0){
+            addQueriesToArray(queriesJson.mediumVulnerabilityQuries, medCveList);
+        }
+        if(queriesJson.lowVulnerabilityQueries.length > 0){
+            addQueriesToArray(queriesJson.lowVulnerabilityQueries, lowCveList);
+        }
+    }
+
+    function addQueriesToArray(queries, array) {
+        queries.forEach(function (element) {
+            //javascript hashes automatically
+            var query = array[element.name];
+            if(query == undefined){
+                array[element.name] = element;
+            }else {
+               query.numberOfOccurrences = query.numberOfOccurrences + element.numberOfOccurrences;
+                array[element.name] = query;
+            }
+        });
+    }
 
 
   /******************************************************************************************************************************************/
@@ -255,6 +263,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
         } else {
              document.getElementById("onSastError").setAttribute("style", "display:block");
              document.getElementById("scanErrorMessage").setAttribute("style", "display:block");
+             return;
          }
 
         //---------------------------------------------------------- osa ---------------------------------------------------------------
