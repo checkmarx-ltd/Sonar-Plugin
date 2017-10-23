@@ -78,12 +78,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /******************************************Build UI ****************************************************/
 
-    function loadUI(response) {
-        /*try {
-            securityRemediationEffortInSonarDb = response.settings[0].value;
-        } catch (err) {
-            securityRemediationEffortInSonarDb = 0;
-        }*/
+    function loadUI() {
         return new Promise(function () {
             var div = document.createElement('div');
             div.className = "configurationDiv";
@@ -219,7 +214,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 }).catch(function(err){
                     terminateFailedTestConnection();
                 });
-            } else {//err msg appears in projects form
+            } else {//err msg already appears in projects form
                 deleteSpanSpinner('testConBtn');
             }
         }catch (err){
@@ -367,7 +362,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 var msg = "Save failed due to SonarQube error " + error.response.statusText;
                 createFailureMsg('saveBtn', msg);
             });
-        } else {//err msg appears in projects form
+        } else {//err msg already appears in projects form
             deleteSpanSpinner('saveBtn');
         }
     }
