@@ -106,6 +106,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .beginObject()
                                     .prop("projects", "")
                                     .prop("isSuccessful", false)
+                                    .prop("errorMsg", e.getMessage())
                                     .endObject()
                                     .close();
                         }
@@ -138,6 +139,7 @@ public class CxConfigRestEndPoint implements WebService {
                             response.newJsonWriter()
                                     .beginObject()
                                     .prop("isSuccessful", false)
+                                    .prop("errorMsg", e.getMessage())
                                     .endObject()
                                     .close();
 
