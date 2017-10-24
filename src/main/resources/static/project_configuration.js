@@ -217,12 +217,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                     deleteSpanSpinner('testConBtn');
                     return cleanUpAndUpdateUI(res3);
                 }).catch(function(err){
+                    console.log(err.message);
                     terminateFailedTestConnection();
                 });
             } else {//err msg already appears in projects form
                 deleteSpanSpinner('testConBtn');
             }
         }catch (err){
+            console.log(err.message);
             terminateFailedTestConnection();
         }
     }
