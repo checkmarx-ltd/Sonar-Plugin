@@ -123,22 +123,10 @@
                 </dependencies>
                 <configuration>
                     <urls>
-                        &lt;!&ndash;<url>http://10.31.2.117/Cxwebinterface/Sonar/CxSonarWebService.asmx?wsdl</url>&ndash;&gt;
                     <url>http://10.31.2.117/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>
                     <url>http://10.31.2.117/Cxwebinterface/CxWSResolver.asmx?wsdl</url>
                     </urls>
-
-                  &lt;!&ndash;  <wsdlFiles>
-                        <File>${basedir}/src/main/resources/wsdl/CxSonarWebService.wsdl</File>
-                        <File>${basedir}/src/main/resources/wsdl/CxWebService-orig.wsdl</File>
-                        <File>${basedir}/src/main/resources/wsdl/CxWsResolver.wsdl</File>
-                    </wsdlFiles>&ndash;&gt;
-                &lt;!&ndash;<wsdlFiles>
-                    <wsdlFile>CxSonarWebService.wsdl</wsdlFile>
-                   <wsdlFile>CxWebService-orig.wsdl</wsdlFile>
-                    <wsdlFile>CxWsResolver.wsdl</wsdlFile>
-                </wsdlFiles>&ndash;&gt;
-                    <packageSpace>com.checkmarx.soap.client</packageSpace>
+                    <packageSpace>com.miki.mouse</packageSpace>
                 </configuration>
                 <executions>
                     <execution>
