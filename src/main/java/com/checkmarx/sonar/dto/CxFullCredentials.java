@@ -1,6 +1,9 @@
 package com.checkmarx.sonar.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 /**
  * Created by: zoharby.
@@ -14,6 +17,10 @@ public class CxFullCredentials {
     private String cxUsername;
     @JsonProperty("cxPassword")
     private String cxPassword;
+
+
+
+
 
 
     public CxFullCredentials() {
@@ -69,5 +76,17 @@ public class CxFullCredentials {
         result = 31 * result + getCxUsername().hashCode();
         result = 31 * result + getCxPassword().hashCode();
         return result;
+    }
+
+    public static CxFullCredentials getCxFullCredentials(String credentialsJson) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        CxFullCredentials cxFullCredentials;
+        String password = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
+        credentialsJson = credentialsJson.replace(password,"Cx123456!");
+        cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
+        cxFullCredentials.setCxPassword(password);
+        return cxFullCredentials;
     }
 }

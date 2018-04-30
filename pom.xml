@@ -17,34 +17,34 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>axistools-maven-plugin</artifactId>
-                <version>1.3</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>axis</groupId>
-                        <artifactId>axis</artifactId>
-                        <version>1.3</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <urls>
-                        <url>http://10.31.2.117/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>
-                        <url>http://10.31.2.117/Cxwebinterface/CxWSResolver.asmx?wsdl</url>
-                    </urls>
-                    <packageSpace>com.checkmarx.soap.client</packageSpace>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>wsdl2java-generation</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>axistools-maven-plugin</artifactId>-->
+                <!--<version>1.3</version>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>axis</groupId>-->
+                        <!--<artifactId>axis</artifactId>-->
+                        <!--<version>1.3</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
+                <!--<configuration>-->
+                    <!--<urls>-->
+                        <!--<url>http://10.31.2.117/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>-->
+                        <!--<url>http://10.31.2.117/Cxwebinterface/CxWSResolver.asmx?wsdl</url>-->
+                    <!--</urls>-->
+                    <!--<packageSpace>com.checkmarx.soap.client</packageSpace>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>wsdl2java-generation</id>-->
+                        <!--<phase>generate-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>wsdl2java</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
                 <artifactId>sonar-packaging-maven-plugin</artifactId>

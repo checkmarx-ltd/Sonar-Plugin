@@ -28,7 +28,7 @@ public class CxConfigRestEndPoint implements WebService {
 
     private CxLogger logger = new CxLogger(CxConfigRestEndPoint.class);
 
-    private ObjectMapper mapper = new ObjectMapper();
+
 
     @Override
     public void define(Context context) {
@@ -49,10 +49,7 @@ public class CxConfigRestEndPoint implements WebService {
                         try {
                            String credentialsJson = request.getParam("credentials").getValue();
                             if(credentialsJson != null && !credentialsJson.equals("")) {
-                                String password = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
-                                credentialsJson = credentialsJson.replace(password,"Cx123456!");
-                                cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
-                                cxFullCredentials.setCxPassword(password);
+                                cxFullCredentials = CxFullCredentials.getCxFullCredentials(credentialsJson);
                             }else {
                                 throw new IOException("No credentials provided");
                             }
@@ -153,6 +150,8 @@ public class CxConfigRestEndPoint implements WebService {
         //apply changes
         controller.done();
     }
+
+
 
 
     private void validateCredentials(CxFullCredentials cxFullCredentials) throws IOException {
