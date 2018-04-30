@@ -63,7 +63,7 @@ public class CheckmarxSensor implements Sensor {
             return;
         }
         try {
-            cxFullCredentials = mapper.readValue(cxCredentialsJson, CxFullCredentials.class);
+            cxFullCredentials = CxFullCredentials.getCxFullCredentials(cxCredentialsJson);
         } catch (Exception e) {
             logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while parsing credentials: " + e.getMessage(), context);
             return;

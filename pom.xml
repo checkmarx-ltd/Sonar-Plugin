@@ -108,18 +108,21 @@
             <version>${sonar.apiVersion}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <!-- packaged with the plugin -->
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+
         <!-- missing from axis, dod not remove - it will result in braking theRESTEndPoints-->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>javax.mail-api</artifactId>
             <version>1.5.1</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-client -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -132,6 +135,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!-- mapping between objects and jsons-->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
