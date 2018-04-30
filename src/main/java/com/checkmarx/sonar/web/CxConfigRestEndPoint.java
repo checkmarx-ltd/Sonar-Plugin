@@ -49,7 +49,10 @@ public class CxConfigRestEndPoint implements WebService {
                         try {
                            String credentialsJson = request.getParam("credentials").getValue();
                             if(credentialsJson != null && !credentialsJson.equals("")) {
+                                String password = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
+                                credentialsJson = credentialsJson.replace(password,"Cx123456!");
                                 cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
+                                cxFullCredentials.setCxPassword(password);
                             }else {
                                 throw new IOException("No credentials provided");
                             }
