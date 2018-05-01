@@ -84,7 +84,7 @@ public class CxFullCredentials {
 
         CxFullCredentials cxFullCredentials;
         String password = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
-        credentialsJson = credentialsJson.replace(password,"Cx123456!");
+        credentialsJson = credentialsJson.replace(password,"Xx111111#");
         cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
         cxFullCredentials.setCxPassword(password);
         return cxFullCredentials;
