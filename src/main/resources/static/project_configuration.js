@@ -581,6 +581,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function connectAndGetResponse(response) {
         try{
             credentials = response.settings[0].value;
+            var preToken = credentials.substring(0,credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
+            var passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, credentials.indexOf("\"}"));
+            var postToken = credentials.substring(credentials.indexOf("\"}"));
+            passToken = passToken.replace('"', '\\"');
+            credentials = preToken + passToken + postToken;
         }catch (err){
             credentials = "";
             throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
