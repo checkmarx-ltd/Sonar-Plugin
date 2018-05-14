@@ -13,6 +13,13 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     var staticUrl = window.baseUrl + '/static/checkmarx';
 
+    var js = document.createElement("script");
+
+    js.type = "text/javascript";
+    js.src = '/static/checkmarx/sjcl.js';
+
+    document.body.appendChild(js);
+
     var configurationPage;
 
     if (isDisplayed) {
@@ -581,6 +588,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function connectAndGetResponse(response) {
         try{
             credentials = response.settings[0].value;
+            //if encrypted
+            if(!credentials.includes("cxPassword")){
+                credentials = sjcl.decrypt("checkmarx.server.credentials.secured", credentials)
+            }
             var preToken = credentials.substring(0,credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
             var passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, credentials.indexOf("\"}"));
             var postToken = credentials.substring(credentials.indexOf("\"}"));
@@ -689,10 +700,18 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function saveCxCredentials(cxCredentials) {
+
+        //if not encrypted
+        if(credentials.includes("cxPassword")){
+            cxCredentialsEncrypted = sjcl.encrypt("checkmarx.server.credentials.secured",cxCredentials) ;
+        }else{
+            cxCredentialsEncrypted = credentials;
+        }
+
         return window.SonarRequest.post('/api/settings/set', {
             resolved: false,
             key: "checkmarx.server.credentials.secured",
-            value: cxCredentials,
+            value: cxCredentialsEncrypted,
             component: options.component.key
         })
     }
