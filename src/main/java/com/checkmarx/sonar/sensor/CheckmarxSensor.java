@@ -6,6 +6,7 @@ import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
+import com.checkmarx.sonar.sensor.encryption.AesUtil;
 import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
 import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
@@ -39,6 +40,12 @@ public class CheckmarxSensor implements Sensor {
     private CxSastResultsService cxSastResultsService = new CxSastResultsService();
     private SastResultsCollector sastResultsCollector = new SastResultsCollector();
 
+    private static final String IV = "F27D5C9927726BCEFE7510B1BDD3D137";
+    private static final String SALT = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
+    private static final int KEY_SIZE = 128;
+    private static final int ITERATION_COUNT = 10000;
+    private static final String PASSPHRASE = "checkmarx.server.credentials.secured";
+
     @Override
     public void describe(SensorDescriptor descriptor) {
         descriptor.name("Import Checkmarx scan results to SonarQube");
@@ -63,6 +70,8 @@ public class CheckmarxSensor implements Sensor {
             return;
         }
         try {
+            AesUtil util = new AesUtil(KEY_SIZE, ITERATION_COUNT);
+            cxCredentialsJson = util.decrypt(SALT, IV, PASSPHRASE, cxCredentialsJson);
             cxFullCredentials = CxFullCredentials.getCxFullCredentials(cxCredentialsJson);
         } catch (Exception e) {
             logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while parsing credentials: " + e.getMessage(), context);

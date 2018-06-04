@@ -13,14 +13,35 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     var staticUrl = window.baseUrl + '/static/checkmarx';
 
-    var js = document.createElement("script");
+    var js1 = document.createElement("script");
+    var js2 = document.createElement("script");
+    var js3 = document.createElement("script");
+    var js4 = document.createElement("script");
 
-    js.type = "text/javascript";
-    js.src = '/static/checkmarx/sjcl.js';
+    js1.type = "text/javascript";
+    js2.type = "text/javascript";
+    js3.type = "text/javascript";
+    js4.type = "text/javascript";
 
-    document.body.appendChild(js);
+    //js.src = '/static/checkmarx/sjcl.js';
+    js1.src = '/static/checkmarx/encryption/jquery-2.1.3.min.js';
+    js2.src = '/static/checkmarx/encryption/aes.js';
+    js3.src = '/static/checkmarx/encryption/pbkdf2.js';
+    js4.src = '/static/checkmarx/encryption/AesUtil.js'
+
+    document.body.appendChild(js1);
+    document.body.appendChild(js2);
+    document.body.appendChild(js3);
+    document.body.appendChild(js4);
 
     var configurationPage;
+
+    var iv = "F27D5C9927726BCEFE7510B1BDD3D137";
+    var salt = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
+    var keySize = 128;
+    var iterationCount = 10000;
+    var passPhrase = "checkmarx.server.credentials.secured";
+
 
     if (isDisplayed) {
 
@@ -590,7 +611,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             credentials = response.settings[0].value;
             //if encrypted
             if(!credentials.includes("cxPassword")){
-                credentials = sjcl.decrypt("checkmarx.server.credentials.secured", credentials)
+                //credentials = sjcl.decrypt("checkmarx.server.credentials.secured", credentials)
+                var aesUtil = new AesUtil(keySize, iterationCount);
+                var decrypted = aesUtil.decrypt(salt, iv, passPhrase, credentials);
+                credentials =  decrypted.toString(CryptoJS.enc.Utf8);
             }
             var preToken = credentials.substring(0,credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
             var passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, credentials.indexOf("\"}"));
@@ -703,7 +727,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
         //if not encrypted
         if(credentials.includes("cxPassword")){
-            cxCredentialsEncrypted = sjcl.encrypt("checkmarx.server.credentials.secured",cxCredentials) ;
+            //cxCredentialsEncrypted = sjcl.encrypt("checkmarx.server.credentials.secured",cxCredentials) ;
+            var aesUtil = new AesUtil(keySize, iterationCount);
+            cxCredentialsEncrypted = aesUtil.encrypt(salt, iv, passPhrase, cxCredentials);
         }else{
             cxCredentialsEncrypted = credentials;
         }
