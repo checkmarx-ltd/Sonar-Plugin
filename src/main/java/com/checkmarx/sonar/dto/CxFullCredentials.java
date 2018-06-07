@@ -83,10 +83,16 @@ public class CxFullCredentials {
         ObjectMapper mapper = new ObjectMapper();
 
         CxFullCredentials cxFullCredentials;
-        String password = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
-        credentialsJson = credentialsJson.replace(password,"Xx111111#");
+        String passwordOrig = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
+        credentialsJson = credentialsJson.replace(passwordOrig,"aaa");
+
+        String temp = credentialsJson.substring(credentialsJson.indexOf("cxUsername") + 13);
+        String usernameOrig = temp.substring(1,temp.indexOf("\","));
+        String usernameTemp = "aaa";
+        credentialsJson = credentialsJson.replace(usernameOrig,usernameTemp);
         cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
-        cxFullCredentials.setCxPassword(password);
+        cxFullCredentials.setCxPassword(passwordOrig);
+        cxFullCredentials.setCxUsername(usernameOrig);
         return cxFullCredentials;
     }
 }
