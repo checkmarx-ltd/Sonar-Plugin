@@ -68,7 +68,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }).then(function (res5) {
             try {
                 projectsIn = JSON.parse(res5.projects);
-            }catch (err){
+            } catch (err) {
                 projectsIn = "";
             }
             cleanConnection();
@@ -78,7 +78,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             console.log(err.message);
             try {
                 options.el.removeChild(spanSpinner);
-            }catch (ignored){}
+            } catch (ignored) {
+            }
             return loadUI();
         });
     }
@@ -151,7 +152,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             var credentialsJson = JSON.parse(credentials);
             createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
             createInput('Username', 'text', 'username', credentialsJson.cxUsername);
-            createInput('Password', 'password', 'password', credentialsJson.cxPassword);
+            createInput('Password', 'password', 'password', "*****");
         } else {
             createInput('Server Url', 'text', 'serverUrl', "");
             createInput('Username', 'text', 'username', "");
@@ -240,18 +241,18 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             if (credentialsToSend != "") {
                 connectWithInputCredentialsAndGetResponse(credentialsToSend)
                     .then(function (res2) {
-                    return getCxProjectsFromServerResponse(res2)
-                }).then(function (res3) {
+                        return getCxProjectsFromServerResponse(res2)
+                    }).then(function (res3) {
                     deleteSpanSpinner('testConBtn');
                     return cleanUpAndUpdateUI(res3);
-                }).catch(function(err){
+                }).catch(function (err) {
                     console.log(err.message);
                     terminateFailedTestConnection();
                 });
             } else {//err msg already appears in projects form
                 deleteSpanSpinner('testConBtn');
             }
-        }catch (err){
+        } catch (err) {
             console.log(err.message);
             terminateFailedTestConnection();
         }
@@ -259,17 +260,20 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
 
     function terminateFailedTestConnection() {
-       try {
-           projectsIn = "";
-           var select = document.getElementById('projectSelect');
-           select.innerHTML = createOptions();
-       }catch (ignored){}
+        try {
+            projectsIn = "";
+            var select = document.getElementById('projectSelect');
+            select.innerHTML = createOptions();
+        } catch (ignored) {
+        }
         try {
             deleteSpanSpinner('testConBtn');
-        }catch (ignored){}
+        } catch (ignored) {
+        }
         try {
             createFailureMsg('testConBtn', 'Connection Failed');
-        }catch (ignored){}
+        } catch (ignored) {
+        }
     }
 
 
@@ -523,15 +527,16 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     //returns empty String if there is no valid project to save
     function getAndValidateProjectToSave() {
-        try{
-            var projectSelect  = document.getElementById('projectSelect');
+        try {
+            var projectSelect = document.getElementById('projectSelect');
             var selectedIdx = projectSelect.selectedIndex;
             var content = projectSelect.options[selectedIdx].textContent;
-            if(content == projectListNoServerConnectionMsg){
+            if (content == projectListNoServerConnectionMsg) {
                 validateInputCostumeErrMsg('projectForm', "", 'Please Connect to Checkmarx server');
                 return "";
             }
-        }catch (ignored){}
+        } catch (ignored) {
+        }
 
         var selectedItem = getSelectedProjectInUI();
         var isValidProject = validateInputCostumeErrMsg('projectForm', selectedItem, 'Please choose a project from the list');
@@ -555,23 +560,23 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         return insertedValue;
     }
 
-    function validateInputHasValue(id, inputValue){
+    function validateInputHasValue(id, inputValue) {
         return validateInputCostumeErrMsg(id, inputValue, 'content must not be empty');
     }
 
     function getSelectedProjectInUI() {
-        try{
-            var projectSelect  = document.getElementById('projectSelect');
+        try {
+            var projectSelect = document.getElementById('projectSelect');
             var selectedIdx = projectSelect.selectedIndex;
             return projectSelect.options[selectedIdx].value;
-        }catch (err){
+        } catch (err) {
             return "";
         }
     }
 
-    function validateInputCostumeErrMsg(id, inputValue, msg){
-        var errSpan = document.getElementById(id+'Err');
-        if(inputValue == ""){
+    function validateInputCostumeErrMsg(id, inputValue, msg) {
+        var errSpan = document.getElementById(id + 'Err');
+        if (inputValue == "") {
             errSpan.textContent = msg;
             return false;
         }
@@ -582,23 +587,28 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /****************************Helper Functions****************************************************************/
 
     function parseCredentials(cxServerUrl, cxUsername, cxPassword) {
-        return "{\"cxServerUrl\":\""+cxServerUrl+"\", \"cxUsername\": \""+cxUsername+"\", \"cxPassword\": \""+cxPassword+"\"}";
+        if (cxPassword == "*****") {
+            var credentialsJsonTemp = JSON.parse(credentials);
+            return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
+        }else {
+            return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
+        }
     }
 
     function isURL(str) {
 
         //test protocol
-        if(!/^(f|ht)tps?:\/\//i.test(str)){
+        if (!/^(f|ht)tps?:\/\//i.test(str)) {
             return false;
         }
 
         //test entire string form
-        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
-            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-            '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-            '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
         return pattern.test(str);
     }
 
@@ -607,21 +617,21 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /*****************Checkmarx server***************/
 
     function connectAndGetResponse(response) {
-        try{
+        try {
             credentials = response.settings[0].value;
             //if encrypted
-            if(!credentials.includes("cxPassword")){
+            if (!credentials.includes("cxPassword")) {
                 //credentials = sjcl.decrypt("checkmarx.server.credentials.secured", credentials)
                 var aesUtil = new AesUtil(keySize, iterationCount);
                 var decrypted = aesUtil.decrypt(salt, iv, passPhrase, credentials);
-                credentials =  decrypted.toString(CryptoJS.enc.Utf8);
+                credentials = decrypted.toString(CryptoJS.enc.Utf8);
             }
-            var preToken = credentials.substring(0,credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
+            var preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
             var passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, credentials.indexOf("\"}"));
             var postToken = credentials.substring(credentials.indexOf("\"}"));
             passToken = passToken.replace('"', '\\"');
             credentials = preToken + passToken + postToken;
-        }catch (err){
+        } catch (err) {
             credentials = "";
             throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
         }
@@ -642,14 +652,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function getCxProjectsFromServerResponse(response) {
-        try{
+        try {
             sessionId = response.sessionId;
             isCxConnectionSuccessful = response.isSuccessful;
-        }catch(err){
+        } catch (err) {
             sessionId = "";
             isCxConnectionSuccessful = 'false';
         }
-        if(!isCxConnectionSuccessful){
+        if (!isCxConnectionSuccessful) {
             throw new Error("Failed to connect to checkmarx server.")
         }
         return window.SonarRequest.postJSON('/api/checkmarx/projects', {
@@ -678,7 +688,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function getCxRemediationEffortFromSonarResponse(response) {
         try {
             selectedProjectInSonarDb = response.settings[0].value;
-        } catch(err){
+        } catch (err) {
             selectedProjectInSonarDb = "";
         }
         return getCxRemediationEffortResponse()
@@ -726,11 +736,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function saveCxCredentials(cxCredentials) {
 
         //if not encrypted
-        if(credentials.includes("cxPassword")){
+        if (credentials.includes("cxPassword")) {
             //cxCredentialsEncrypted = sjcl.encrypt("checkmarx.server.credentials.secured",cxCredentials) ;
             var aesUtil = new AesUtil(keySize, iterationCount);
             cxCredentialsEncrypted = aesUtil.encrypt(salt, iv, passPhrase, cxCredentials);
-        }else{
+        } else {
             cxCredentialsEncrypted = credentials;
         }
 
@@ -745,8 +755,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /*****************************************************************************************************************/
 
     //Sonar documentation says this runs when the page closes, but as of 6.3 this has no effect
-  return function () {
-      isDisplayed = false;
-  };
+    return function () {
+        isDisplayed = false;
+    };
 
 });
