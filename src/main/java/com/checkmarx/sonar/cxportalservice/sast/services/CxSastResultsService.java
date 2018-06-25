@@ -202,7 +202,16 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         if (!cxWSResponseProjectsScansList.isIsSuccesfull()) {
             throw new ConnectionException(errMsg + cxWSResponseProjectsScansList.getErrorMessage());
         }
-        List<ProjectScannedDisplayData> projects = Arrays.asList(webServiceSoap.getProjectScannedDisplayData(sessionId).getProjectScannedList().getProjectScannedDisplayData());
+
+        ProjectScannedDisplayData[] projectDisplayDataArr = webServiceSoap.getProjectScannedDisplayData(sessionId).getProjectScannedList().getProjectScannedDisplayData();
+
+        if (projectDisplayDataArr == null) {
+            String message = "Project \"" + projectName + "\" was not found on Checkmarx server. This may be because the project contains no public scans.";
+            logger.warn(message);
+            throw new ConnectionException(message);
+        }
+
+        List<ProjectScannedDisplayData> projects = Arrays.asList(projectDisplayDataArr);
 
         ProjectScannedDisplayData projectDisplayData = null;
         for (ProjectScannedDisplayData p : projects) {
@@ -213,7 +222,7 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
         }
 
         if (projectDisplayData == null) {
-            String message = "Project \"" + projectName + "\" was not found on Checkmarx server. This may be because the project contains no scans.";
+            String message = "Project \"" + projectName + "\" was not found on Checkmarx server. This may be because the project contains no public scans.";
             logger.warn(message);
             throw new ConnectionException(message);
         }
