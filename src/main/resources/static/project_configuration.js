@@ -23,7 +23,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     js3.type = "text/javascript";
     js4.type = "text/javascript";
 
-    //js.src = '/static/checkmarx/sjcl.js';
     js1.src = '/static/checkmarx/encryption/jquery-2.1.3.min.js';
     js2.src = '/static/checkmarx/encryption/aes.js';
     js3.src = '/static/checkmarx/encryption/pbkdf2.js';
@@ -149,10 +148,19 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function createCredentialsForms() {
         if (credentials != "" && credentials != null) {
-            var credentialsJson = JSON.parse(credentials);
+            var decrypted;
+            if (!credentials.includes("cxUsername")) {
+                var aesUtil = new AesUtil(keySize, iterationCount);
+                decrypted = aesUtil.decrypt(salt, iv, passPhrase, credentials);
+                decrypted = decrypted.toString(CryptoJS.enc.Utf8);
+            }else{
+                decrypted = credentials;
+            }
+            var credentialsJson = JSON.parse(decrypted);
             createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
             createInput('Username', 'text', 'username', credentialsJson.cxUsername);
             createInput('Password', 'password', 'password', "*****");
+            credentialsJson.cxPassword = "*****"
         } else {
             createInput('Server Url', 'text', 'serverUrl', "");
             createInput('Username', 'text', 'username', "");
@@ -588,10 +596,20 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function parseCredentials(cxServerUrl, cxUsername, cxPassword) {
         if (cxPassword == "*****") {
-            var credentialsJsonTemp = JSON.parse(credentials);
-            return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
+            return credentials;
+            //var credentialsJsonTemp = JSON.parse(credentials);
+            //return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
         }else {
-            return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
+            try {
+                var aesUtil = new AesUtil(keySize, iterationCount);
+                cxCredentialsTemp = "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
+                cxCredentialsEncrypted = aesUtil.encrypt(salt, iv, passPhrase, cxCredentialsTemp);
+                return cxCredentialsEncrypted;
+            } catch (err) {
+                // not encrypted
+                return credentials;
+        }
+
         }
     }
 
@@ -619,18 +637,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function connectAndGetResponse(response) {
         try {
             credentials = response.settings[0].value;
-            //if encrypted
-            if (!credentials.includes("cxPassword")) {
-                //credentials = sjcl.decrypt("checkmarx.server.credentials.secured", credentials)
-                var aesUtil = new AesUtil(keySize, iterationCount);
-                var decrypted = aesUtil.decrypt(salt, iv, passPhrase, credentials);
-                credentials = decrypted.toString(CryptoJS.enc.Utf8);
-            }
-            var preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length);
-            var passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, credentials.indexOf("\"}"));
-            var postToken = credentials.substring(credentials.indexOf("\"}"));
-            passToken = passToken.replace('"', '\\"');
-            credentials = preToken + passToken + postToken;
         } catch (err) {
             credentials = "";
             throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
