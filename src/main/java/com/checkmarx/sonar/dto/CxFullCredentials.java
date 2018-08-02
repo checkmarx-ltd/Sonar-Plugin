@@ -1,5 +1,6 @@
 package com.checkmarx.sonar.dto;
 
+import com.checkmarx.sonar.sensor.encryption.AesUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,6 +19,11 @@ public class CxFullCredentials {
     @JsonProperty("cxPassword")
     private String cxPassword;
 
+    private static final String IV = "F27D5C9927726BCEFE7510B1BDD3D137";
+    private static final String SALT = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
+    private static final int KEY_SIZE = 128;
+    private static final int ITERATION_COUNT = 10000;
+    private static final String PASSPHRASE = "checkmarx.server.credentials.secured";
 
 
 
@@ -80,9 +86,19 @@ public class CxFullCredentials {
 
     public static CxFullCredentials getCxFullCredentials(String credentialsJson) throws IOException {
 
+        AesUtil util = new AesUtil(KEY_SIZE, ITERATION_COUNT);
+        credentialsJson = util.decrypt(SALT, IV, PASSPHRASE, credentialsJson);
+
+        credentialsJson = transformToSupportPasswordSpecialCharacters(credentialsJson);
+        CxFullCredentials cxFullCredentials = transformToSupportDomainUser(credentialsJson);
+
+        return cxFullCredentials;
+    }
+
+    private static CxFullCredentials transformToSupportDomainUser(String credentialsJson) throws IOException {
+        CxFullCredentials cxFullCredentials;
         ObjectMapper mapper = new ObjectMapper();
 
-        CxFullCredentials cxFullCredentials;
         String passwordOrig = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
         credentialsJson = credentialsJson.replace(passwordOrig,"aaa");
 
@@ -94,5 +110,14 @@ public class CxFullCredentials {
         cxFullCredentials.setCxPassword(passwordOrig);
         cxFullCredentials.setCxUsername(usernameOrig);
         return cxFullCredentials;
+    }
+
+    private static String transformToSupportPasswordSpecialCharacters(String credentials) {
+        String preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length());
+        String passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length(), credentials.indexOf("\"}"));
+        String postToken = credentials.substring(credentials.indexOf("\"}"));
+        passToken = passToken.replace("\"", "\\");
+        credentials = preToken + passToken + postToken;
+        return credentials;
     }
 }
