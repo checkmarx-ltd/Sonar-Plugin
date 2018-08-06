@@ -148,15 +148,30 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function createCredentialsForms() {
         if (credentials != "" && credentials != null) {
-            var decrypted;
+            var tempCred;
             if (!credentials.includes("cxUsername")) {
                 var aesUtil = new AesUtil(keySize, iterationCount);
-                decrypted = aesUtil.decrypt(salt, iv, passPhrase, credentials);
-                decrypted = decrypted.toString(CryptoJS.enc.Utf8);
+                tempCred = aesUtil.decrypt(salt, iv, passPhrase, credentials);
+                tempCred = tempCred.toString(CryptoJS.enc.Utf8);
             }else{
-                decrypted = credentials;
+                tempCred = credentials;
             }
-            var credentialsJson = JSON.parse(decrypted);
+
+            //support domain user
+            var temp = tempCred.substring(tempCred.indexOf("cxUsername") + 13);
+            var usernameOrig = temp.substring(1,temp.indexOf("\","));
+            var usernameTemp = "aaa";
+            tempCred = tempCred.replace(usernameOrig,usernameTemp);
+
+            // support special characters in pass
+            var passToken = tempCred.substring(tempCred.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, tempCred.indexOf("\"}"));
+            tempCred = tempCred.replace(passToken , 'XXX');
+
+            var credentialsJson = JSON.parse(tempCred);
+
+            credentialsJson.cxUsername=usernameOrig
+            credentialsJson.cxPassword=passToken;
+
             createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
             createInput('Username', 'text', 'username', credentialsJson.cxUsername);
             createInput('Password', 'password', 'password', "*****");
