@@ -89,13 +89,13 @@ public class CxFullCredentials {
         AesUtil util = new AesUtil(KEY_SIZE, ITERATION_COUNT);
         credentialsJson = util.decrypt(SALT, IV, PASSPHRASE, credentialsJson);
 
-        credentialsJson = transformToSupportPasswordSpecialCharacters(credentialsJson);
-        CxFullCredentials cxFullCredentials = transformToSupportDomainUser(credentialsJson);
+        //credentialsJson = transformToSupportPasswordSpecialCharacters(credentialsJson);
+        CxFullCredentials cxFullCredentials = transformKeepSpecialCharacters(credentialsJson);
 
         return cxFullCredentials;
     }
 
-    private static CxFullCredentials transformToSupportDomainUser(String credentialsJson) throws IOException {
+    private static CxFullCredentials transformKeepSpecialCharacters(String credentialsJson) throws IOException {
         CxFullCredentials cxFullCredentials;
         ObjectMapper mapper = new ObjectMapper();
 
@@ -112,12 +112,15 @@ public class CxFullCredentials {
         return cxFullCredentials;
     }
 
-    private static String transformToSupportPasswordSpecialCharacters(String credentials) {
-        String preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length());
-        String passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length(), credentials.indexOf("\"}"));
-        String postToken = credentials.substring(credentials.indexOf("\"}"));
-        passToken = passToken.replace("\"", "\\");
-        credentials = preToken + passToken + postToken;
-        return credentials;
-    }
+//    private static String transformToSupportPasswordSpecialCharacters(String credentials) {
+//        String preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length());
+//        String passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length(), credentials.indexOf("\"}"));
+//        String postToken = credentials.substring(credentials.indexOf("\"}"));
+//
+//        if(passToken.contains("\"")){
+//            passToken.replaceAll("\"","\\\"");
+//        }
+//        credentials = preToken + passToken + postToken;
+//        return credentials;
+//    }
 }
