@@ -23,7 +23,7 @@ public class CxConfigSoapService extends CxSDKSonarSoapService {
 
     public List<ProjectDisplayData> getProjectsDisplayData(String sessionId) throws ConnectionException {
         logger.info("Extracting projects list from Checkmarx server.");
-        if(webServiceSoap == null || sessionId == null || sessionId.equals("")){
+        if(webServiceSoap == null){
             throw new ConnectionException("User is not logged in.");
         }
 
@@ -37,7 +37,7 @@ public class CxConfigSoapService extends CxSDKSonarSoapService {
             if (projectsDisplayData.getProjectList() != null && projectsDisplayData.getProjectList().getProjectDisplayData() != null){
                 return Arrays.asList(projectsDisplayData.getProjectList().getProjectDisplayData());
             }
-        } catch (javax.xml.ws.WebServiceException | RemoteException e) {
+        } catch (RemoteException e) {
             throw logErrorAndCreateConnectionException(errMsg + e.getMessage(), e);
         }
 

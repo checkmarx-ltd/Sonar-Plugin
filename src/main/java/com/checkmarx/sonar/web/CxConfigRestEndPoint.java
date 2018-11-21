@@ -55,12 +55,12 @@ public class CxConfigRestEndPoint implements WebService {
                             }
                             validateCredentials(cxFullCredentials);
 
-                            String sessionId = cxConfigSoapService.login(cxFullCredentials);
+                            cxConfigSoapService.login(cxFullCredentials);
                             // read request parameters and generates response output
                             response.newJsonWriter()
                                     .beginObject()
                                     .prop("isSuccessful", true)
-                                    .prop("sessionId", sessionId)
+                                    .prop("sessionId", "")
                                     .endObject()
                                     .close();
                         } catch (Exception e) {
@@ -90,7 +90,6 @@ public class CxConfigRestEndPoint implements WebService {
                         logger.info("Retrieving Cx server projects.");
                         try {
                             String sessionId = request.getParam("sessionId").getValue();
-                            validateSessionId(sessionId);
 
                             String projects = getProjects(sessionId);
                             response.newJsonWriter()
@@ -125,7 +124,6 @@ public class CxConfigRestEndPoint implements WebService {
                         logger.info("Logging out of Checkmarx.");
                         try {
                             String sessionId = request.getParam("sessionId").getValue();
-                            validateSessionId(sessionId);
 
                             cxConfigSoapService.closeConnection(sessionId);
                             response.newJsonWriter()
@@ -169,11 +167,6 @@ public class CxConfigRestEndPoint implements WebService {
         }
     }
 
-    private void validateSessionId(String sessionId) throws IOException {
-        if(sessionId == null || sessionId.equals("")){
-            throw new IOException("Session id is not provided (user might not be logged in).");
-        }
-    }
 
     private String getProjects(String sessionId) throws JSONException, ConnectionException {
         List<ProjectDisplayData> projectsDisplayData = cxConfigSoapService.getProjectsDisplayData(sessionId);

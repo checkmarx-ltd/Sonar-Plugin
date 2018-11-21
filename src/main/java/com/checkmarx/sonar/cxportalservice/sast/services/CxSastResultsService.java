@@ -2,6 +2,7 @@ package com.checkmarx.sonar.cxportalservice.sast.services;
 
 import com.checkmarx.soap.client.*;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.cxportalservice.sast.exception.CxRestLoginException;
 import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
@@ -24,15 +25,15 @@ public class CxSastResultsService extends CxSDKSonarSoapService {
 
     private static final int RETRY_ATTEMPTS = 10;
 
-    private String sessionId;
+    private String sessionId = "";
 
     public CxSastResultsService() {
         super();
         logger = new CxLogger(CxSastResultsService.class);
     }
 
-    public CxXMLResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException {
-        sessionId = login(cxFullCredentials);
+    public CxXMLResults retrieveScan(CxFullCredentials cxFullCredentials, String cxProjectName) throws IOException, InterruptedException, JAXBException, CxRestLoginException {
+        login(cxFullCredentials);
 
         ProjectDisplayData projectDisplayData = getProjectDisplayData(cxProjectName);
         ProjectScannedDisplayData projectScannedDisplayData = getLastScanForProject(cxProjectName, projectDisplayData.getProjectID());

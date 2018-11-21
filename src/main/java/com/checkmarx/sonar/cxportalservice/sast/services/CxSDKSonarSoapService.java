@@ -5,13 +5,18 @@ import com.checkmarx.soap.client.CxSDKWebServiceLocator;
 import com.checkmarx.soap.client.CxSDKWebServiceSoap_PortType;
 import com.checkmarx.soap.client.CxWSResponseLoginData;
 import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
+import com.checkmarx.sonar.cxportalservice.sast.exception.CxRestLoginException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
+import org.apache.axis.client.Stub;
+import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.transport.http.HTTPConstants;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Hashtable;
 
 
 /**
@@ -21,18 +26,21 @@ import java.rmi.RemoteException;
 abstract class CxSDKSonarSoapService {
 
     private static final String SONAR_WS_WEB_ADDRESS = "%s/cxwebinterface/sdk/CxSDKWebService.asmx";
-    private final static int LCID = 1033; // English
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BEARER = "Bearer ";
 
     CxSDKWebServiceSoap_PortType webServiceSoap;
 
     private volatile String currServerUrl;
 
     protected CxLogger logger = new CxLogger(CxSDKSonarSoapService.class);
+    private CxRestLoginClientImpl cxRestLoginClientImpl;
 
     public CxSDKSonarSoapService() {
+        cxRestLoginClientImpl = new CxRestLoginClientImpl();
     }
 
-    public String login(CxFullCredentials cxFullCredentials) throws ConnectionException {
+    public void login(CxFullCredentials cxFullCredentials) throws ConnectionException, CxRestLoginException {
         logger.info("Attempting Connection to Checkmarx server");
         if (webServiceSoap == null || !cxFullCredentials.getCxServerUrl().equals(currServerUrl)) {
             currServerUrl = cxFullCredentials.getCxServerUrl();
@@ -40,12 +48,16 @@ abstract class CxSDKSonarSoapService {
             logger.info("Connected to server");
         }
 
-        String sessionId = authenticate(cxFullCredentials);
+        String token = cxRestLoginClientImpl.login(cxFullCredentials);
+        setAuthorizationHeader(token);
         logger.info("Login successful");
-
-        return sessionId;
     }
 
+    private void setAuthorizationHeader(String token) {
+        Hashtable<String, String> httpHeaders = new Hashtable<>();
+        httpHeaders.put(AUTHORIZATION_HEADER, BEARER + token);
+        ((Stub)webServiceSoap)._setProperty(HTTPConstants.REQUEST_HEADERS, httpHeaders);
+    }
 
     private void connect(String serverUrl) throws ConnectionException {
         logger.info("Validating server url");
@@ -64,30 +76,6 @@ abstract class CxSDKSonarSoapService {
         if (webServiceSoap == null) {
             throw logErrorAndCreateConnectionException("Could not reach Checkmarx web service.");
         }
-    }
-
-    private String authenticate(CxFullCredentials cxFullCredentials) throws ConnectionException {
-        logger.info("Authenticating Checkmarx client");
-        String sessionId = null;
-
-        Credentials credentials = new Credentials();
-        credentials.setUser(cxFullCredentials.getCxUsername());
-        credentials.setPass(cxFullCredentials.getCxPassword());
-        CxWSResponseLoginData cxWSResponseLoginData;
-        try {
-            cxWSResponseLoginData = webServiceSoap.login(credentials, LCID);
-            if (!cxWSResponseLoginData.isIsSuccesfull()) {
-                throw logErrorAndCreateConnectionException("Checkmarx server login error: " + cxWSResponseLoginData.getErrorMessage());
-            }
-            sessionId = cxWSResponseLoginData.getSessionId();
-        } catch (javax.xml.ws.WebServiceException | RemoteException e) {
-            throw logErrorAndCreateConnectionException("error while retrieving session id: " + e.getLocalizedMessage(), e);
-        }
-
-        if (sessionId == null) {
-            throw logErrorAndCreateConnectionException("Web service did not return session id");
-        }
-        return sessionId;
     }
 
 
