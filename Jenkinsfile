@@ -18,14 +18,19 @@ pipeline {
         powershell '''#------------------------------------------------------------------------------------------------------------
 # REMOVE THE WORD SNAPSHOT (ONLY FOR RELEASE BUILDS)
 #------------------------------------------------------------------------------------------------------------
+
 [string]$IsReleaseBuild = $ENV:IsReleaseBuild
-[string]$RootPath = "C:\\CI-Slave\\workspace\\$ENV:JOB_NAME"
+[string]$RootPath = "C:\CI-Slave\workspace\$ENV:JOB_NAME"
+
+
 If($IsReleaseBuild -eq "true")
 {
     Write-Host " ----------------------------------------------------- "
     Write-Host "|  SNAPSHOT DISABLED: Removing Snapshot before build  |"
     Write-Host " ----------------------------------------------------- "
-    $XmlPath = $RootPath + "\\pom.xml"
+
+    $XmlPath = $RootPath + "\pom.xml"
+
     If(Test-Path "$XmlPath")
     {  
         [xml]$XmlDocument = Get-Content -Path $XmlPath
