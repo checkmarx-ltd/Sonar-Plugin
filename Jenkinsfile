@@ -1,10 +1,8 @@
 pipeline {
-  
   parameters {        
         booleanParam(name: 'IsReleaseBuild', description: 'Check the box if you want to create a release build') 
         string(name: 'BranchName', defaultValue: 'master', description: 'Branch used by the job')  
     }
-  
   agent {
     node {
       label 'Plugins'
@@ -18,19 +16,14 @@ pipeline {
         powershell '''#------------------------------------------------------------------------------------------------------------
 # REMOVE THE WORD SNAPSHOT (ONLY FOR RELEASE BUILDS)
 #------------------------------------------------------------------------------------------------------------
-
 [string]$IsReleaseBuild = $ENV:IsReleaseBuild
-[string]$RootPath = "C:\CI-Slave\workspace\$ENV:JOB_NAME"
-
-
+[string]$RootPath = "C:\\CI-Slave\\workspace\\$ENV:JOB_NAME"
 If($IsReleaseBuild -eq "true")
 {
     Write-Host " ----------------------------------------------------- "
     Write-Host "|  SNAPSHOT DISABLED: Removing Snapshot before build  |"
     Write-Host " ----------------------------------------------------- "
-
-    $XmlPath = $RootPath + "\pom.xml"
-
+    $XmlPath = $RootPath + "\\pom.xml"
     If(Test-Path "$XmlPath")
     {  
         [xml]$XmlDocument = Get-Content -Path $XmlPath
@@ -44,7 +37,6 @@ Else
     Write-Host "|    SNAPSHOT ENABLED: Run Build without modifying    |"
     Write-Host " ----------------------------------------------------- " 
 }'''
-
       }
     }
 	
