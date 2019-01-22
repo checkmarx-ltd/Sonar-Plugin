@@ -90,7 +90,7 @@ public class CxRestLoginClientImpl implements CxRestLoginClient {
         urlParameters.add(new BasicNameValuePair(USERNAME_KEY, userName));
         urlParameters.add(new BasicNameValuePair(PASS_KEY, password));
         urlParameters.add(new BasicNameValuePair(GRANT_TYPE_KEY, PASS_KEY));
-        urlParameters.add(new BasicNameValuePair(SCOPE_KEY, "sast_rest_api"));
+        urlParameters.add(new BasicNameValuePair(SCOPE_KEY, "sast_rest_api cxarm_api access_control_api"));
         urlParameters.add(new BasicNameValuePair(CLIENT_ID_KEY, CLIENT_VALUE));
         urlParameters.add(new BasicNameValuePair(CLIENT_SECRET_KEY, CLIENT_SECRET_VALUE));
 
