@@ -1,8 +1,10 @@
 package com.checkmarx.sonar.dto;
 
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
+import com.checkmarx.sonar.settings.CxProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.sonar.api.batch.sensor.SensorContext;
 
 import java.io.IOException;
 
@@ -89,7 +91,6 @@ public class CxFullCredentials {
         AesUtil util = new AesUtil(KEY_SIZE, ITERATION_COUNT);
         credentialsJson = util.decrypt(SALT, IV, PASSPHRASE, credentialsJson);
 
-        //credentialsJson = transformToSupportPasswordSpecialCharacters(credentialsJson);
         CxFullCredentials cxFullCredentials = transformKeepSpecialCharacters(credentialsJson);
 
         return cxFullCredentials;
@@ -112,15 +113,9 @@ public class CxFullCredentials {
         return cxFullCredentials;
     }
 
-//    private static String transformToSupportPasswordSpecialCharacters(String credentials) {
-//        String preToken = credentials.substring(0, credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length());
-//        String passToken = credentials.substring(credentials.indexOf("cxPassword\": \"") + "cxPassword\": \"".length(), credentials.indexOf("\"}"));
-//        String postToken = credentials.substring(credentials.indexOf("\"}"));
-//
-//        if(passToken.contains("\"")){
-//            passToken.replaceAll("\"","\\\"");
-//        }
-//        credentials = preToken + passToken + postToken;
-//        return credentials;
-//    }
+    public static CxFullCredentials getCxFullCredentials(SensorContext context) throws IOException {
+        String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
+        return getCxFullCredentials(cxCredentialsJson);
+    }
+
 }

@@ -1,23 +1,31 @@
 package com.checkmarx.sonar.sensor;
 
 import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
-import com.checkmarx.sonar.cxportalservice.sast.services.CxSastResultsService;
 import com.checkmarx.sonar.dto.CxFullCredentials;
-import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
 import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
 import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
+import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
-import com.checkmarx.sonar.settings.CxProperties;
+import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.sast.dto.SASTResults;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
@@ -29,16 +37,12 @@ import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_R
  */
 public class CheckmarxSensor implements Sensor {
 
-    private CxLogger logger = new CxLogger(CheckmarxSensor.class);
+    private Logger logger = LoggerFactory.getLogger(CheckmarxSensor.class);
     private PluginVersionProvider versionProvider = new PluginVersionProvider();
-
     private ObjectMapper mapper = new ObjectMapper();
-
-    private static final String CANCEL_MESSAGE = "NOTE: Checkmarx scan is canceled;\n";
-
-    private CxSastResultsService cxSastResultsService = new CxSastResultsService();
     private SastResultsCollector sastResultsCollector = new SastResultsCollector();
-
+    private CxShragaClient shraga = null;
+    private CxFullCredentials cxFullCredentials = null;
 
 
     @Override
@@ -51,36 +55,20 @@ public class CheckmarxSensor implements Sensor {
         logger.info(versionProvider.appendVersionToMsg("Retrieving Checkmarx scan results for current module"));
         logger.info("Getting Checkmarx configuration data from sonar Database.");
 
-        CxFullCredentials cxFullCredentials;
-        String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
-        String cxProject = context.settings().getString(CxProperties.CXPROJECT_KEY);
-        if (cxCredentialsJson == null || cxProject == null) {
-            logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while retrieving Checkmarx settings from sonar Database.\n" + "" +
-                                                                        "Please make sure Checkmarx credentials are configured.", context);
-            return;
-        }
-        if ("".equals(cxCredentialsJson) || "".equals(cxProject)) {
-            logErrorAndNotifyContext(CANCEL_MESSAGE + "Checkmarx settings were not configured.\n Can be configured by admin at: " +
-                    "Project Page > Administration > Checkmarx\n", context);
-            return;
-        }
         try {
-
-            cxFullCredentials = CxFullCredentials.getCxFullCredentials(cxCredentialsJson);
-
-        } catch (Exception e) {
-            logErrorAndNotifyContext(CANCEL_MESSAGE + "Error while parsing credentials: " + e.getMessage(), context);
-            return;
-        }
-
-        try {
-            CxXMLResults cxXMLResults = cxSastResultsService.retrieveScan(cxFullCredentials, cxProject);
+            CxConfigHelper configHelper = new CxConfigHelper(logger);
+            CxScanConfig config = configHelper.resolveSettings(context);
+            shraga = new CxShragaClient(config, logger);
+            shraga.init();
+            SASTResults latestSASTResults = shraga.getLatestSASTResults();
+//            shraga.generateHTMLSummary(latestSASTResults, new OSAResults());
+            CxXMLResults cxXMLResults = convertToXMLResult(latestSASTResults.getRawXMLReport());
             CxReportToSonarReport cxReportToSonarReport = CxResultsAdapter.adaptCxXmlResultsForSonar(cxXMLResults);
 
             sastResultsCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
             notifyComputeSatMeasuresSonarProjectHaveSastResults(context);
 
-            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxFullCredentials);
+            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, CxFullCredentials.getCxFullCredentials(context));
             saveSastForDetailReport(context, sastReportData);
 
             logger.info("Sast results retrieval finished.");
@@ -118,9 +106,12 @@ public class CheckmarxSensor implements Sensor {
         context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue(scanDetails).save();
     }
 
-    private void logErrorAndNotifyContext(String massage, SensorContext context){
-        logger.error(versionProvider.appendVersionToMsg(massage));
-        context.newAnalysisError().message(versionProvider.appendVersionToMsg(massage)).save();
+    private com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cxReport);
+        JAXBContext jaxbContext = JAXBContext.newInstance(com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+        return (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
     }
 
 }
