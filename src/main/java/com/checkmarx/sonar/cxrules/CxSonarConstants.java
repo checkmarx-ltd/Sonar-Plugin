@@ -7,4 +7,6 @@ package com.checkmarx.sonar.cxrules;
 public class CxSonarConstants {
 
     public static final String RULES_REPOSITORY_PREFIX = "checkmarx.rules.";
+    public static final String CX_SONAR_ORIGIN = "Sonar";
+    public static final String CANCEL_MESSAGE = "NOTE: Checkmarx scan is canceled;\n";
 }

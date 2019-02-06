@@ -5,7 +5,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     var credentials;
     var isCxConnectionSuccessful;
-    var sessionId;
     var projectsIn;
     var projectListNoServerConnectionMsg = "Unable to connect to server. Make sure URL and Credentials are valid to see project list.";
     var selectedProjectInSonarDb;
@@ -265,10 +264,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 connectWithInputCredentialsAndGetResponse(credentialsToSend)
                     .then(function (res2) {
                         return getCxProjectsFromServerResponse(res2)
-                    }).then(function (res3) {
-                    deleteSpanSpinner('testConBtn');
-                    return cleanUpAndUpdateUI(res3);
-                }).catch(function (err) {
+                            .then(function (res3) {
+                            deleteSpanSpinner('testConBtn');
+                            return cleanUpAndUpdateUI(res3);
+                        }).catch(function (err) {
+                            console.log(err.message);
+                            terminateFailedTestConnection();
+                        });
+                    }).catch(function (err) {
                     console.log(err.message);
                     terminateFailedTestConnection();
                 });
@@ -674,10 +677,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function getCxProjectsFromServerResponse(response) {
         try {
-            sessionId = response.sessionId;
             isCxConnectionSuccessful = response.isSuccessful;
         } catch (err) {
-            sessionId = "";
             isCxConnectionSuccessful = 'false';
         }
         if (!isCxConnectionSuccessful) {
@@ -685,8 +686,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }
         return window.SonarRequest.postJSON('/api/checkmarx/projects', {
             resolved: false,
-            key: "checkmarx.server.credentials.secured",
-            sessionId: sessionId
+            key: "checkmarx.server.credentials.secured"
         })
     }
 
@@ -694,8 +694,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         window.SonarRequest.postJSON('/api/checkmarx/clean_connection', {
             resolved: false,
             //identify current project
-            component: options.component.key,
-            sessionId: sessionId
+            component: options.component.key
         });
     }
 

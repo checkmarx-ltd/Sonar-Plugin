@@ -19,7 +19,6 @@
  */
 package com.checkmarx.sonar;
 
-import com.checkmarx.sonar.cxportalservice.sast.services.CxConfigSoapService;
 import com.checkmarx.sonar.cxpropfiles.*;
 import com.checkmarx.sonar.cxrules.CxRulesDefinition;
 import com.checkmarx.sonar.measures.ComputeSastMeasures;
@@ -35,7 +34,7 @@ public class CheckmarxPlugin implements Plugin {
   @Override
   public void define(Context context) {
 
-    context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CxConfigSoapService.class, CheckmarxSensor.class,
+    context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CheckmarxSensor.class,
                    CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class, CxRulesDefinition.class);
 
     context.addExtensions(CxCppProfile.class,
