@@ -181,7 +181,6 @@ public class CxConfigRestEndPoint implements WebService {
         List<String> projectNames = new LinkedList<>();
         for (Project project: allProjects) {
             String teamName = shraga.getTeamNameById(project.getTeamId());
-            teamName = teamName.replace("/", "\\");
             projectNames.add(teamName + "\\" + project.getName());
         }
         return convertToJsonArray(projectNames);

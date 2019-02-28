@@ -244,7 +244,7 @@
         <dependency>
             <groupId>com.checkmarx</groupId>
             <artifactId>cx-client-common</artifactId>
-            <version>9.00.0-20190124.175548-18</version>
+            <version>9.00.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
