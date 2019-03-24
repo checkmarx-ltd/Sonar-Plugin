@@ -28,8 +28,8 @@
       <!--</dependencies>-->
       <!--<configuration>-->
       <!--<urls>-->
-      <!--<url>http://10.31.3.196/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>-->
-      <!--<url>http://10.31.3.196/Cxwebinterface/CxWSResolver.asmx?wsdl</url>-->
+      <!--<url>http://10.32.1.91/Cxwebinterface/sdk/CxSDKWebService.asmx?wsdl</url>-->
+      <!--<url>http://10.32.1.91/Cxwebinterface/CxWSResolver.asmx?wsdl</url>-->
       <!--</urls>-->
       <!--<packageSpace>com.checkmarx.soap.client</packageSpace>-->
       <!--</configuration>-->
@@ -165,7 +165,7 @@
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>2.22.2</version>
+      <version>2.28</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
