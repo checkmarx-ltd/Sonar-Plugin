@@ -22,7 +22,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     js3.type = "text/javascript";
     js4.type = "text/javascript";
 
-    js1.src = '/static/checkmarx/encryption/jquery-2.1.3.min.js';
+    js1.src = '/static/checkmarx/encryption/jquery-3.3.1.min.js';
     js2.src = '/static/checkmarx/encryption/aes.js';
     js3.src = '/static/checkmarx/encryption/pbkdf2.js';
     js4.src = '/static/checkmarx/encryption/AesUtil.js'
