@@ -113,9 +113,6 @@ public class CxFullCredentials {
         return cxFullCredentials;
     }
 
-    public static CxFullCredentials getCxFullCredentials(SensorContext context) throws IOException {
-        String cxCredentialsJson = context.settings().getString(CxProperties.CX_CREDENTIALS_KEY);
-        return getCxFullCredentials(cxCredentialsJson);
-    }
+
 
 }

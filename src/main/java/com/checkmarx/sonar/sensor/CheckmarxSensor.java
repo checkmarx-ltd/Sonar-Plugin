@@ -42,7 +42,7 @@ public class CheckmarxSensor implements Sensor {
     private ObjectMapper mapper = new ObjectMapper();
     private SastResultsCollector sastResultsCollector = new SastResultsCollector();
     private CxShragaClient shraga = null;
-    private CxFullCredentials cxFullCredentials = null;
+
 
 
     @Override
@@ -57,7 +57,8 @@ public class CheckmarxSensor implements Sensor {
 
         try {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
-            CxScanConfig config = configHelper.resolveSettings(context);
+            CxFullCredentials cxCredentials = configHelper.getCxFullCredentials(context);
+            CxScanConfig config = configHelper.getScanConfig(cxCredentials, context);
             shraga = new CxShragaClient(config, logger);
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestSASTResults();
@@ -68,7 +69,7 @@ public class CheckmarxSensor implements Sensor {
             sastResultsCollector.collectVulnerabilitiesAndSaveToMetrics(context, cxReportToSonarReport);
             notifyComputeSatMeasuresSonarProjectHaveSastResults(context);
 
-            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, CxFullCredentials.getCxFullCredentials(context));
+            SastReportData sastReportData = CxResultsAdapter.adaptCxXmlResultsToCxDetailReport(cxXMLResults, cxCredentials);
             saveSastForDetailReport(context, sastReportData);
 
             logger.info("Sast results retrieval finished.");

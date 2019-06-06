@@ -654,7 +654,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function connectAndGetResponse(response) {
         try {
-            credentials = response.settings[0].value;
+            credentials = response[0].value;
         } catch (err) {
             credentials = "";
             throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
@@ -707,7 +707,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function getCxRemediationEffortFromSonarResponse(response) {
         try {
-            selectedProjectInSonarDb = response.settings[0].value;
+            selectedProjectInSonarDb = response[0].value;
         } catch (err) {
             selectedProjectInSonarDb = "";
         }
@@ -716,7 +716,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function getCxCredentialsResponse(response) {
         try {
-            securityRemediationEffortInSonarDb = response.settings[0].value;
+            securityRemediationEffortInSonarDb = response[0].value;
         } catch (err) {
             securityRemediationEffortInSonarDb = 0;
         }
@@ -728,28 +728,25 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function getSonarSettingResponse(key) {
-        return window.SonarRequest.getJSON('/api/settings/values', {
-            resolved: false,
-            keys: key,
-            component: options.component.key
+        return window.SonarRequest.getJSON('/api/properties', {
+            id: key,
+            resource: options.component.key
         })
     }
 
     function saveCxProject(cxProject) {
-        return window.SonarRequest.post('/api/settings/set', {
-            resolved: false,
-            key: "checkmarx.server.project_name.secured",
+        return window.SonarRequest.post('/api/properties', {
+            id: "checkmarx.server.project_name.secured",
             value: cxProject,
-            component: options.component.key
+            resource: options.component.key
         })
     }
 
     function saveCxRemediationEffort(remediation) {
-        return window.SonarRequest.post('/api/settings/set', {
-            resolved: false,
-            key: "checkmarx.server.remediation",
+        return window.SonarRequest.post('/api/properties', {
+            id: "checkmarx.server.remediation",
             value: remediation,
-            component: options.component.key
+            resource: options.component.key
         })
     }
 
@@ -764,11 +761,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             cxCredentialsEncrypted = credentials;
         }
 
-        return window.SonarRequest.post('/api/settings/set', {
-            resolved: false,
-            key: "checkmarx.server.credentials.secured",
+        return window.SonarRequest.post('/api/properties', {
+            id: "checkmarx.server.credentials.secured",
             value: cxCredentialsEncrypted,
-            component: options.component.key
+            resource: options.component.key
         })
     }
 
