@@ -1,11 +1,11 @@
 package com.checkmarx.sonar.dto;
 
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
-import com.checkmarx.sonar.settings.CxProperties;
+import com.checkmarx.sonar.sensor.encryption.SecretKeyStore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.sonar.api.batch.sensor.SensorContext;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 
 /**
@@ -20,16 +20,6 @@ public class CxFullCredentials {
     private String cxUsername;
     @JsonProperty("cxPassword")
     private String cxPassword;
-
-    private static final String IV = "F27D5C9927726BCEFE7510B1BDD3D137";
-    private static final String SALT = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
-    private static final int KEY_SIZE = 128;
-    private static final int ITERATION_COUNT = 10000;
-    private static final String PASSPHRASE = "checkmarx.server.credentials.secured";
-
-
-
-
 
     public CxFullCredentials() {
     }
@@ -87,9 +77,11 @@ public class CxFullCredentials {
     }
 
     public static CxFullCredentials getCxFullCredentials(String credentialsJson) throws IOException {
+        SecretKeyStore keyStore = new SecretKeyStore();
+        SecretKey key = keyStore.getSecretKey();
 
-        AesUtil util = new AesUtil(KEY_SIZE, ITERATION_COUNT);
-        credentialsJson = util.decrypt(SALT, IV, PASSPHRASE, credentialsJson);
+        AesUtil util = new AesUtil();
+        credentialsJson = util.decrypt(key, SecretKeyStore.IV, credentialsJson);
 
         CxFullCredentials cxFullCredentials = transformKeepSpecialCharacters(credentialsJson);
 
