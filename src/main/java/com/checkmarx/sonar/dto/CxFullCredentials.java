@@ -1,12 +1,6 @@
 package com.checkmarx.sonar.dto;
 
-import com.checkmarx.sonar.sensor.encryption.AesUtil;
-import com.checkmarx.sonar.sensor.encryption.SecretKeyStore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.crypto.SecretKey;
-import java.io.IOException;
 
 /**
  * Created by: zoharby.
@@ -28,7 +22,6 @@ public class CxFullCredentials {
         this.cxServerUrl = cxServerUrl;
         this.cxUsername = cxUser;
         this.cxPassword = password;
-
     }
 
     public void setCxServerUrl(String cxServerUrl) {
@@ -75,36 +68,4 @@ public class CxFullCredentials {
         result = 31 * result + getCxPassword().hashCode();
         return result;
     }
-
-    public static CxFullCredentials getCxFullCredentials(String credentialsJson) throws IOException {
-        SecretKeyStore keyStore = new SecretKeyStore();
-        SecretKey key = keyStore.getSecretKey();
-
-        AesUtil util = new AesUtil();
-        credentialsJson = util.decrypt(key, SecretKeyStore.IV, credentialsJson);
-
-        CxFullCredentials cxFullCredentials = transformKeepSpecialCharacters(credentialsJson);
-
-        return cxFullCredentials;
-    }
-
-    private static CxFullCredentials transformKeepSpecialCharacters(String credentialsJson) throws IOException {
-        CxFullCredentials cxFullCredentials;
-        ObjectMapper mapper = new ObjectMapper();
-
-        String passwordOrig = new String(credentialsJson.substring(credentialsJson.lastIndexOf(": \"")+3,credentialsJson.lastIndexOf("\"")));
-        credentialsJson = credentialsJson.replace(passwordOrig,"aaa");
-
-        String temp = credentialsJson.substring(credentialsJson.indexOf("cxUsername") + 13);
-        String usernameOrig = temp.substring(1,temp.indexOf("\","));
-        String usernameTemp = "aaa";
-        credentialsJson = credentialsJson.replace(usernameOrig,usernameTemp);
-        cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
-        cxFullCredentials.setCxPassword(passwordOrig);
-        cxFullCredentials.setCxUsername(usernameOrig);
-        return cxFullCredentials;
-    }
-
-
-
 }

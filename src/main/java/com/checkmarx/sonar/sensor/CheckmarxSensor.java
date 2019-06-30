@@ -59,6 +59,8 @@ public class CheckmarxSensor implements Sensor {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
             CxFullCredentials cxCredentials = configHelper.getCxFullCredentials(context);
             CxScanConfig config = configHelper.getScanConfig(cxCredentials, context);
+
+            logger.info("Connecting to {}", config.getUrl());
             shraga = new CxShragaClient(config, logger);
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestSASTResults();

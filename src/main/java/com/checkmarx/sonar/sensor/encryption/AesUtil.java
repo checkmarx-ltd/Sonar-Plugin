@@ -8,7 +8,6 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -19,6 +18,8 @@ import java.security.spec.KeySpec;
 
 // TODO: Implement 256-bit version like: http://securejava.wordpress.com/2012/10/25/aes-256/
 public class AesUtil {
+    public static final int IV_LENGTH_IN_BYTES = 16;
+
     private static final String KEY_FACTORY_TYPE = "PBKDF2WithHmacSHA1";
 
     private final Cipher cipher;

@@ -22,8 +22,6 @@ public class SecretKeyStore {
 
     private static final char[] PASSWORD = "RksdGtdBvkJmetJ-ieQX95FtN8Ozac".toCharArray();
 
-    public static final String IV = "F27D5C9927726BCEFE7510B1BDD3D137";
-
     private static final int KEY_SIZE = 128;
 
     private static final String KEYSTORE_FILENAME = "keystore.bin";
