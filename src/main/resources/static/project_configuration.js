@@ -9,7 +9,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     var selectedProjectInSonarDb;
     var securityRemediationEffortInSonarDb;
 
-    var cxConnectionConfig = {
+    var cxCredentials = {
         cxServerUrl: null,
         cxUsername: null,
         cxPassword: null    // Becomes non-null only if the user updates the password input.
@@ -52,8 +52,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
             getCxProjectFromSonarResponse()
             .then(getRemediationEffort)
-            .then(getCxServerUrl)
-            .then(getCxUsername)
+            .then(getCredentials)
             .then(connectToCxWithCredentials)
             .then(getCxProjectsFromServerResponse)
             .catch(function (err) {
@@ -141,8 +140,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /*********************Inputs*******************/
 
     function createCredentialsForms() {
-        createInput('Server Url', 'text', 'serverUrl', cxConnectionConfig.cxServerUrl);
-        createInput('Username', 'text', 'username', cxConnectionConfig.cxUsername);
+        createInput('Server Url', 'text', 'serverUrl', cxCredentials.cxServerUrl);
+        createInput('Username', 'text', 'username', cxCredentials.cxUsername);
         createPasswordInput();
         createUrlDescription();
     }
@@ -187,7 +186,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var passwordInput = $('#' + ElementIds.PasswordInput);
 
         // If we have a saved username, assume that we have a saved password as well.
-        var hasSavedPassword = !!cxConnectionConfig.cxUsername;
+        var hasSavedPassword = !!cxCredentials.cxUsername;
         if (hasSavedPassword) {
             passwordInput
                 .prop('placeholder', '<click to change>')
@@ -247,9 +246,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         createSpanSpinner('testConBtn');
 
         try {
-            var connectionConfig = getValidatedConnectionConfig();
-            if (connectionConfig != "") {
-                connectWithInputCredentialsAndGetResponse(connectionConfig)
+            var credentials = getValidatedCredentials();
+            if (credentials != "") {
+                connectWithInputCredentialsAndGetResponse(credentials)
                     .then(function (res2) {
                         return getCxProjectsFromServerResponse(res2)
                             .then(function (res3) {
@@ -389,14 +388,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         clearButtonsAndProjectListMsgs();
         createSpanSpinner('saveBtn');
 
-        var connnectionConfig = getValidatedConnectionConfig();
+        var connnectionConfig = getValidatedCredentials();
         var projectToSave = getAndValidateProjectToSave();
         var remediationEffortToSave = getAndValidateRemediationEffortSave();
 
         if (connnectionConfig != "" && projectToSave != "" && remediationEffortToSave != "") {
             saveCxProject(projectToSave).then(function () {
                 selectedProjectInSonarDb = projectToSave;
-                return saveConnectionConfig(connnectionConfig);
+                return saveCredentials(connnectionConfig);
             }).then(function () {
                 securityRemediationEffortInSonarDb = remediationEffortToSave.trim();
                 return saveCxRemediationEffort(remediationEffortToSave);
@@ -508,7 +507,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     /************************Validations and Retrievals*****************************************************************/
 
     //returns empty string if credentials are not valid
-    function getValidatedConnectionConfig() {
+    function getValidatedCredentials() {
         var server = document.getElementById('serverUrl');
         var serverValue = server.value.trim();
         var isServerValid = validateUrl('serverUrl', serverValue);
@@ -632,37 +631,16 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /*****************Checkmarx server***************/
 
-    function getCxServerUrl() {
-        return getSonarSettingResponse(SettingKeys.ServerUrl)
-            .then(function(response) {
-                cxConnectionConfig.cxServerUrl = getSettingValue(response, '');
-            });
-    }
-
-    function getCxUsername() {
-        return getSonarSettingResponse(SettingKeys.Username)
-            .then(function(response) {
-                cxConnectionConfig.cxUsername = getSettingValue(response, '');
-            });
-    }
-
     function connectWithInputCredentialsAndGetResponse(inserted) {
-        cxConnectionConfig = inserted;
+        cxCredentials = inserted;
         return connectToCxWithCredentials();
     }
 
     function connectToCxWithCredentials() {
         return window.SonarRequest.postJSON('/api/checkmarx/connect', {
             component: options.component.key,
-            credentials: JSON.stringify(cxConnectionConfig)
+            credentials: JSON.stringify(cxCredentials)
         })
-    }
-
-    function updatePassword(newValue) {
-        return window.SonarRequest.postJSON('/api/checkmarx/password', {
-            component: options.component.key,
-            password: newValue
-        });
     }
 
     function getCxProjectsFromServerResponse(response) {
@@ -719,18 +697,21 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         return updateSonarSetting(SettingKeys.RemediationEffort, remediation);
     }
 
-    function saveConnectionConfig(config) {
-        var requestsToSend = [
-            updateSonarSetting(SettingKeys.ServerUrl, config.cxServerUrl),
-            updateSonarSetting(SettingKeys.Username, config.cxUsername)
-        ];
+    function getCredentials() {
+        return window.SonarRequest.getJSON('/api/checkmarx/credentials', {
+            component: options.component.key
+        })
+        .then(function(response) {
+            cxCredentials.cxServerUrl = response.cxServerUrl || '';
+            cxCredentials.cxUsername = response.cxUsername || '';
+        });
+    }
 
-        // Send the update password request only if user has changed the password.
-        if (config.cxPassword !== null) {
-            requestsToSend.push(updatePassword(config.cxPassword));
-        }
-
-        return Promise.all(requestsToSend);
+    function saveCredentials(credentials) {
+        return window.SonarRequest.postJSON('/api/checkmarx/update_credentials', {
+            component: options.component.key, 
+            credentials: JSON.stringify(credentials)
+        });
     }
 
     function updateSonarSetting(id, newValue) {

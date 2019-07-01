@@ -7,54 +7,45 @@ import com.checkmarx.sonar.sensor.dto.ProjectDetails;
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
 import com.checkmarx.sonar.sensor.encryption.SecretKeyStore;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
+import com.checkmarx.sonar.settings.CredentialMigration;
 import com.checkmarx.sonar.settings.CxProperties;
+import com.checkmarx.sonar.settings.PropertyApiClient;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.config.Configuration;
 
 import javax.crypto.SecretKey;
-import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class CxConfigHelper {
-    private static final String SONAR_HOST_URL = "sonar.host.url";
-    private static final String SONAR_PROJECT_KEY = "sonar.projectKey";
-    private static final String SONAR_LOGIN_KEY = "sonarLogin";
-    private static final String SONAR_PASSWORD_KEY = "sonarPassword";
+    public static final String SONAR_HOST_URL = "sonar.host.url";
+    public static final String SONAR_PROJECT_KEY = "sonar.projectKey";
+    public static final String SONAR_LOGIN_KEY = "sonarLogin";
+    public static final String SONAR_PASSWORD_KEY = "sonarPassword";
 
     private static final String VALUE = "value";
 
     private static final String ENCODING = StandardCharsets.UTF_8.name();
-    private static final String PROPERTIES_API_PATH = "api/properties";
+    public static final String PROPERTIES_API_PATH = "api/properties";
 
     private Logger log;
 
@@ -68,18 +59,51 @@ public class CxConfigHelper {
 
     public CxFullCredentials getCxFullCredentials(SensorContext context) {
         try {
-            String serverUrl = getSonarProperty(context, CxProperties.SERVER_URL_KEY);
+            PropertyApiClient client = new PropertyApiClient(context, log);
 
-            String username = getSonarProperty(context, CxProperties.USERNAME_KEY);
+            CredentialMigration migration = new CredentialMigration(client, log);
+            migration.ensureLatestFormat();
 
-            String encryptedPassword = getSonarProperty(context, CxProperties.PASSWORD_KEY);
-            String password = decrypt(encryptedPassword);
+            CxFullCredentials credentials = null;
+            String credentialsJson = client.getProperty(CxProperties.CREDENTIALS_KEY);
 
-            return new CxFullCredentials(serverUrl, username, password);
+            if (StringUtils.isNotEmpty(credentialsJson)) {
+                credentials = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
+                String plaintextPassword = decrypt(credentials.getCxPassword());
+                credentials.setCxPassword(plaintextPassword);
+            } else {
+                logErrorAndNotifyContext(CxSonarConstants.CANCEL_MESSAGE + "Error while retrieving Checkmarx settings from Sonar database.\n" +
+                        "Please make sure Checkmarx credentials are configured. Can be configured by admin at: " +
+                        "Project Page > Administration > Checkmarx\n", context);
+            }
+
+            return credentials;
         } catch (IOException e) {
-            logErrorAndNotifyContext(CxSonarConstants.CANCEL_MESSAGE + "Error while parsing credentials: " + e.getMessage(), context);
+            logErrorAndNotifyContext(CxSonarConstants.CANCEL_MESSAGE + "Error while getting credentials: " + e.getMessage(), context);
             return null;
         }
+    }
+
+    public CxFullCredentials getCredentialsWithoutPassword(RestEndpointContext context) throws IOException {
+        PropertyApiClient client = new PropertyApiClient(context, log);
+        CredentialMigration migration = new CredentialMigration(client, log);
+        migration.ensureLatestFormat();
+
+        CxFullCredentials result = getStoredCredentials(client);
+        result.setCxPassword(null);
+
+        return result;
+    }
+
+    private CxFullCredentials getStoredCredentials(PropertyApiClient client) throws IOException {
+        CxFullCredentials result;
+        String credentialsJson = client.getProperty(CxProperties.CREDENTIALS_KEY);
+        if (StringUtils.isNotEmpty(credentialsJson)) {
+            result = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
+        } else {
+            result = new CxFullCredentials();
+        }
+        return result;
     }
 
     private String getSonarProperty(SensorContext context, String propertyName) {
@@ -127,8 +151,8 @@ public class CxConfigHelper {
         return scanConfig;
     }
 
-    private String getPropertyValue(String cxProject) {
-        return cxProject.substring(cxProject.indexOf(VALUE) + 8, cxProject.length() - 3);
+    private String getPropertyValue(String responseJson) {
+        return responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 3);
     }
 
     private ProjectDetails getProjectAndTeamDetails(String cxProject, CxFullCredentials cxFullCredentials) throws IOException {
@@ -140,9 +164,9 @@ public class CxConfigHelper {
         return projectDetails;
     }
 
-    private void logErrorAndNotifyContext(String massage, SensorContext context) {
-        log.error(versionProvider.appendVersionToMsg(massage));
-        context.newAnalysisError().message(versionProvider.appendVersionToMsg(massage)).save();
+    private void logErrorAndNotifyContext(String message, SensorContext context) {
+        log.error(versionProvider.appendVersionToMsg(message));
+        context.newAnalysisError().message(versionProvider.appendVersionToMsg(message)).save();
     }
 
     private String getSonarPropertyHttp(String propertyName, Configuration config) {
@@ -151,7 +175,7 @@ public class CxConfigHelper {
 
         String propertyHttpURL = getPropertyUrl(sonarURL, propertyName, projectName);
 
-        HttpResponse generateTokenResponse = null;
+        HttpResponse response = null;
         HttpClient client = HttpClientBuilder.create().build();
 
         try {
@@ -164,18 +188,18 @@ public class CxConfigHelper {
             String authHeader = "Basic " + new String(encodedAuth);
             request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
-            generateTokenResponse = client.execute(request);
+            response = client.execute(request);
 
-            if (isOk(generateTokenResponse)) {
-                return createStringFromResponse(generateTokenResponse);
+            if (isOk(response)) {
+                return createStringFromResponse(response);
             } else {
                 return "";
             }
         } catch (IOException e) {
             return null;
         } finally {
-            if (generateTokenResponse != null) {
-                HttpClientUtils.closeQuietly(generateTokenResponse);
+            if (response != null) {
+                HttpClientUtils.closeQuietly(response);
             }
         }
     }
@@ -224,39 +248,34 @@ public class CxConfigHelper {
     }
 
     public String getPassword(RestEndpointContext context) throws IOException {
-        String requestUrl = getPropertyUrl(context.getSonarBaseUrl(), CxProperties.PASSWORD_KEY, context.getComponentKey());
-        HttpUriRequest request = new HttpGet(requestUrl);
-        HttpResponse response = getResponse(context, request);
+        PropertyApiClient client = new PropertyApiClient(context, log);
+        CxFullCredentials credentials = getStoredCredentials(client);
 
-        JsonNode root = objectMapper.readTree(response.getEntity().getContent());
-        String encryptedPassword = root.at("/0/value").textValue();
-
-        return decrypt(encryptedPassword);
-    }
-
-    public void updatePassword(RestEndpointContext context, String newValue) throws IOException {
-        String requestUrl = String.format("%s/%s", context.getSonarBaseUrl(), PROPERTIES_API_PATH);
-        HttpPost request = new HttpPost(requestUrl);
-
-        String encryptedPassword = encrypt(newValue);
-        NameValuePair[] params = new NameValuePair[]{
-                new BasicNameValuePair("id", CxProperties.PASSWORD_KEY),
-                new BasicNameValuePair("resource", context.getComponentKey()),
-                new BasicNameValuePair("value", encryptedPassword),
-        };
-        UrlEncodedFormEntity body = new UrlEncodedFormEntity(Arrays.asList(params));
-        request.setEntity(body);
-
-        HttpResponse response = getResponse(context, request);
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != Response.Status.NO_CONTENT.getStatusCode()) {
-            String responseString = createStringFromResponse(response);
-            throw new IOException(String.format("Error updating password. Response status: %d, response: %s",
-                    statusCode, responseString));
+        String plaintextPassword = null;
+        String encryptedPassword = credentials.getCxPassword();
+        if (StringUtils.isNotEmpty(encryptedPassword)) {
+            plaintextPassword = decrypt(encryptedPassword);
         }
+        return plaintextPassword;
     }
 
-    private String getPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {
+    public void updateCredentials(RestEndpointContext context, CxFullCredentials credentials) throws IOException {
+        PropertyApiClient client = new PropertyApiClient(context, log);
+        CxFullCredentials storedCredentials = getStoredCredentials(client);
+        storedCredentials.setCxServerUrl(credentials.getCxServerUrl());
+        storedCredentials.setCxUsername(credentials.getCxUsername());
+
+        if (StringUtils.isNotEmpty(credentials.getCxPassword())) {
+            String encryptedPassword = encrypt(credentials.getCxPassword());
+            storedCredentials.setCxPassword(encryptedPassword);
+        }
+
+        String credentialsJson = objectMapper.writeValueAsString(storedCredentials);
+
+        client.setProperty(CxProperties.CREDENTIALS_KEY, credentialsJson);
+    }
+
+    public static String getPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {
         String result = null;
         try {
             result = String.format("%s/%s?id=%s&resource=%s",
@@ -264,28 +283,12 @@ public class CxConfigHelper {
                     PROPERTIES_API_PATH,
                     URLEncoder.encode(propertyName, ENCODING),
                     URLEncoder.encode(componentKey, ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error getting property URL.", e);
+        } catch (UnsupportedEncodingException ignored) {
         }
         return result;
     }
 
-    private HttpResponse getResponse(RestEndpointContext context, HttpUriRequest request) throws IOException {
-        request.setHeaders(context.getRequiredHeaders());
-
-        CookieStore cookieStore = new BasicCookieStore();
-        for (Cookie cookie : context.getRequiredCookies()) {
-            cookieStore.addCookie(cookie);
-        }
-
-        HttpClient client = HttpClientBuilder.create()
-                .setDefaultCookieStore(cookieStore)
-                .build();
-
-        return client.execute(request);
-    }
-
-    private String encrypt(String plaintext) throws IOException {
+    public static String encrypt(String plaintext) throws IOException {
         SecretKeyStore keyStore = new SecretKeyStore();
         SecretKey key = keyStore.getSecretKey();
         AesUtil util = new AesUtil();

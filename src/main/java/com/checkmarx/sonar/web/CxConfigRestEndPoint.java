@@ -21,7 +21,9 @@ import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -34,12 +36,16 @@ import java.util.List;
 public class CxConfigRestEndPoint implements WebService {
 
     private static final String COMPONENT_KEY_PARAM = "component";
+    private static final String CREDENTIALS_PARAM = "credentials";
+
     private static final String IS_SUCCESSFUL = "isSuccessful";
     private static final String ERROR_MESSAGE = "errorMsg";
 
     private Logger logger = LoggerFactory.getLogger(CxConfigRestEndPoint.class);
 
     private CxShragaClient shraga;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void define(Context context) {
@@ -54,15 +60,8 @@ public class CxConfigRestEndPoint implements WebService {
                     @Override
                     public void handle(Request request, Response response) {
                         try {
-                            CxFullCredentials cxFullCredentials;
-                            String credentialsJson = request.getParam("credentials").getValue();
-                            if (StringUtils.isNotEmpty(credentialsJson)) {
-                                ObjectMapper mapper = new ObjectMapper();
-                                cxFullCredentials = mapper.readValue(credentialsJson, CxFullCredentials.class);
-                                setPasswordIfMissing(cxFullCredentials, request);
-                            } else {
-                                throw new IOException("No credentials provided");
-                            }
+                            CxFullCredentials cxFullCredentials = getCredentialsFromRequest(request);
+                            setPasswordIfMissing(cxFullCredentials, request);
 
                             validateCredentials(cxFullCredentials);
 
@@ -76,12 +75,11 @@ public class CxConfigRestEndPoint implements WebService {
                             // read request parameters and generates response output
                             sendSuccess(response);
                         } catch (Exception e) {
-                            logger.error("Login failed due to Exception: " + e.getMessage());
-                            sendError(response, e.getMessage());
+                            sendError(response, "Login failed.", e);
                         }
                     }
                 });
-        testConnection.createParam("credentials").setDescription("cx credentials").setRequired(true);
+        testConnection.createParam(CREDENTIALS_PARAM).setDescription("cx credentials").setRequired(true);
         testConnection.createParam(COMPONENT_KEY_PARAM).setDescription("Current component key").setRequired(true);
 
         controller.createAction("projects")
@@ -128,36 +126,70 @@ public class CxConfigRestEndPoint implements WebService {
                             sendSuccess(response);
 
                         } catch (Exception e) {
-                            logger.error("Logging out of Checkmarx failed due to Exception: " + e.getMessage());
-                            sendError(response, e.getMessage());
+                            sendError(response, "Logging out of Checkmarx failed.", e);
                         }
                     }
                 });
 
-        NewAction updatePassword = controller.createAction("password")
+        NewAction getCredentials = controller.createAction("credentials")
+                .setInternal(true)
+                .setHandler(this::getCredentials);
+        getCredentials.createParam(COMPONENT_KEY_PARAM).setRequired(true);
+
+        // Sonar doesn't allow to use the same action key in GET and POST.
+        NewAction updateCredentials = controller.createAction("update_credentials")
                 .setInternal(true)
                 .setPost(true)
-                .setHandler(this::updatePassword);
-        updatePassword.createParam("password").setRequired(true);
-        updatePassword.createParam(COMPONENT_KEY_PARAM).setRequired(true);
+                .setHandler(this::updateCredentials);
+        updateCredentials.createParam(COMPONENT_KEY_PARAM).setRequired(true);
+        updateCredentials.createParam(CREDENTIALS_PARAM).setRequired(true);
 
         //apply changes
         controller.done();
     }
 
-    private void updatePassword(Request request, Response response) {
+    private void getCredentials(Request request, Response response) {
         try {
             RestEndpointContext context = getRestEndpointContext(request);
 
             CxConfigHelper configHelper = new CxConfigHelper(logger);
-            configHelper.updatePassword(context, request.getParam("password").getValue());
+            CxFullCredentials credentials = configHelper.getCredentialsWithoutPassword(context);
+
+            byte[] jsonBytes = objectMapper.writeValueAsBytes(credentials);
+
+            OutputStream output = response.stream()
+                    .setMediaType(MediaType.APPLICATION_JSON)
+                    .output();
+            output.write(jsonBytes);
+            output.close();
+        } catch (Exception e) {
+            sendError(response, "Error getting credentials.", e);
+        }
+    }
+
+    private void updateCredentials(Request request, Response response) {
+        try {
+            CxConfigHelper configHelper = new CxConfigHelper(logger);
+
+            RestEndpointContext context = getRestEndpointContext(request);
+            CxFullCredentials credentials = getCredentialsFromRequest(request);
+            configHelper.updateCredentials(context, credentials);
 
             sendSuccess(response);
         } catch (Exception e) {
-            final String MESSAGE = "Error updating password.";
-            logger.error(MESSAGE, e);
-            sendError(response, MESSAGE);
+            sendError(response, "Error updating connection config.", e);
         }
+    }
+
+    private CxFullCredentials getCredentialsFromRequest(Request request) throws IOException {
+        CxFullCredentials result;
+        String credentialsJson = request.getParam(CREDENTIALS_PARAM).getValue();
+        if (StringUtils.isNotEmpty(credentialsJson)) {
+            result = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
+        } else {
+            throw new IOException("No credentials provided");
+        }
+        return result;
     }
 
     private void sendSuccess(Response response) {
@@ -168,7 +200,9 @@ public class CxConfigRestEndPoint implements WebService {
                 .close();
     }
 
-    private void sendError(Response response, String message) {
+    private void sendError(Response response, String message, Exception exception) {
+        logger.error(message, exception);
+
         response.newJsonWriter()
                 .beginObject()
                 .prop(IS_SUCCESSFUL, false)
@@ -177,16 +211,16 @@ public class CxConfigRestEndPoint implements WebService {
                 .close();
     }
 
-    private void setPasswordIfMissing(CxFullCredentials cxFullCredentials, Request request) throws URISyntaxException, IOException {
+    private void setPasswordIfMissing(CxFullCredentials credentialsFromRequest, Request request) throws URISyntaxException, IOException {
         // If user hasn't changed the password, the password is null in cxFullCredentials.
         // However, we need the password to test connection => get the password from config.
-        if (cxFullCredentials != null && cxFullCredentials.getCxPassword() == null) {
+        if (credentialsFromRequest != null && credentialsFromRequest.getCxPassword() == null) {
             RestEndpointContext context = getRestEndpointContext(request);
 
             CxConfigHelper configHelper = new CxConfigHelper(logger);
             String password = configHelper.getPassword(context);
 
-            cxFullCredentials.setCxPassword(password);
+            credentialsFromRequest.setCxPassword(password);
         }
     }
 

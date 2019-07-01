@@ -15,9 +15,7 @@ public class CxProperties {
     public static final String CXPROJECT_KEY = "checkmarx.server.project_name.secured";
     public static final String CX_REMEDIATION_EFFORT = "checkmarx.server.remediation";
 
-    public static final String SERVER_URL_KEY = "checkmarx.server.url.secured";
-    public static final String USERNAME_KEY = "checkmarx.server.username.secured";
-    public static final String PASSWORD_KEY = "checkmarx.server.password.secured";
+    public static final String CREDENTIALS_KEY = "checkmarx.server.credentials.v2.secured";
 
     public CxProperties() {
     }
@@ -26,10 +24,7 @@ public class CxProperties {
         PropertyDefinition[] properties = new PropertyDefinition[]{
                 defineProperty(CXPROJECT_KEY, "cx_project", "cx_project"),
                 defineProperty(CX_REMEDIATION_EFFORT, "cx_remediation_effort", "remediation per checkmarx vulnerability"),
-
-                defineProperty(SERVER_URL_KEY, "Server URL", "Server URL"),
-                defineProperty(USERNAME_KEY, "Username", "Username"),
-                defineProperty(PASSWORD_KEY, "Password", "Password")
+                defineProperty(CREDENTIALS_KEY, "Credentials", "Parameters required to connect to Checkmarx server")
         };
         return Arrays.asList(properties);
     }
