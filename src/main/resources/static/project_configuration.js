@@ -22,10 +22,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     js3.type = "text/javascript";
     js4.type = "text/javascript";
 
-    js1.src = '/static/checkmarx/encryption/jquery-3.3.1.min.js';
-    js2.src = '/static/checkmarx/encryption/aes.js';
-    js3.src = '/static/checkmarx/encryption/pbkdf2.js';
-    js4.src = '/static/checkmarx/encryption/AesUtil.js'
+    js1.src = getContextPath() + '/static/checkmarx/encryption/jquery-3.3.1.min.js';
+    js2.src = getContextPath() + '/static/checkmarx/encryption/aes.js';
+    js3.src = getContextPath() + '/static/checkmarx/encryption/pbkdf2.js';
+    js4.src = getContextPath() + '/static/checkmarx/encryption/AesUtil.js'
 
     document.body.appendChild(js1);
     document.body.appendChild(js2);
@@ -42,11 +42,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
 
     if (isDisplayed) {
-
         loadCssFile();
         //clear page in case where the page was loaded, redirected and then redirected back
         options.el.textContent = '';
-
 
         var spanSpinner = getConnectingSpinner();
         options.el.appendChild(spanSpinner);
@@ -83,7 +81,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     /*********************pre loading page************************************************/
-
 
     function loadCssFile() {
         var fileRef = document.createElement("link");
@@ -142,7 +139,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         configurationPage.appendChild(div);
     }
 
-
     /*********************Inputs*******************/
 
     function createCredentialsForms() {
@@ -152,24 +148,24 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 var aesUtil = new AesUtil(keySize, iterationCount);
                 tempCred = aesUtil.decrypt(salt, iv, passPhrase, credentials);
                 tempCred = tempCred.toString(CryptoJS.enc.Utf8);
-            }else{
+            } else {
                 tempCred = credentials;
             }
 
             //support domain user
             var temp = tempCred.substring(tempCred.indexOf("cxUsername") + 13);
-            var usernameOrig = temp.substring(1,temp.indexOf("\","));
+            var usernameOrig = temp.substring(1, temp.indexOf("\","));
             var usernameTemp = "aaa";
-            tempCred = tempCred.replace(usernameOrig,usernameTemp);
+            tempCred = tempCred.replace(usernameOrig, usernameTemp);
 
             // support special characters in pass
             var passToken = tempCred.substring(tempCred.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, tempCred.indexOf("\"}"));
-            tempCred = tempCred.replace(passToken , 'XXX');
+            tempCred = tempCred.replace(passToken, 'XXX');
 
             var credentialsJson = JSON.parse(tempCred);
 
-            credentialsJson.cxUsername=usernameOrig
-            credentialsJson.cxPassword=passToken;
+            credentialsJson.cxUsername = usernameOrig
+            credentialsJson.cxPassword = passToken;
 
             createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
             createInput('Username', 'text', 'username', credentialsJson.cxUsername);
@@ -265,12 +261,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                     .then(function (res2) {
                         return getCxProjectsFromServerResponse(res2)
                             .then(function (res3) {
-                            deleteSpanSpinner('testConBtn');
-                            return cleanUpAndUpdateUI(res3);
-                        }).catch(function (err) {
-                            console.log(err.message);
-                            terminateFailedTestConnection();
-                        });
+                                deleteSpanSpinner('testConBtn');
+                                return cleanUpAndUpdateUI(res3);
+                            }).catch(function (err) {
+                                console.log(err.message);
+                                terminateFailedTestConnection();
+                            });
                     }).catch(function (err) {
                     console.log(err.message);
                     terminateFailedTestConnection();
@@ -301,7 +297,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         } catch (ignored) {
         }
     }
-
 
     function cleanUpAndUpdateUI(response) {
         try {
@@ -348,7 +343,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         configurationPage.appendChild(paragraph);
     }
 
-
     function createOptions() {
         if (isCxConnectionSuccessful == false || projectsIn == "" || projectsIn == null) {
             return '<option value=\"">' + projectListNoServerConnectionMsg + '</option>';
@@ -375,7 +369,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }
     }
 
-
     /********************************Save***************************/
 
     function createSaveButton() {
@@ -398,7 +391,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function save() {
-
         clearButtonsAndProjectListMsgs();
         createSpanSpinner('saveBtn');
 
@@ -431,7 +423,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             deleteSpanSpinner('saveBtn');
         }
     }
-
 
     /*********************Create\Delete Sub Elements*****************************************************************/
 
@@ -516,7 +507,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
         eraseFailureMsg('projectForm');
     }
-
 
     /************************Validations and Retrievals*****************************************************************/
 
@@ -617,7 +607,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             return credentials;
             //var credentialsJsonTemp = JSON.parse(credentials);
             //return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
-        }else {
+        } else {
             try {
                 var aesUtil = new AesUtil(keySize, iterationCount);
                 cxCredentialsTemp = "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
@@ -626,13 +616,19 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             } catch (err) {
                 // not encrypted
                 return credentials;
-        }
-
+            }
         }
     }
 
-    function isURL(str) {
+    function getContextPath() {
+        let ctxPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
+            return "";
+        }
+        return ctxPath;
+    }
 
+    function isURL(str) {
         //test protocol
         if (!/^(f|ht)tps?:\/\//i.test(str)) {
             return false;
@@ -697,7 +693,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             component: options.component.key
         });
     }
-
 
     /***********sonar DB***************/
 

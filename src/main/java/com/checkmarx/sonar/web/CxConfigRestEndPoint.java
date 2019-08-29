@@ -2,7 +2,6 @@ package com.checkmarx.sonar.web;
 
 import com.checkmarx.sonar.cxrules.CxSonarConstants;
 import com.checkmarx.sonar.dto.CxFullCredentials;
-import com.checkmarx.sonar.logger.CxLogger;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sast.dto.Project;
@@ -13,12 +12,12 @@ import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by: Zoharby.
@@ -26,12 +25,11 @@ import java.util.regex.Pattern;
  */
 public class CxConfigRestEndPoint implements WebService {
 
-    private Logger logger = LoggerFactory.getLogger(CxConfigRestEndPoint.class);
+    private static final Logger logger = LoggerFactory.getLogger(CxConfigRestEndPoint.class);
     private CxShragaClient shraga;
 
     @Override
     public void define(Context context) {
-
         NewController controller = context.createController("api/checkmarx");
         controller.setDescription("Web service example");
         controller.createAction("connect")
@@ -45,9 +43,9 @@ public class CxConfigRestEndPoint implements WebService {
                         CxFullCredentials cxFullCredentials = null;
                         try {
                             String credentialsJson = request.getParam("credentials").getValue();
-                            if(credentialsJson != null && !credentialsJson.equals("")) {
+                            if (credentialsJson != null && !credentialsJson.equals("")) {
                                 cxFullCredentials = CxFullCredentials.getCxFullCredentials(credentialsJson);
-                            }else {
+                            } else {
                                 throw new IOException("No credentials provided");
                             }
                             validateCredentials(cxFullCredentials);
@@ -75,9 +73,6 @@ public class CxConfigRestEndPoint implements WebService {
                     }
                 })
                 .createParam("credentials").setDescription("cx credentials").setRequired(true);
-
-
-
 
         controller.createAction("projects")
                 .setPost(true)
@@ -146,7 +141,7 @@ public class CxConfigRestEndPoint implements WebService {
     public String getTeamId(String teamName, CxFullCredentials cxFullCredentials) throws IOException {
         String teamId;
         try {
-            if(shraga == null){
+            if (shraga == null) {
                 shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(), cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, false, logger);
             }
             teamId = shraga.getTeamIdByName(teamName);
@@ -155,31 +150,29 @@ public class CxConfigRestEndPoint implements WebService {
         } catch (IOException e) {
             throw new IOException("Error in getTeamIdByName , teamName:" + teamName);
         }
-        return  teamId;
+        return teamId;
     }
 
-
     private void validateCredentials(CxFullCredentials cxFullCredentials) throws IOException {
-        if(cxFullCredentials == null){
+        if (cxFullCredentials == null) {
             throw new IOException("No credentials provided");
         }
-        if(cxFullCredentials.getCxServerUrl() == null || cxFullCredentials.getCxServerUrl().equals("")){
+        if (cxFullCredentials.getCxServerUrl() == null || cxFullCredentials.getCxServerUrl().equals("")) {
             throw new IOException("Checkmarx server URL was not provided.");
         }
-        if(cxFullCredentials.getCxUsername() == null || cxFullCredentials.getCxUsername().equals("")){
+        if (cxFullCredentials.getCxUsername() == null || cxFullCredentials.getCxUsername().equals("")) {
             throw new IOException("Checkmarx server username was not provided.");
         }
-        if(cxFullCredentials.getCxPassword() == null || cxFullCredentials.getCxPassword().equals("")){
+        if (cxFullCredentials.getCxPassword() == null || cxFullCredentials.getCxPassword().equals("")) {
             throw new IOException("Checkmarx server password was not provided.");
         }
     }
-
 
     private String getProjects() throws IOException, CxClientException {
         List<Project> allProjects = shraga.getAllProjects();
 
         List<String> projectNames = new LinkedList<>();
-        for (Project project: allProjects) {
+        for (Project project : allProjects) {
             String teamName = shraga.getTeamNameById(project.getTeamId());
             projectNames.add(teamName + "\\" + project.getName());
         }
@@ -190,4 +183,5 @@ public class CxConfigRestEndPoint implements WebService {
         JSONArray jsonArray = new JSONArray(listToConvert);
         return jsonArray.toString();
     }
+
 }
