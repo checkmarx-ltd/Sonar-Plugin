@@ -23,10 +23,10 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     js3.type = "text/javascript";
     js4.type = "text/javascript";
 
-    js1.src = '/static/checkmarx/encryption/jquery-3.3.1.min.js';
-    js2.src = '/static/checkmarx/encryption/aes.js';
-    js3.src = '/static/checkmarx/encryption/pbkdf2.js';
-    js4.src = '/static/checkmarx/encryption/AesUtil.js'
+    js1.src = getContextPath() + '/static/checkmarx/encryption/jquery-3.3.1.min.js';
+    js2.src = getContextPath() + '/static/checkmarx/encryption/aes.js';
+    js3.src = getContextPath() + '/static/checkmarx/encryption/pbkdf2.js';
+    js4.src = getContextPath() + '/static/checkmarx/encryption/AesUtil.js'
 
     document.body.appendChild(js1);
     document.body.appendChild(js2);
@@ -84,7 +84,6 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     /*********************pre loading page************************************************/
-
 
     function loadCssFile() {
         var fileRef = document.createElement("link");
@@ -153,24 +152,24 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 var aesUtil = new AesUtil(keySize, iterationCount);
                 tempCred = aesUtil.decrypt(salt, iv, passPhrase, credentials);
                 tempCred = tempCred.toString(CryptoJS.enc.Utf8);
-            }else{
+            } else {
                 tempCred = credentials;
             }
 
             //support domain user
             var temp = tempCred.substring(tempCred.indexOf("cxUsername") + 13);
-            var usernameOrig = temp.substring(1,temp.indexOf("\","));
+            var usernameOrig = temp.substring(1, temp.indexOf("\","));
             var usernameTemp = "aaa";
-            tempCred = tempCred.replace(usernameOrig,usernameTemp);
+            tempCred = tempCred.replace(usernameOrig, usernameTemp);
 
             // support special characters in pass
             var passToken = tempCred.substring(tempCred.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, tempCred.indexOf("\"}"));
-            tempCred = tempCred.replace(passToken , 'XXX');
+            tempCred = tempCred.replace(passToken, 'XXX');
 
             var credentialsJson = JSON.parse(tempCred);
 
-            credentialsJson.cxUsername=usernameOrig
-            credentialsJson.cxPassword=passToken;
+            credentialsJson.cxUsername = usernameOrig
+            credentialsJson.cxPassword = passToken;
 
             createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
             createInput('Username', 'text', 'username', credentialsJson.cxUsername);
@@ -260,7 +259,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         createSpanSpinner('testConBtn');
 
         try {
-            var credentialsToSend = getInputCredentialsAndValidateValues();
+            let credentialsToSend = getInputCredentialsAndValidateValues();
             if (credentialsToSend != "") {
                 connectWithInputCredentialsAndGetResponse(credentialsToSend)
                     .then(function (res2) {
@@ -614,7 +613,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             return credentials;
             //var credentialsJsonTemp = JSON.parse(credentials);
             //return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
-        }else {
+        } else {
             try {
                 var aesUtil = new AesUtil(keySize, iterationCount);
                 cxCredentialsTemp = "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
@@ -623,9 +622,17 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             } catch (err) {
                 // not encrypted
                 return credentials;
-        }
+            }
 
         }
+    }
+
+    function getContextPath() {
+        let ctxPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
+            return "";
+        }
+        return ctxPath;
     }
 
     function isURL(str) {

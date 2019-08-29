@@ -5,7 +5,6 @@ import com.checkmarx.sonar.cxportalservice.sast.exception.ConnectionException;
 import com.checkmarx.sonar.cxportalservice.sast.services.CxConfigSoapService;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.sonar.api.server.ws.Request;
@@ -23,19 +22,13 @@ import java.util.List;
  */
 public class CxConfigRestEndPoint implements WebService {
 
-
+    private static final CxLogger logger = new CxLogger(CxConfigRestEndPoint.class);
     private CxConfigSoapService cxConfigSoapService = new CxConfigSoapService();
-
-    private CxLogger logger = new CxLogger(CxConfigRestEndPoint.class);
-
-
 
     @Override
     public void define(Context context) {
-
         NewController controller = context.createController("api/checkmarx");
         controller.setDescription("Web service example");
-
 
         controller.createAction("connect")
                 .setPost(true)
@@ -47,10 +40,10 @@ public class CxConfigRestEndPoint implements WebService {
 
                         CxFullCredentials cxFullCredentials = null;
                         try {
-                           String credentialsJson = request.getParam("credentials").getValue();
-                            if(credentialsJson != null && !credentialsJson.equals("")) {
+                            String credentialsJson = request.getParam("credentials").getValue();
+                            if (credentialsJson != null && !credentialsJson.equals("")) {
                                 cxFullCredentials = CxFullCredentials.getCxFullCredentials(credentialsJson);
-                            }else {
+                            } else {
                                 throw new IOException("No credentials provided");
                             }
                             validateCredentials(cxFullCredentials);
@@ -75,9 +68,6 @@ public class CxConfigRestEndPoint implements WebService {
                     }
                 })
                 .createParam("credentials").setDescription("cx credentials").setRequired(true);
-
-
-
 
         controller.createAction("projects")
                 .setPost(true)
@@ -112,7 +102,6 @@ public class CxConfigRestEndPoint implements WebService {
                         }
                     }
                 }).createParam("sessionId").setDescription("cx session id").setRequired(true);
-
 
 
         controller.createAction("clean_connection")
@@ -152,25 +141,23 @@ public class CxConfigRestEndPoint implements WebService {
     }
 
 
-
-
     private void validateCredentials(CxFullCredentials cxFullCredentials) throws IOException {
-        if(cxFullCredentials == null){
+        if (cxFullCredentials == null) {
             throw new IOException("No credentials provided");
         }
-        if(cxFullCredentials.getCxServerUrl() == null || cxFullCredentials.getCxServerUrl().equals("")){
+        if (cxFullCredentials.getCxServerUrl() == null || cxFullCredentials.getCxServerUrl().equals("")) {
             throw new IOException("Checkmarx server URL was not provided.");
         }
-        if(cxFullCredentials.getCxUsername() == null || cxFullCredentials.getCxUsername().equals("")){
+        if (cxFullCredentials.getCxUsername() == null || cxFullCredentials.getCxUsername().equals("")) {
             throw new IOException("Checkmarx server username was not provided.");
         }
-        if(cxFullCredentials.getCxPassword() == null || cxFullCredentials.getCxPassword().equals("")){
+        if (cxFullCredentials.getCxPassword() == null || cxFullCredentials.getCxPassword().equals("")) {
             throw new IOException("Checkmarx server password was not provided.");
         }
     }
 
     private void validateSessionId(String sessionId) throws IOException {
-        if(sessionId == null || sessionId.equals("")){
+        if (sessionId == null || sessionId.equals("")) {
             throw new IOException("Session id is not provided (user might not be logged in).");
         }
     }
@@ -180,8 +167,8 @@ public class CxConfigRestEndPoint implements WebService {
 
         List<String> projectNames = new LinkedList<>();
 
-        for (ProjectDisplayData projectDisplayData : projectsDisplayData){
-            String toAdd = projectDisplayData.getGroup()+"\\"+projectDisplayData.getProjectName();
+        for (ProjectDisplayData projectDisplayData : projectsDisplayData) {
+            String toAdd = projectDisplayData.getGroup() + "\\" + projectDisplayData.getProjectName();
             projectNames.add(toAdd);
         }
         return convertToJsonArray(projectNames);
