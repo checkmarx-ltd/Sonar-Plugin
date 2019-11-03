@@ -111,7 +111,8 @@ public class CheckmarxSensor implements Sensor {
 
     private com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cxReport);
-        JAXBContext jaxbContext = JAXBContext.newInstance(com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(com.cx.restclient.sast.dto.CxXMLResults.class.getPackage().getName(),
+                com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.class.getClassLoader());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
         return (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
