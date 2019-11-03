@@ -1,6 +1,6 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 import org.sonar.api.batch.fs.InputFile;

@@ -1,6 +1,6 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.*;
@@ -56,20 +56,21 @@ public class CxResultsAdapter {
      */
     public static SastReportData adaptCxXmlResultsToCxDetailReport(CxXMLResults results, CxFullCredentials cxFullCredentials){
         SastReportData sastReportData = new SastReportData();
-        sastReportData.setNumOfCodeLines(results.getLinesOfCodeScanned());
-        sastReportData.setNumOfFiles(results.getFilesScanned());
+        if(results.getLinesOfCodeScanned() != null)
+            sastReportData.setNumOfCodeLines(Long.valueOf(results.getLinesOfCodeScanned()));
+        if(results.getFilesScanned() != null)
+            sastReportData.setNumOfFiles(Long.valueOf(results.getFilesScanned()));
         setStartEndDateTime(sastReportData, results);
         String viewerUri = cxFullCredentials.getCxServerUrl() + "/CxWebClient/ViewerMain.aspx?scanId=" + results.getScanId() + "&ProjectID=" + results.getProjectId();
         sastReportData.setViewerUri(viewerUri);
         return sastReportData;
     }
 
-
     private static CxXMLResults.Query.Result.Path.PathNode retrieveNodeToMarkInResultFile(CxXMLResults.Query.Result result){
         List<CxXMLResults.Query.Result.Path.PathNode> nodes = result.getPath().getPathNode();
         for (int i = (nodes.size() - 1) ; i > -1 ; --i){
             CxXMLResults.Query.Result.Path.PathNode currNode = nodes.get(i);
-            if(currNode.getFileName() != null && currNode.getLine() != 0){
+            if(currNode.getFileName() != null && !"0".equals(currNode.getLine())){
                 return currNode;
             }
         }

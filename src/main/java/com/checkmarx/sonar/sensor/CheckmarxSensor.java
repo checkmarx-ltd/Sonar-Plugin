@@ -1,6 +1,5 @@
 package com.checkmarx.sonar.sensor;
 
-import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
@@ -10,7 +9,10 @@ import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.exception.CxClientException;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import com.cx.restclient.sast.dto.SASTResults;
+import com.cx.restclient.sast.utils.SASTUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -21,10 +23,7 @@ import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -109,13 +108,8 @@ public class CheckmarxSensor implements Sensor {
         context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue(scanDetails).save();
     }
 
-    private com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cxReport);
-        JAXBContext jaxbContext = JAXBContext.newInstance(com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.class.getPackage().getName(),
-                com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.class.getClassLoader());
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-        return (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
+    private com.cx.restclient.sast.dto.CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException, CxClientException {
+        return SASTUtils.convertToXMLResult(cxReport);
     }
 
 }
