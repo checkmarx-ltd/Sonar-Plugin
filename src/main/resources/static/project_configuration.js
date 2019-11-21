@@ -26,7 +26,8 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         PasswordInput: 'password'
     };
 
-    var staticUrl = window.baseUrl + '/static/checkmarx';
+    var staticUrl = getContextPath() + '/static/checkmarx';
+
 
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -610,12 +611,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /****************************Helper Functions****************************************************************/
 
-    function isURL(str) {
+             function isURL(str) {
 
-        //test protocol
-        if (!/^(f|ht)tps?:\/\//i.test(str)) {
-            return false;
-        }
+                 //test protocol
+                 if (!/^(f|ht)tps?:\/\//i.test(str)) {
+                     return false;
+                 }
 
         //test entire string form
         var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -626,6 +627,13 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
         return pattern.test(str);
     }
+      function getContextPath() {
+            let ctxPath = encodeURI(window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)));
+            if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
+                return "";
+            }
+            return ctxPath;
+        }
 
     /*************************************************REST Requests****************************************************/
 

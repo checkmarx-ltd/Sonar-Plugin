@@ -39,8 +39,8 @@ import java.nio.charset.StandardCharsets;
 public class CxConfigHelper {
     public static final String SONAR_HOST_URL = "sonar.host.url";
     public static final String SONAR_PROJECT_KEY = "sonar.projectKey";
-    public static final String SONAR_LOGIN_KEY = "sonarLogin";
-    public static final String SONAR_PASSWORD_KEY = "sonarPassword";
+    public static final String SONAR_LOGIN_KEY = "sonar.login";
+    public static final String SONAR_PASSWORD_KEY = "sonar.password";
 
     private static final String VALUE = "value";
 
