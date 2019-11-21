@@ -209,7 +209,7 @@
         <dependency>
             <groupId>com.checkmarx</groupId>
             <artifactId>cx-client-common</artifactId>
-            <version>9.20.0-SNAPSHOT</version>
+            <version>9.20.0-TEST-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
