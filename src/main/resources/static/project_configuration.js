@@ -621,7 +621,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function getContextPath() {
-        let ctxPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        let ctxPath = encodeURI(window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)));
         if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
             return "";
         }
