@@ -18,7 +18,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     var SettingKeys = {
         ServerUrl: 'checkmarx.server.url.secured',
         Username: 'checkmarx.server.username.secured',
-        ProjectName: 'checkmarx.server.project_name.secured',
+        ProjectName: 'checkmarx.server.project_name',
         RemediationEffort: 'checkmarx.server.remediation'
     }
 

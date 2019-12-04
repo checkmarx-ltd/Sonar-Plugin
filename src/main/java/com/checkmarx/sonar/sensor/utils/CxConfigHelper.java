@@ -14,10 +14,8 @@ import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -37,10 +35,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class CxConfigHelper {
+
     public static final String SONAR_HOST_URL = "sonar.host.url";
     public static final String SONAR_PROJECT_KEY = "sonar.projectKey";
-    public static final String SONAR_LOGIN_KEY = "sonar.login";
-    public static final String SONAR_PASSWORD_KEY = "sonar.password";
 
     private static final String VALUE = "value";
 
@@ -179,15 +176,7 @@ public class CxConfigHelper {
         HttpClient client = HttpClientBuilder.create().build();
 
         try {
-            String user = config.get(SONAR_LOGIN_KEY).get();
-            String pass = config.get(SONAR_PASSWORD_KEY).get();
-
             HttpGet request = new HttpGet(propertyHttpURL);
-            String auth = user + ":" + pass;
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-            String authHeader = "Basic " + new String(encodedAuth);
-            request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-
             response = client.execute(request);
 
             if (isOk(response)) {

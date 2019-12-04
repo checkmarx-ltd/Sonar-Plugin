@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class CxProperties {
 
-    public static final String CXPROJECT_KEY = "checkmarx.server.project_name.secured";
+    public static final String CXPROJECT_KEY = "checkmarx.server.project_name";
     public static final String CX_REMEDIATION_EFFORT = "checkmarx.server.remediation";
 
-    public static final String CREDENTIALS_KEY = "checkmarx.server.credentials.v2.secured";
+    public static final String CREDENTIALS_KEY = "checkmarx.server.credentials";
 
     public CxProperties() {
     }
@@ -26,6 +26,7 @@ public class CxProperties {
                 defineProperty(CX_REMEDIATION_EFFORT, "cx_remediation_effort", "remediation per checkmarx vulnerability"),
                 defineProperty(CREDENTIALS_KEY, "Credentials", "Parameters required to connect to Checkmarx server")
         };
+
         return Arrays.asList(properties);
     }
 
@@ -38,5 +39,6 @@ public class CxProperties {
                 .onQualifiers(Qualifiers.PROJECT)
                 .build();
     }
+
 }
 

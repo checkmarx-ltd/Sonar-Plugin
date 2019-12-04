@@ -4,8 +4,6 @@ import com.checkmarx.sonar.dto.RestEndpointContext;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -24,7 +22,6 @@ import org.sonar.api.batch.sensor.SensorContext;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -32,6 +29,7 @@ import java.util.Arrays;
  */
 // TODO: use for all the requests in CxConfigHelper.
 public class PropertyApiClient {
+
     private SensorContext sensorContext;
     private RestEndpointContext endpointContext;
     private final Logger logger;
@@ -103,7 +101,6 @@ public class PropertyApiClient {
 
     private HttpResponse getResponse(HttpUriRequest request) throws IOException {
         CookieStore cookieStore = new BasicCookieStore();
-
         addAuthHeaders(request, cookieStore);
 
         HttpClient client = HttpClientBuilder.create()
@@ -114,18 +111,14 @@ public class PropertyApiClient {
     }
 
     private void addAuthHeaders(HttpUriRequest request, CookieStore cookieStore) {
-        if (sensorContext != null) {
-            String username = sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).get();
-            String password = sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).get();
-
-            String auth = username + ":" + password;
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-            String authHeader = "Basic " + new String(encodedAuth);
-            request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        } else {
-            request.setHeaders(endpointContext.getRequiredHeaders());
-            for (Cookie cookie : endpointContext.getRequiredCookies()) {
-                cookieStore.addCookie(cookie);
+        if (endpointContext != null) {
+            try {
+                request.setHeaders(endpointContext.getRequiredHeaders());
+                for (Cookie cookie : endpointContext.getRequiredCookies()) {
+                    cookieStore.addCookie(cookie);
+                }
+            } catch (Exception e) {
+                logger.error("Fail to add authentication headers", e);
             }
         }
     }
@@ -136,4 +129,5 @@ public class PropertyApiClient {
             throw new IOException(String.format("Error setting property: %s, HTTP status code: %d", propertyName, statusCode));
         }
     }
+
 }

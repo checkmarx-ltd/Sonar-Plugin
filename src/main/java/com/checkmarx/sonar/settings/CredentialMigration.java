@@ -13,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 
 public class CredentialMigration {
+
     private static final String LEGACY_CREDENTIALS_KEY = "checkmarx.server.credentials.secured";
 
     private static final String IV = "F27D5C9927726BCEFE7510B1BDD3D137";
@@ -38,7 +39,12 @@ public class CredentialMigration {
      * @throws IOException
      */
     public void ensureLatestFormat() throws IOException {
-        String encryptedLegacyCredentials = client.getProperty(LEGACY_CREDENTIALS_KEY);
+        String encryptedLegacyCredentials = null;
+        try {
+            encryptedLegacyCredentials = client.getProperty(LEGACY_CREDENTIALS_KEY);
+        } catch (Exception e) {
+            logger.debug("No sonar authentication was given.");
+        }
         if (StringUtils.isNotEmpty(encryptedLegacyCredentials)) {
             logger.info("Found credentials in legacy format. Starting the migration.");
 
