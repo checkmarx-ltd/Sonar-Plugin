@@ -210,7 +210,7 @@
         <dependency>
             <groupId>com.checkmarx</groupId>
             <artifactId>cx-client-common</artifactId>
-            <version>9.20.1-SNAPSHOT</version>
+            <version>9.20.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
