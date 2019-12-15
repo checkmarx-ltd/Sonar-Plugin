@@ -45,7 +45,6 @@ public class CxConfigHelper {
     public static final String PROPERTIES_API_PATH = "api/properties";
 
     private Logger log;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private PluginVersionProvider versionProvider = new PluginVersionProvider();
