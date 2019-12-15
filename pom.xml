@@ -5,7 +5,9 @@
     <groupId>checkmarx.com</groupId>
     <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
+
     <version>2019.4.1</version>
+
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
