@@ -3,84 +3,82 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     // let's create a flag telling if the static is still displayed
     var isDisplayed = true;
 
-    var credentials;
     var isCxConnectionSuccessful;
     var projectsIn;
     var projectListNoServerConnectionMsg = "Unable to connect to server. Make sure URL and Credentials are valid to see project list.";
     var selectedProjectInSonarDb;
     var securityRemediationEffortInSonarDb;
 
-    var staticUrl = window.baseUrl + '/static/checkmarx';
+    var cxCredentials = {
+        cxServerUrl: null,
+        cxUsername: null,
+        cxPassword: null    // Becomes non-null only if the user updates the password input.
+    };
 
-    var js1 = document.createElement("script");
-    var js2 = document.createElement("script");
-    var js3 = document.createElement("script");
-    var js4 = document.createElement("script");
-
-    js1.type = "text/javascript";
-    js2.type = "text/javascript";
-    js3.type = "text/javascript";
-    js4.type = "text/javascript";
-
-    js1.src = getContextPath() + '/static/checkmarx/encryption/jquery-3.3.1.min.js';
-    js2.src = getContextPath() + '/static/checkmarx/encryption/aes.js';
-    js3.src = getContextPath() + '/static/checkmarx/encryption/pbkdf2.js';
-    js4.src = getContextPath() + '/static/checkmarx/encryption/AesUtil.js'
-
-    document.body.appendChild(js1);
-    document.body.appendChild(js2);
-    document.body.appendChild(js3);
-    document.body.appendChild(js4);
-
-    var configurationPage;
-
-    var iv = "F27D5C9927726BCEFE7510B1BDD3D137";
-    var salt = "3FF2EC019C627B945225DEBAD71A01B6985FE84C95A70EB132882F88C0A59A55";
-    var keySize = 128;
-    var iterationCount = 10000;
-    var passPhrase = "checkmarx.server.credentials.secured";
-
-
-    if (isDisplayed) {
-        loadCssFile();
-        //clear page in case where the page was loaded, redirected and then redirected back
-        options.el.textContent = '';
-
-        var spanSpinner = getConnectingSpinner();
-        options.el.appendChild(spanSpinner);
-
-        getCxProjectFromSonarResponse().then(function (res1) {
-            return getCxRemediationEffortFromSonarResponse(res1);
-        }).then(function (res2) {
-            return getCxCredentialsResponse(res2);
-        }).then(function (res3) {
-            return connectAndGetResponse(res3);
-        }).then(function (res4) {
-            return getCxProjectsFromServerResponse(res4);
-        }).catch(function (err) {
-            console.log(err.message);
-            options.el.removeChild(spanSpinner);
-            return loadUI();
-        }).then(function (res5) {
-            try {
-                projectsIn = JSON.parse(res5.projects);
-            } catch (err) {
-                projectsIn = "";
-            }
-            cleanConnection();
-            options.el.removeChild(spanSpinner);
-            return loadUI();
-        }).catch(function (err) {
-            console.log(err.message);
-            try {
-                options.el.removeChild(spanSpinner);
-            } catch (ignored) {
-            }
-            return loadUI();
-        });
+    var SettingKeys = {
+        ServerUrl: 'checkmarx.server.url.secured',
+        Username: 'checkmarx.server.username.secured',
+        ProjectName: 'checkmarx.server.project_name',
+        RemediationEffort: 'checkmarx.server.remediation'
     }
 
+    var ElementIds = {
+        PasswordInput: 'password'
+    };
+
+    var staticUrl = getContextPath() + '/static/checkmarx';
+
+
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = staticUrl + '/jquery-3.3.1.min.js';
+    // Perform the rest of the init process after jQuery loads.
+    script.onload = init;
+    document.body.appendChild(script);
+    
+    var configurationPage;
+
+
     /*********************pre loading page************************************************/
+
+    function init() {
+        if (isDisplayed) {
+            loadCssFile();
+            
+            //clear page in case where the page was loaded, redirected and then redirected back
+            options.el.textContent = '';
+
+            var spanSpinner = getConnectingSpinner();
+            options.el.appendChild(spanSpinner);
+
+            getCxProjectFromSonarResponse()
+            .then(getRemediationEffort)
+            .then(getCredentials)
+            .then(connectToCxWithCredentials)
+            .then(getCxProjectsFromServerResponse)
+            .catch(function (err) {
+                console.log(err.message);
+                options.el.removeChild(spanSpinner);
+                return loadUI();
+            }).then(function (res5) {
+                try {
+                    projectsIn = JSON.parse(res5.projects);
+                } catch (err) {
+                    projectsIn = "";
+                }
+                cleanConnection();
+                options.el.removeChild(spanSpinner);
+                return loadUI();
+            }).catch(function (err) {
+                console.log(err.message);
+                try {
+                    options.el.removeChild(spanSpinner);
+                } catch (ignored) {
+                }
+                return loadUI();
+            });
+        }        
+    }
 
     function loadCssFile() {
         var fileRef = document.createElement("link");
@@ -139,43 +137,13 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         configurationPage.appendChild(div);
     }
 
+
     /*********************Inputs*******************/
 
     function createCredentialsForms() {
-        if (credentials != "" && credentials != null) {
-            var tempCred;
-            if (!credentials.includes("cxUsername")) {
-                var aesUtil = new AesUtil(keySize, iterationCount);
-                tempCred = aesUtil.decrypt(salt, iv, passPhrase, credentials);
-                tempCred = tempCred.toString(CryptoJS.enc.Utf8);
-            } else {
-                tempCred = credentials;
-            }
-
-            //support domain user
-            var temp = tempCred.substring(tempCred.indexOf("cxUsername") + 13);
-            var usernameOrig = temp.substring(1, temp.indexOf("\","));
-            var usernameTemp = "aaa";
-            tempCred = tempCred.replace(usernameOrig, usernameTemp);
-
-            // support special characters in pass
-            var passToken = tempCred.substring(tempCred.indexOf("cxPassword\": \"") + "cxPassword\": \"".length, tempCred.indexOf("\"}"));
-            tempCred = tempCred.replace(passToken, 'XXX');
-
-            var credentialsJson = JSON.parse(tempCred);
-
-            credentialsJson.cxUsername = usernameOrig
-            credentialsJson.cxPassword = passToken;
-
-            createInput('Server Url', 'text', 'serverUrl', credentialsJson.cxServerUrl);
-            createInput('Username', 'text', 'username', credentialsJson.cxUsername);
-            createInput('Password', 'password', 'password', "*****");
-            credentialsJson.cxPassword = "*****"
-        } else {
-            createInput('Server Url', 'text', 'serverUrl', "");
-            createInput('Username', 'text', 'username', "");
-            createInput('Password', 'password', 'password', "");
-        }
+        createInput('Server Url', 'text', 'serverUrl', cxCredentials.cxServerUrl);
+        createInput('Username', 'text', 'username', cxCredentials.cxUsername);
+        createPasswordInput();
         createUrlDescription();
     }
 
@@ -209,6 +177,30 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         paragraph.appendChild(br);
         paragraph.appendChild(errSpan);
         configurationPage.appendChild(paragraph);
+    }
+
+    function createPasswordInput() {
+        // The password is never sent from server to client. 
+        // The password is sometimes sent from client to server: in case the user wants to test
+        // connection with a new password or to save the new password.
+        createInput('Password', 'password', ElementIds.PasswordInput, '');
+        var passwordInput = $('#' + ElementIds.PasswordInput);
+
+        // If we have a saved username, assume that we have a saved password as well.
+        var hasSavedPassword = !!cxCredentials.cxUsername;
+        if (hasSavedPassword) {
+            passwordInput
+                .prop('placeholder', '<click to change>')
+                .keydown(function(){
+                    $(this).data('isDirty', true)
+                        .prop('placeholder', '');
+                });
+        }
+        else {
+            // No saved password: this may happen e.g. right after the plugin installation.
+            // Make sure an empty password won't pass validation.
+            passwordInput.data('isDirty', true)
+        }
     }
 
     function createAnyInput(inputType, id, value) {
@@ -255,18 +247,18 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         createSpanSpinner('testConBtn');
 
         try {
-            var credentialsToSend = getInputCredentialsAndValidateValues();
-            if (credentialsToSend != "") {
-                connectWithInputCredentialsAndGetResponse(credentialsToSend)
+            var credentials = getValidatedCredentials();
+            if (credentials != "") {
+                connectWithInputCredentialsAndGetResponse(credentials)
                     .then(function (res2) {
                         return getCxProjectsFromServerResponse(res2)
                             .then(function (res3) {
-                                deleteSpanSpinner('testConBtn');
-                                return cleanUpAndUpdateUI(res3);
-                            }).catch(function (err) {
-                                console.log(err.message);
-                                terminateFailedTestConnection();
-                            });
+                            deleteSpanSpinner('testConBtn');
+                            return cleanUpAndUpdateUI(res3);
+                        }).catch(function (err) {
+                            console.log(err.message);
+                            terminateFailedTestConnection();
+                        });
                     }).catch(function (err) {
                     console.log(err.message);
                     terminateFailedTestConnection();
@@ -297,6 +289,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         } catch (ignored) {
         }
     }
+
 
     function cleanUpAndUpdateUI(response) {
         try {
@@ -343,6 +336,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         configurationPage.appendChild(paragraph);
     }
 
+
     function createOptions() {
         if (isCxConnectionSuccessful == false || projectsIn == "" || projectsIn == null) {
             return '<option value=\"">' + projectListNoServerConnectionMsg + '</option>';
@@ -369,6 +363,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         }
     }
 
+
     /********************************Save***************************/
 
     function createSaveButton() {
@@ -394,14 +389,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         clearButtonsAndProjectListMsgs();
         createSpanSpinner('saveBtn');
 
-        var credentialsToSave = getInputCredentialsAndValidateValues();
+        var connnectionConfig = getValidatedCredentials();
         var projectToSave = getAndValidateProjectToSave();
         var remediationEffortToSave = getAndValidateRemediationEffortSave();
 
-        if (credentialsToSave != "" && projectToSave != "" && remediationEffortToSave != "") {
+        if (connnectionConfig != "" && projectToSave != "" && remediationEffortToSave != "") {
             saveCxProject(projectToSave).then(function () {
                 selectedProjectInSonarDb = projectToSave;
-                return saveCxCredentials(credentialsToSave);
+                return saveCredentials(connnectionConfig);
             }).then(function () {
                 securityRemediationEffortInSonarDb = remediationEffortToSave.trim();
                 return saveCxRemediationEffort(remediationEffortToSave);
@@ -423,6 +418,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             deleteSpanSpinner('saveBtn');
         }
     }
+
 
     /*********************Create\Delete Sub Elements*****************************************************************/
 
@@ -508,21 +504,34 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         eraseFailureMsg('projectForm');
     }
 
+
     /************************Validations and Retrievals*****************************************************************/
 
     //returns empty string if credentials are not valid
-    function getInputCredentialsAndValidateValues() {
+    function getValidatedCredentials() {
         var server = document.getElementById('serverUrl');
         var serverValue = server.value.trim();
         var isServerValid = validateUrl('serverUrl', serverValue);
+        
         var username = document.getElementById('username');
         var usernameValue = username.value.trim();
-        var isUsernameInput = validateInputHasValue('username', usernameValue);
-        var password = document.getElementById('password');
-        var passwordValue = password.value;
-        var isPasswordInput = validateInputHasValue('password', passwordValue);
-        if (isServerValid && isUsernameInput && isPasswordInput) {
-            return parseCredentials(serverValue, usernameValue, passwordValue);
+        var isUsernameValid = validateInputHasValue('username', usernameValue);
+        
+        var password = $('#' + ElementIds.PasswordInput);
+        var passwordToSend = null;
+        var isPasswordValid = true;
+        if (password.data('isDirty')){
+            // Only validate the password if user has entered something into the input.
+            passwordToSend = password.val();
+            isPasswordValid = validateInputHasValue(ElementIds.PasswordInput, passwordToSend);
+        }
+        
+        if (isServerValid && isUsernameValid && isPasswordValid) {
+            return {
+                cxServerUrl: serverValue,
+                cxUsername: usernameValue,
+                cxPassword: passwordToSend
+            }
         } else {
             return "";
         }
@@ -602,37 +611,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /****************************Helper Functions****************************************************************/
 
-    function parseCredentials(cxServerUrl, cxUsername, cxPassword) {
-        if (cxPassword == "*****") {
-            return credentials;
-            //var credentialsJsonTemp = JSON.parse(credentials);
-            //return "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + credentialsJsonTemp.cxPassword + "\"}";
-        } else {
-            try {
-                var aesUtil = new AesUtil(keySize, iterationCount);
-                cxCredentialsTemp = "{\"cxServerUrl\":\"" + cxServerUrl + "\", \"cxUsername\": \"" + cxUsername + "\", \"cxPassword\": \"" + cxPassword + "\"}";
-                cxCredentialsEncrypted = aesUtil.encrypt(salt, iv, passPhrase, cxCredentialsTemp);
-                return cxCredentialsEncrypted;
-            } catch (err) {
-                // not encrypted
-                return credentials;
-            }
-        }
-    }
+             function isURL(str) {
 
-    function getContextPath() {
-        let ctxPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
-        if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
-            return "";
-        }
-        return ctxPath;
-    }
-
-    function isURL(str) {
-        //test protocol
-        if (!/^(f|ht)tps?:\/\//i.test(str)) {
-            return false;
-        }
+                 //test protocol
+                 if (!/^(f|ht)tps?:\/\//i.test(str)) {
+                     return false;
+                 }
 
         //test entire string form
         var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -643,31 +627,27 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
         return pattern.test(str);
     }
+      function getContextPath() {
+            let ctxPath = encodeURI(window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)));
+            if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
+                return "";
+            }
+            return ctxPath;
+        }
 
     /*************************************************REST Requests****************************************************/
 
     /*****************Checkmarx server***************/
 
-    function connectAndGetResponse(response) {
-        try {
-            credentials = response[0].value;
-        } catch (err) {
-            credentials = "";
-            throw new Error("Error retrieving Checkmarx credentials from SonarQube (credentials might not have been set).");
-        }
-        return connectToCxWithCredentials();
-    }
-
     function connectWithInputCredentialsAndGetResponse(inserted) {
-        credentials = inserted;
+        cxCredentials = inserted;
         return connectToCxWithCredentials();
     }
 
     function connectToCxWithCredentials() {
         return window.SonarRequest.postJSON('/api/checkmarx/connect', {
-            resolved: false,
             component: options.component.key,
-            credentials: credentials
+            credentials: JSON.stringify(cxCredentials)
         })
     }
 
@@ -681,8 +661,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             throw new Error("Failed to connect to checkmarx server.")
         }
         return window.SonarRequest.postJSON('/api/checkmarx/projects', {
-            resolved: false,
-            key: "checkmarx.server.credentials.secured"
+            resolved: false
         })
     }
 
@@ -694,32 +673,21 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         });
     }
 
+
     /***********sonar DB***************/
 
     function getCxProjectFromSonarResponse() {
-        return getSonarSettingResponse("checkmarx.server.project_name.secured")
+        return getSonarSettingResponse(SettingKeys.ProjectName)
+        .then(function(response){
+            selectedProjectInSonarDb = getSettingValue(response, '');
+        });
     }
 
-    function getCxRemediationEffortFromSonarResponse(response) {
-        try {
-            selectedProjectInSonarDb = response[0].value;
-        } catch (err) {
-            selectedProjectInSonarDb = "";
-        }
-        return getCxRemediationEffortResponse()
-    }
-
-    function getCxCredentialsResponse(response) {
-        try {
-            securityRemediationEffortInSonarDb = response[0].value;
-        } catch (err) {
-            securityRemediationEffortInSonarDb = 0;
-        }
-        return getSonarSettingResponse("checkmarx.server.credentials.secured")
-    }
-
-    function getCxRemediationEffortResponse() {
-        return getSonarSettingResponse("checkmarx.server.remediation")
+    function getRemediationEffort() {
+        return getSonarSettingResponse(SettingKeys.RemediationEffort)
+        .then(function(response){
+            securityRemediationEffortInSonarDb = getSettingValue(response, 0);
+        });
     }
 
     function getSonarSettingResponse(key) {
@@ -730,37 +698,47 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function saveCxProject(cxProject) {
-        return window.SonarRequest.post('/api/properties', {
-            id: "checkmarx.server.project_name.secured",
-            value: cxProject,
-            resource: options.component.key
-        })
+        return updateSonarSetting(SettingKeys.ProjectName, cxProject);
     }
 
     function saveCxRemediationEffort(remediation) {
-        return window.SonarRequest.post('/api/properties', {
-            id: "checkmarx.server.remediation",
-            value: remediation,
-            resource: options.component.key
-        })
+        return updateSonarSetting(SettingKeys.RemediationEffort, remediation);
     }
 
-    function saveCxCredentials(cxCredentials) {
-
-        //if not encrypted
-        if (credentials.includes("cxPassword")) {
-            //cxCredentialsEncrypted = sjcl.encrypt("checkmarx.server.credentials.secured",cxCredentials) ;
-            var aesUtil = new AesUtil(keySize, iterationCount);
-            cxCredentialsEncrypted = aesUtil.encrypt(salt, iv, passPhrase, cxCredentials);
-        } else {
-            cxCredentialsEncrypted = credentials;
-        }
-
-        return window.SonarRequest.post('/api/properties', {
-            id: "checkmarx.server.credentials.secured",
-            value: cxCredentialsEncrypted,
-            resource: options.component.key
+    function getCredentials() {
+        return window.SonarRequest.getJSON('/api/checkmarx/credentials', {
+            component: options.component.key
         })
+        .then(function(response) {
+            cxCredentials.cxServerUrl = response.cxServerUrl || '';
+            cxCredentials.cxUsername = response.cxUsername || '';
+        });
+    }
+
+    function saveCredentials(credentials) {
+        return window.SonarRequest.postJSON('/api/checkmarx/update_credentials', {
+            component: options.component.key, 
+            credentials: JSON.stringify(credentials)
+        });
+    }
+
+    function updateSonarSetting(id, newValue) {
+        return window.SonarRequest.post('/api/properties', {
+            id: id,
+            value: newValue,
+            resource: options.component.key
+        });        
+    }
+
+    function getSettingValue(response, defaultValue) {
+        var result;
+        try {
+            result = response[0].value;
+        }
+        catch(err) {
+            result = defaultValue;
+        }
+        return result;
     }
 
     /*****************************************************************************************************************/

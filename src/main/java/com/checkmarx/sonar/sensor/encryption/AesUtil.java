@@ -8,7 +8,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -18,13 +18,13 @@ import java.security.spec.KeySpec;
 
 // TODO: Implement 256-bit version like: http://securejava.wordpress.com/2012/10/25/aes-256/
 public class AesUtil {
-    private final int keySize;
-    private final int iterationCount;
+    public static final int IV_LENGTH_IN_BYTES = 16;
+
+    private static final String KEY_FACTORY_TYPE = "PBKDF2WithHmacSHA1";
+
     private final Cipher cipher;
     
-    public AesUtil(int keySize, int iterationCount) {
-        this.keySize = keySize;
-        this.iterationCount = iterationCount;
+    public AesUtil() {
         try {
             cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         }
@@ -33,26 +33,14 @@ public class AesUtil {
         }
     }
     
-    public String encrypt(String salt, String iv, String passphrase, String plaintext) {
-        try {
-            SecretKey key = generateKey(salt, passphrase);
-            byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, iv, plaintext.getBytes("UTF-8"));
-            return base64(encrypted);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw fail(e);
-        }
+    public String encrypt(SecretKey key, String iv, String plaintext) {
+        byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, iv, plaintext.getBytes(StandardCharsets.UTF_8));
+        return base64(encrypted);
     }
     
-    public String decrypt(String salt, String iv, String passphrase, String ciphertext) {
-        try {
-            SecretKey key = generateKey(salt, passphrase);
-            byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, iv, base64(ciphertext));
-            return new String(decrypted, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
-            throw fail(e);
-        }
+    public String decrypt(SecretKey key, String iv, String ciphertext) {
+        byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, iv, base64(ciphertext));
+        return new String(decrypted, StandardCharsets.UTF_8);
     }
     
     private byte[] doFinal(int encryptMode, SecretKey key, String iv, byte[] bytes) {
@@ -68,9 +56,9 @@ public class AesUtil {
         }
     }
     
-    private SecretKey generateKey(String salt, String passphrase) {
+    public SecretKey generateKey(String passphrase, String salt, int iterationCount, int keySize) {
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(KEY_FACTORY_TYPE);
             KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), hex(salt), iterationCount, keySize);
             SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
             return key;

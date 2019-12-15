@@ -3,7 +3,7 @@ package com.checkmarx.sonar.settings;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,44 +12,33 @@ import java.util.List;
  */
 public class CxProperties {
 
-    public static final String CXPROJECT_KEY = "checkmarx.server.project_name.secured";
-    public static final String CX_CREDENTIALS_KEY = "checkmarx.server.credentials.secured";
+    public static final String CXPROJECT_KEY = "checkmarx.server.project_name";
     public static final String CX_REMEDIATION_EFFORT = "checkmarx.server.remediation";
+
+    public static final String CREDENTIALS_KEY = "checkmarx.server.credentials";
 
     public CxProperties() {
     }
 
     public static List<PropertyDefinition> getProperties() {
+        PropertyDefinition[] properties = new PropertyDefinition[]{
+                defineProperty(CXPROJECT_KEY, "cx_project", "cx_project"),
+                defineProperty(CX_REMEDIATION_EFFORT, "cx_remediation_effort", "remediation per checkmarx vulnerability"),
+                defineProperty(CREDENTIALS_KEY, "Credentials", "Parameters required to connect to Checkmarx server")
+        };
 
-        List<PropertyDefinition> propertyDefinitionList = new LinkedList<>();
-
-
-        propertyDefinitionList.add(PropertyDefinition.builder(CX_CREDENTIALS_KEY)
-                .name("cx_credentials")
-                .description("Checkmarx server credentials")
-                .defaultValue("")
-                .category("checkmarx")
-                .onlyOnQualifiers(Qualifiers.PROJECT)
-                .build());
-
-        propertyDefinitionList.add(PropertyDefinition.builder(CXPROJECT_KEY)
-                .name("cx_project")
-                .description("cx_project")
-                .defaultValue("")
-                .category("checkmarx")
-                .onQualifiers(Qualifiers.PROJECT)
-                .build());
-
-        propertyDefinitionList.add(PropertyDefinition.builder(CX_REMEDIATION_EFFORT)
-                .name("cx_remediation_effort")
-                .description("remediation per checkmarx vulnerability")
-                .defaultValue("")
-                .category("checkmarx")
-                .onQualifiers(Qualifiers.PROJECT)
-                .build());
-
-
-        return propertyDefinitionList;
+        return Arrays.asList(properties);
     }
+
+    private static PropertyDefinition defineProperty(String key, String name, String description) {
+        return PropertyDefinition.builder(key)
+                .name(name)
+                .description(description)
+                .defaultValue("")
+                .category("checkmarx")
+                .onQualifiers(Qualifiers.PROJECT)
+                .build();
+    }
+
 }
 

@@ -1,6 +1,6 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -59,7 +59,7 @@ public class SastResultsCollector {
                 }
 
                 for (CxResultToSonarResult result : resultsForCurrFile) {
-                        if(result.getResultData().getState() == 1){
+                        if("1".equals(result.getResultData().getState())){
                             //continue if result state is "Not Exploitable"
                             continue;
                         }
@@ -118,7 +118,8 @@ public class SastResultsCollector {
         private SastSeverity getSastSeverity(CxResultToSonarResult result){
             SastSeverity sastSeverity = SastSeverity.fromName(result.getResultData().getSeverity());
             if(sastSeverity == null){
-                sastSeverity = SastSeverity.fromId(result.getQuery().getSeverityIndex());
+                int index = result.getQuery().getSeverityIndex() != null ? Integer.valueOf(result.getQuery().getSeverityIndex()):null;
+                sastSeverity = SastSeverity.fromId(index);
             }
             return sastSeverity;
         }

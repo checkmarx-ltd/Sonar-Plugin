@@ -1,6 +1,6 @@
 package com.checkmarx.sonar.sensor.dto;
 
-import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults;
+import com.cx.restclient.sast.dto.CxXMLResults;
 
 /**
  * Created by: zoharby.
