@@ -627,13 +627,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
         return pattern.test(str);
     }
-      function getContextPath() {
-            let ctxPath = encodeURI(window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)));
-            if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
-                return "";
-            }
-            return ctxPath;
+
+    function getContextPath() {
+        let ctxPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", window.location.pathname.lastIndexOf("project/admin") - 1));
+        if (!ctxPath || 0 === ctxPath.length || ctxPath === "/static" || ctxPath === "/project") {
+            return "";
         }
+        return ctxPath;
+    }
 
     /*************************************************REST Requests****************************************************/
 
