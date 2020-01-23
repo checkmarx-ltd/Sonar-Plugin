@@ -28,14 +28,13 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     var staticUrl = getContextPath() + '/static/checkmarx';
 
-
     var script = document.createElement("script");
     script.type = "text/javascript";
     script.src = staticUrl + '/jquery-3.3.1.min.js';
     // Perform the rest of the init process after jQuery loads.
     script.onload = init;
     document.body.appendChild(script);
-    
+
     var configurationPage;
 
 
@@ -44,7 +43,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     function init() {
         if (isDisplayed) {
             loadCssFile();
-            
+
             //clear page in case where the page was loaded, redirected and then redirected back
             options.el.textContent = '';
 
@@ -52,15 +51,15 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             options.el.appendChild(spanSpinner);
 
             getCxProjectFromSonarResponse()
-            .then(getRemediationEffort)
-            .then(getCredentials)
-            .then(connectToCxWithCredentials)
-            .then(getCxProjectsFromServerResponse)
-            .catch(function (err) {
-                console.log(err.message);
-                options.el.removeChild(spanSpinner);
-                return loadUI();
-            }).then(function (res5) {
+                .then(getRemediationEffort)
+                .then(getCredentials)
+                .then(connectToCxWithCredentials)
+                .then(getCxProjectsFromServerResponse)
+                .catch(function (err) {
+                    console.log(err.message);
+                    options.el.removeChild(spanSpinner);
+                    return loadUI();
+                }).then(function (res5) {
                 try {
                     projectsIn = JSON.parse(res5.projects);
                 } catch (err) {
@@ -77,7 +76,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                 }
                 return loadUI();
             });
-        }        
+        }
     }
 
     function loadCssFile() {
@@ -180,7 +179,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function createPasswordInput() {
-        // The password is never sent from server to client. 
+        // The password is never sent from server to client.
         // The password is sometimes sent from client to server: in case the user wants to test
         // connection with a new password or to save the new password.
         createInput('Password', 'password', ElementIds.PasswordInput, '');
@@ -191,12 +190,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         if (hasSavedPassword) {
             passwordInput
                 .prop('placeholder', '<click to change>')
-                .keydown(function(){
+                .keydown(function () {
                     $(this).data('isDirty', true)
                         .prop('placeholder', '');
                 });
-        }
-        else {
+        } else {
             // No saved password: this may happen e.g. right after the plugin installation.
             // Make sure an empty password won't pass validation.
             passwordInput.data('isDirty', true)
@@ -253,12 +251,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
                     .then(function (res2) {
                         return getCxProjectsFromServerResponse(res2)
                             .then(function (res3) {
-                            deleteSpanSpinner('testConBtn');
-                            return cleanUpAndUpdateUI(res3);
-                        }).catch(function (err) {
-                            console.log(err.message);
-                            terminateFailedTestConnection();
-                        });
+                                deleteSpanSpinner('testConBtn');
+                                return cleanUpAndUpdateUI(res3);
+                            }).catch(function (err) {
+                                console.log(err.message);
+                                terminateFailedTestConnection();
+                            });
                     }).catch(function (err) {
                     console.log(err.message);
                     terminateFailedTestConnection();
@@ -512,20 +510,20 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         var server = document.getElementById('serverUrl');
         var serverValue = server.value.trim();
         var isServerValid = validateUrl('serverUrl', serverValue);
-        
+
         var username = document.getElementById('username');
         var usernameValue = username.value.trim();
         var isUsernameValid = validateInputHasValue('username', usernameValue);
-        
+
         var password = $('#' + ElementIds.PasswordInput);
         var passwordToSend = null;
         var isPasswordValid = true;
-        if (password.data('isDirty')){
+        if (password.data('isDirty')) {
             // Only validate the password if user has entered something into the input.
             passwordToSend = password.val();
             isPasswordValid = validateInputHasValue(ElementIds.PasswordInput, passwordToSend);
         }
-        
+
         if (isServerValid && isUsernameValid && isPasswordValid) {
             return {
                 cxServerUrl: serverValue,
@@ -611,12 +609,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     /****************************Helper Functions****************************************************************/
 
-             function isURL(str) {
+    function isURL(str) {
 
-                 //test protocol
-                 if (!/^(f|ht)tps?:\/\//i.test(str)) {
-                     return false;
-                 }
+        //test protocol
+        if (!/^(f|ht)tps?:\/\//i.test(str)) {
+            return false;
+        }
 
         //test entire string form
         var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -679,16 +677,16 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     function getCxProjectFromSonarResponse() {
         return getSonarSettingResponse(SettingKeys.ProjectName)
-        .then(function(response){
-            selectedProjectInSonarDb = getSettingValue(response, '');
-        });
+            .then(function (response) {
+                selectedProjectInSonarDb = getSettingValue(response, '');
+            });
     }
 
     function getRemediationEffort() {
         return getSonarSettingResponse(SettingKeys.RemediationEffort)
-        .then(function(response){
-            securityRemediationEffortInSonarDb = getSettingValue(response, 0);
-        });
+            .then(function (response) {
+                securityRemediationEffortInSonarDb = getSettingValue(response, 0);
+            });
     }
 
     function getSonarSettingResponse(key) {
@@ -710,15 +708,15 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         return window.SonarRequest.getJSON('/api/checkmarx/credentials', {
             component: options.component.key
         })
-        .then(function(response) {
-            cxCredentials.cxServerUrl = response.cxServerUrl || '';
-            cxCredentials.cxUsername = response.cxUsername || '';
-        });
+            .then(function (response) {
+                cxCredentials.cxServerUrl = response.cxServerUrl || '';
+                cxCredentials.cxUsername = response.cxUsername || '';
+            });
     }
 
     function saveCredentials(credentials) {
         return window.SonarRequest.postJSON('/api/checkmarx/update_credentials', {
-            component: options.component.key, 
+            component: options.component.key,
             credentials: JSON.stringify(credentials)
         });
     }
@@ -728,15 +726,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             id: id,
             value: newValue,
             resource: options.component.key
-        });        
+        });
     }
 
     function getSettingValue(response, defaultValue) {
         var result;
         try {
             result = response[0].value;
-        }
-        catch(err) {
+        } catch (err) {
             result = defaultValue;
         }
         return result;
