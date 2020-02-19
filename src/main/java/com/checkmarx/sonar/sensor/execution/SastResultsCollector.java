@@ -1,6 +1,5 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -8,6 +7,7 @@ import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 import com.checkmarx.sonar.sensor.dto.FileQueries;
 import com.checkmarx.sonar.sensor.dto.SastSeverity;
 import com.checkmarx.sonar.settings.CxProperties;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sonar.api.batch.fs.FileSystem;

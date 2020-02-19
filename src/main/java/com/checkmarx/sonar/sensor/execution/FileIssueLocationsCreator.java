@@ -1,8 +1,8 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
+import com.cx.restclient.sast.dto.CxXMLResults;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;

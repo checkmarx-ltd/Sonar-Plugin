@@ -1,9 +1,11 @@
 package com.checkmarx.sonar.sensor.execution;
 
-import com.cx.restclient.sast.dto.CxXMLResults;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.logger.CxLogger;
-import com.checkmarx.sonar.sensor.dto.*;
+import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
+import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
+import com.checkmarx.sonar.sensor.dto.SastReportData;
+import com.cx.restclient.sast.dto.CxXMLResults;
 
 import java.text.DateFormat;
 import java.text.ParseException;
