@@ -3,7 +3,10 @@ package com.checkmarx.sonar.sensor.execution;
 import com.checkmarx.sonar.sensor.dto.FileQueries;
 import com.checkmarx.sonar.sensor.dto.QueryData;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by: zoharby.
