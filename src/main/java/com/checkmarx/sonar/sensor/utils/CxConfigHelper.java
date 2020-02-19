@@ -227,6 +227,7 @@ public class CxConfigHelper {
                     CxSonarConstants.CX_SONAR_ORIGIN,
                     false,
                     log);
+            shraga.login();
 
             teamId = shraga.getTeamIdByName(teamName);
         } catch (CxClientException | IOException e) {

@@ -1,9 +1,5 @@
 package com.checkmarx.sonar.sensor.dto;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.regex.Pattern;
-
 public class ProjectDetails {
 
     private String projectName;

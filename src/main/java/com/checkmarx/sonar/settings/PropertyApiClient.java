@@ -47,7 +47,7 @@ public class PropertyApiClient {
 
     public String getProperty(String name) throws IOException {
         String requestUrl = CxConfigHelper.getPropertyUrl(getSonarBaseUrl(), name, getComponentKey());
-        logger.info("Getting property: {}", requestUrl);
+        logger.debug("Getting property: {}", requestUrl);
 
         HttpUriRequest request = new HttpGet(requestUrl);
 
