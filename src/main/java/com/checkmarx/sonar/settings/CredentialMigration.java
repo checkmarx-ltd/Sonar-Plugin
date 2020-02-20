@@ -70,6 +70,8 @@ public class CredentialMigration {
             client.deleteProperty(LEGACY_CREDENTIALS_KEY);
 
             logger.info("Migration completed successfully.");
+        } else {
+            logger.info("Checkmarx credentials migration not needed");
         }
     }
 }
