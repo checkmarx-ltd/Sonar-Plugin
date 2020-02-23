@@ -5,7 +5,7 @@
     <groupId>checkmarx.com</groupId>
     <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>2019.4.1</version>
+    <version>2019.4.2</version>
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
@@ -210,7 +210,7 @@
         <dependency>
             <groupId>com.checkmarx</groupId>
             <artifactId>cx-client-common</artifactId>
-            <version>9.20.2</version>
+            <version>2020.1.2.NO.SCA</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
