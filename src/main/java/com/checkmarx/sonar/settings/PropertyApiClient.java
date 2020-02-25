@@ -4,6 +4,8 @@ import com.checkmarx.sonar.dto.RestEndpointContext;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -22,6 +24,7 @@ import org.sonar.api.batch.sensor.SensorContext;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -119,15 +122,25 @@ public class PropertyApiClient {
     }
 
     private void addAuthHeaders(HttpUriRequest request, CookieStore cookieStore) {
-        if (endpointContext != null) {
-            try {
-                request.setHeaders(endpointContext.getRequiredHeaders());
-                for (Cookie cookie : endpointContext.getRequiredCookies()) {
-                    cookieStore.addCookie(cookie);
+        try {
+            if (sensorContext != null &&
+                    sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).isPresent() &&
+                    sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).isPresent()) {
+                logger.info("Sonar server credentials are provided");
+                String auth = sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).get() + ":" + sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).get();
+                byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+                String authHeader = "Basic " + new String(encodedAuth);
+                request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            } else {
+                if (endpointContext != null) {
+                    request.setHeaders(endpointContext.getRequiredHeaders());
+                    for (Cookie cookie : endpointContext.getRequiredCookies()) {
+                        cookieStore.addCookie(cookie);
+                    }
                 }
-            } catch (Exception e) {
-                logger.error("Fail to add authentication headers", e);
             }
+        } catch (Exception e) {
+            logger.error("Fail to add authentication headers", e);
         }
     }
 
