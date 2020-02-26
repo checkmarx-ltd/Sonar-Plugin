@@ -123,14 +123,22 @@ public class PropertyApiClient {
 
     private void addAuthHeaders(HttpUriRequest request, CookieStore cookieStore) {
         try {
-            if (sensorContext != null &&
-                    sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).isPresent() &&
-                    sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).isPresent()) {
-                logger.info("Sonar server credentials are provided");
-                String auth = sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).get() + ":" + sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).get();
-                byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-                String authHeader = "Basic " + new String(encodedAuth);
-                request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            if (sensorContext != null) {
+                if (sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).isPresent() &&
+                        !sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).isPresent()) {
+                    logger.info("Sonar server token is provided");
+                    String auth = sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).get() + ":";
+                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+                    String authHeader = "Basic " + new String(encodedAuth);
+                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                } else if (sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).isPresent() &&
+                        sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).isPresent()) {
+                    logger.info("Sonar server credentials are provided");
+                    String auth = sensorContext.config().get(CxConfigHelper.SONAR_LOGIN_KEY).get() + ":" + sensorContext.config().get(CxConfigHelper.SONAR_PASSWORD_KEY).get();
+                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+                    String authHeader = "Basic " + new String(encodedAuth);
+                    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                }
             } else {
                 if (endpointContext != null) {
                     request.setHeaders(endpointContext.getRequiredHeaders());
