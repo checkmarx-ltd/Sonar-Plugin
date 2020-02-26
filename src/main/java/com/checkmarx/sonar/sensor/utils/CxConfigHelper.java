@@ -139,7 +139,6 @@ public class CxConfigHelper {
         scanConfig.setPresetId(1);
         String cxProject = getSonarProperty(context, CxProperties.CXPROJECT_KEY);
         try {
-
             ProjectDetails projectDetails = getProjectAndTeamDetails(cxProject, cxFullCredentials);
             scanConfig.setProjectName(projectDetails.getProjectName());
             scanConfig.setTeamId(projectDetails.getTeamId());
@@ -187,13 +186,29 @@ public class CxConfigHelper {
             } else if (response.getStatusLine().getStatusCode() == 401) {
                 log.info("Forced authentication is enabled: Sonar credentials must be provided");
                 HttpResponse retResponse;
-                String user = config.get(SONAR_LOGIN_KEY).get();
-                String pass = config.get(SONAR_PASSWORD_KEY).get();
+
+                String auth = null;
+                String token;
+                String user;
+                String pass;
+                if (config.get(SONAR_LOGIN_KEY).isPresent() &&
+                        !config.get(SONAR_PASSWORD_KEY).isPresent()) {
+                    token = config.get(SONAR_LOGIN_KEY).get();
+                    auth = token + ":";
+                    auth = new String(Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1)));
+                } else if (config.get(SONAR_LOGIN_KEY).isPresent() && config.get(SONAR_PASSWORD_KEY).isPresent()) {
+                    user = config.get(SONAR_LOGIN_KEY).get();
+                    pass = config.get(SONAR_PASSWORD_KEY).get();
+                    auth = user + ":" + pass;
+                    auth = new String(Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1)));
+                }
+                if (StringUtils.isEmpty(auth)) {
+                    log.error("No authentication input was provided.");
+                    return "";
+                }
 
                 HttpGet retRequest = new HttpGet(propertyHttpURL);
-                String auth = user + ":" + pass;
-                byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-                String authHeader = "Basic " + new String(encodedAuth);
+                String authHeader = "Basic " + auth;
                 retRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
                 retResponse = client.execute(retRequest);

@@ -1,5 +1,6 @@
 package com.checkmarx.sonar.sensor;
 
+import com.checkmarx.sonar.cxportalservice.sast.exception.CxRestLoginException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
@@ -43,7 +44,6 @@ public class CheckmarxSensor implements Sensor {
     private CxShragaClient shraga = null;
 
 
-
     @Override
     public void describe(SensorDescriptor descriptor) {
         descriptor.name("Import Checkmarx scan results to SonarQube");
@@ -57,6 +57,9 @@ public class CheckmarxSensor implements Sensor {
         try {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
             CxFullCredentials cxCredentials = configHelper.getCxFullCredentials(context);
+            if (cxCredentials == null) {
+                throw new CxRestLoginException("Missing Checkmarx credentials");
+            }
             CxScanConfig config = configHelper.getScanConfig(cxCredentials, context);
 
             logger.info("Connecting to {}", config.getUrl());
@@ -76,28 +79,28 @@ public class CheckmarxSensor implements Sensor {
             logger.info("Sast results retrieval finished.");
         } catch (Exception e) {
             logger.error("---------------------------------------------------------------------------------------\n");
-            logger.error("Sast results retrieval failed due to exception: "+e.getMessage() + "\n");
+            logger.error("Sast results retrieval failed due to exception: " + e.getMessage() + "\n");
             logger.error(versionProvider.appendVersionToMsg(""));
             logger.error("---------------------------------------------------------------------------------------");
             e.printStackTrace();
         }
     }
 
-    private void notifyComputeSatMeasuresSonarProjectHaveSastResults(SensorContext context){
+    private void notifyComputeSatMeasuresSonarProjectHaveSastResults(SensorContext context) {
         Iterable<InputFile> mainfiles = getMainFiles(context);
-        for (InputFile file : mainfiles){
+        for (InputFile file : mainfiles) {
             context.<Integer>newMeasure().on(file).forMetric(SONAR_PROJECT_HAVE_SAST_RESULTS).withValue(1).save();
         }
     }
 
-    private Iterable<InputFile> getMainFiles(SensorContext context){
+    private Iterable<InputFile> getMainFiles(SensorContext context) {
         FileSystem fs = context.fileSystem();
-        if(fs == null){
+        if (fs == null) {
             return new ArrayList<>();
         }
 
         Iterable<InputFile> mainFiles = fs.inputFiles(fs.predicates().hasType(InputFile.Type.MAIN));
-        if(mainFiles == null){
+        if (mainFiles == null) {
             return new ArrayList<>();
         }
         return mainFiles;
