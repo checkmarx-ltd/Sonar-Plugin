@@ -77,6 +77,10 @@
     </build>
 
     <properties>
+        <sonar.projectKey>checkmarx-ltd_Sonar-Plugin</sonar.projectKey>
+        <sonar.organization>checkmarx-ltd</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>2a6af192d7d0a013f3100bd5bc1c7e3f9d7c1e02</sonar.login>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.apiVersion>6.7</sonar.apiVersion>
         <jdk.min.version>1.8</jdk.min.version>
