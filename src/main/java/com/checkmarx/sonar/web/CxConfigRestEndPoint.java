@@ -10,9 +10,12 @@ import com.cx.restclient.sast.dto.Project;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +24,17 @@ import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,9 +76,16 @@ public class CxConfigRestEndPoint implements WebService {
                             validateCredentials(cxFullCredentials);
 
                             URL url = new URL(cxFullCredentials.getCxServerUrl());
-                            HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+                            URLConnection urlConn;
+                            if (url.getProtocol().equalsIgnoreCase("https")) {
+                                urlConn = url.openConnection();
+                                ((HttpsURLConnection) urlConn).setSSLSocketFactory(getSSLSocketFactory());
+                                ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
+                            } else {
+                                urlConn = url.openConnection();
+                            }
 
-                            shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(), cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, false, logger);
+                            shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(), cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger);
                             shraga.login();
                             urlConn.connect();
 
@@ -146,6 +163,21 @@ public class CxConfigRestEndPoint implements WebService {
 
         //apply changes
         controller.done();
+    }
+
+    private static SSLSocketFactory getSSLSocketFactory() throws CxClientException {
+        TrustStrategy acceptingTrustStrategy = new TrustAllStrategy();
+        SSLContext sslContext;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new CxClientException("Fail to set trust all certificate, 'SSLConnectionSocketFactory'", e);
+        }
+        return sslContext.getSocketFactory();
+    }
+
+    private static HostnameVerifier getHostnameVerifier() throws CxClientException {
+        return (hostname, session) -> true;
     }
 
     private void getCredentials(Request request, Response response) {

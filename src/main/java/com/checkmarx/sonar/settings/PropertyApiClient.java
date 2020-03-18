@@ -5,6 +5,7 @@ import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -55,13 +56,18 @@ public class PropertyApiClient {
         HttpUriRequest request = new HttpGet(requestUrl);
 
         String value;
+        JsonNode root = null;
         try {
             HttpResponse response = getResponse(request);
-            JsonNode root = objectMapper.readTree(response.getEntity().getContent());
+            root = objectMapper.readTree(response.getEntity().getContent());
             value = root.at("/0/value").textValue();
-        } catch (NullPointerException e) {
-            logger.error("Fail to get property from: " + requestUrl);
-            logger.debug("Fail to get property from: " + requestUrl, e);
+        } catch (Exception e) {
+            String msgVal = "";
+            if (root != null && StringUtils.isEmpty(root.toString())) {
+                msgVal = root.toString();
+            }
+            logger.error("Fail to get property from: " + requestUrl + ", Response value: " + msgVal);
+            logger.debug("Fail to get property from: " + requestUrl + ", Response value: " + msgVal, e);
             return null;
         }
         return value;

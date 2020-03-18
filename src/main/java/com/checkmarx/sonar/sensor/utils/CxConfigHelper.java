@@ -133,6 +133,7 @@ public class CxConfigHelper {
         scanConfig.setSastEnabled(true);
         scanConfig.setOsaEnabled(false);
         scanConfig.setSynchronous(true);
+        scanConfig.setDisableCertificateValidation(true);
         scanConfig.setUrl(cxFullCredentials.getCxServerUrl());
         scanConfig.setUsername(cxFullCredentials.getCxUsername());
         scanConfig.setPassword(cxFullCredentials.getCxPassword());
@@ -259,7 +260,7 @@ public class CxConfigHelper {
                     cxFullCredentials.getCxUsername(),
                     cxFullCredentials.getCxPassword(),
                     CxSonarConstants.CX_SONAR_ORIGIN,
-                    false,
+                    true,
                     log);
             shraga.login();
 
