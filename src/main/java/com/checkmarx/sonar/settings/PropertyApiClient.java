@@ -66,8 +66,7 @@ public class PropertyApiClient {
             if (root != null && StringUtils.isEmpty(root.toString())) {
                 msgVal = root.toString();
             }
-            logger.error("Fail to get property from: " + requestUrl + ", Response value: " + msgVal);
-            logger.debug("Fail to get property from: " + requestUrl + ", Response value: " + msgVal, e);
+            logger.error("Fail to get property from: " + requestUrl + ", Response value: " + msgVal, e);
             return null;
         }
         return value;
