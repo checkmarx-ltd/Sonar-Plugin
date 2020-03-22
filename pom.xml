@@ -82,6 +82,12 @@
         <jdk.min.version>1.8</jdk.min.version>
         <!-- Exclude generated classes from Sonar analyzes -->
         <sonar.exclusions>com/checkmarx/soap/client/**</sonar.exclusions>
+
+        <!-- properties to enable scan of this project in SonarCloud -->
+        <sonar.projectKey>checkmarx-ltd_Sonar-Plugin</sonar.projectKey>
+        <sonar.organization>checkmarx-ltd</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>86f4d98b457bb3cb42be1da752d6d57a449abddb</sonar.login>
     </properties>
 
     <repositories>
