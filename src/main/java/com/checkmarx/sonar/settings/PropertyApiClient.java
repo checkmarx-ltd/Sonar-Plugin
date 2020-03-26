@@ -55,7 +55,7 @@ public class PropertyApiClient {
 
         HttpUriRequest request = new HttpGet(requestUrl);
 
-        String value;
+        String value = null;
         JsonNode root = null;
         try {
             HttpResponse response = getResponse(request);
@@ -63,11 +63,10 @@ public class PropertyApiClient {
             value = root.at("/0/value").textValue();
         } catch (Exception e) {
             String msgVal = "";
-            if (root != null && StringUtils.isEmpty(root.toString())) {
+            if (root != null && StringUtils.isNotEmpty(root.toString())) {
                 msgVal = root.toString();
             }
             logger.error("Fail to get property from: " + requestUrl + ", Response value: " + msgVal, e);
-            return null;
         }
         return value;
     }
