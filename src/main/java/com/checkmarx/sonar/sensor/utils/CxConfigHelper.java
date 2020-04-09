@@ -106,7 +106,7 @@ public class CxConfigHelper {
         return result;
     }
 
-    private String getSonarProperty(SensorContext context, String propertyName) {
+    public String getSonarProperty(SensorContext context, String propertyName) {
         log.info("Resolving Cx setting: {}", propertyName);
 
         Configuration config = context.config();
@@ -152,7 +152,13 @@ public class CxConfigHelper {
     }
 
     private String getPropertyValue(String responseJson) {
-        return responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 3);
+        String value = null;
+        try {
+            value = responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 3);
+        } catch (StringIndexOutOfBoundsException e) {
+            log.debug("Fail to retrieve property value");
+        }
+        return value;
     }
 
     private ProjectDetails getProjectAndTeamDetails(String cxProject, CxFullCredentials cxFullCredentials) throws IOException {

@@ -8,7 +8,6 @@ import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sast.dto.Project;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.cookie.Cookie;
@@ -38,6 +37,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Created by: Zoharby.
@@ -77,12 +78,16 @@ public class CxConfigRestEndPoint implements WebService {
 
                             URL url = new URL(cxFullCredentials.getCxServerUrl());
                             URLConnection urlConn;
-                            if (url.getProtocol().equalsIgnoreCase("https")) {
-                                urlConn = url.openConnection();
-                                ((HttpsURLConnection) urlConn).setSSLSocketFactory(getSSLSocketFactory());
-                                ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
+
+                            Proxy proxy = getProxy();
+                            if (proxy != null) {
+                                urlConn = url.openConnection(proxy);
                             } else {
                                 urlConn = url.openConnection();
+                            }
+                            if (url.getProtocol().equalsIgnoreCase("https")) {
+                                ((HttpsURLConnection) urlConn).setSSLSocketFactory(getSSLSocketFactory());
+                                ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
                             }
 
                             shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(), cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger);
@@ -216,7 +221,7 @@ public class CxConfigRestEndPoint implements WebService {
     private CxFullCredentials getCredentialsFromRequest(Request request) throws IOException {
         CxFullCredentials result;
         String credentialsJson = request.getParam(CREDENTIALS_PARAM).getValue();
-        if (StringUtils.isNotEmpty(credentialsJson)) {
+        if (isNotEmpty(credentialsJson)) {
             result = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
         } else {
             throw new IOException("No credentials provided");
@@ -326,7 +331,6 @@ public class CxConfigRestEndPoint implements WebService {
         }
     }
 
-
     private String getProjects() throws IOException, CxClientException {
         List<Project> allProjects = shraga.getAllProjects();
 
@@ -342,4 +346,42 @@ public class CxConfigRestEndPoint implements WebService {
         JSONArray jsonArray = new JSONArray(listToConvert);
         return jsonArray.toString();
     }
+
+    private Proxy getProxy() {
+        final String HTTP_HOST = System.getProperty("http.proxyHost");
+        final String HTTP_PORT = System.getProperty("http.proxyPort");
+        final String HTTP_USERNAME = System.getProperty("http.proxyUser");
+        final String HTTP_PASSWORD = System.getProperty("http.proxyPassword");
+        final String HTTPS_HOST = System.getProperty("https.proxyHost");
+        final String HTTPS_PORT = System.getProperty("https.proxyPort");
+        final String HTTPS_USERNAME = System.getProperty("https.proxyUser");
+        final String HTTPS_PASSWORD = System.getProperty("https.proxyPassword");
+
+        Proxy proxy = null;
+        Authenticator authenticator;
+        if (isNotEmpty(HTTPS_HOST) && isNotEmpty(HTTPS_PORT)) {
+            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(HTTPS_HOST, Integer.parseInt(HTTPS_PORT)));
+            if (isNotEmpty(HTTPS_USERNAME) && isNotEmpty(HTTPS_PASSWORD)) {
+                authenticator = new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return (new PasswordAuthentication(HTTPS_USERNAME, HTTPS_PASSWORD.toCharArray()));
+                    }
+                };
+                Authenticator.setDefault(authenticator);
+            }
+        } else if (isNotEmpty(HTTP_HOST) && isNotEmpty(HTTP_PORT)) {
+            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(HTTP_HOST, Integer.parseInt(HTTP_PORT)));
+            if (isNotEmpty(HTTP_USERNAME) && isNotEmpty(HTTP_PASSWORD)) {
+                authenticator = new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return (new PasswordAuthentication(HTTP_USERNAME, HTTP_PASSWORD.toCharArray()));
+                    }
+                };
+                Authenticator.setDefault(authenticator);
+            }
+        }
+
+        return proxy;
+    }
+
 }
