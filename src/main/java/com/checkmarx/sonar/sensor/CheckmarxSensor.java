@@ -8,6 +8,7 @@ import com.checkmarx.sonar.sensor.execution.CxResultsAdapter;
 import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
+import com.checkmarx.sonar.settings.CxProperties;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
@@ -16,6 +17,7 @@ import com.cx.restclient.sast.dto.SASTResults;
 import com.cx.restclient.sast.utils.SASTUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
@@ -56,6 +58,11 @@ public class CheckmarxSensor implements Sensor {
 
         try {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
+            String cxProject = configHelper.getSonarProperty(context, CxProperties.CXPROJECT_KEY);
+            if (StringUtils.isEmpty(cxProject)) {
+                logger.info("Checkmarx analysis isn't configured, skipping step.");
+                return;
+            }
             CxFullCredentials cxCredentials = configHelper.getCxFullCredentials(context);
             if (cxCredentials == null) {
                 throw new CxRestLoginException("Missing Checkmarx credentials");

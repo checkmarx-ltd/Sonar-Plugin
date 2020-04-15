@@ -179,7 +179,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function createPasswordInput() {
-        // The password is never sent from server to client. 
+        // The password is never sent from server to client.
         // The password is sometimes sent from client to server: in case the user wants to test
         // connection with a new password or to save the new password.
         createInput('Password', 'password', ElementIds.PasswordInput, '');
