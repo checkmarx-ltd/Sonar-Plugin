@@ -65,7 +65,7 @@ class CxSonarFilePathUtil {
             shortPath = pathA;
         }
         String endOfLongPath = longPath.substring(longPath.length() - shortPath.length() , longPath.length());
-        return endOfLongPath.equals(shortPath);
+        return endOfLongPath.equalsIgnoreCase(shortPath);
     }
 
 }
