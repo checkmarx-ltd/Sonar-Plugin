@@ -55,15 +55,18 @@ public class PropertyApiClient {
 
         HttpUriRequest request = new HttpGet(requestUrl);
 
-        String value;
+        String value = null;
+        JsonNode root = null;
         try {
             HttpResponse response = getResponse(request);
-            JsonNode root = objectMapper.readTree(response.getEntity().getContent());
+            root = objectMapper.readTree(response.getEntity().getContent());
             value = root.at("/0/value").textValue();
-        } catch (NullPointerException e) {
-            logger.error("Fail to get property from: " + requestUrl);
-            logger.debug("Fail to get property from: " + requestUrl, e);
-            return null;
+        } catch (Exception e) {
+            String msgVal = "";
+            if (root != null && StringUtils.isNotEmpty(root.toString())) {
+                msgVal = root.toString();
+            }
+            logger.error("Fail to get property from: " + requestUrl + ", Response value: " + msgVal, e);
         }
         return value;
     }
