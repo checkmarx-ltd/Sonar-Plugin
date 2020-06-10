@@ -9,6 +9,8 @@ import com.checkmarx.sonar.sensor.execution.SastResultsCollector;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CxProperties;
+import com.checkmarx.sonar.web.HttpHelper;
+import com.checkmarx.sonar.web.ProxyParams;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
@@ -45,6 +47,9 @@ public class CheckmarxSensor implements Sensor {
     private SastResultsCollector sastResultsCollector = new SastResultsCollector();
     private CxShragaClient shraga = null;
 
+    static {
+        System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+    }
 
     @Override
     public void describe(SensorDescriptor descriptor) {
@@ -70,7 +75,13 @@ public class CheckmarxSensor implements Sensor {
             CxScanConfig config = configHelper.getScanConfig(cxCredentials, context);
 
             logger.info("Connecting to {}", config.getUrl());
-            shraga = new CxShragaClient(config, logger);
+            ProxyParams proxyParam = HttpHelper.getProxyParam();
+            if (proxyParam == null) {
+                shraga = new CxShragaClient(config, logger);
+            } else {
+                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
+            }
+
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestSASTResults();
 //            shraga.generateHTMLSummary(latestSASTResults, new OSAResults());

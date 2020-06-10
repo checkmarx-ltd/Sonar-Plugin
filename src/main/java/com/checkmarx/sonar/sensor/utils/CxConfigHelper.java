@@ -10,6 +10,8 @@ import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CredentialMigration;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.settings.PropertyApiClient;
+import com.checkmarx.sonar.web.HttpHelper;
+import com.checkmarx.sonar.web.ProxyParams;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
@@ -261,13 +263,30 @@ public class CxConfigHelper {
     private String getTeamId(String teamName, CxFullCredentials cxFullCredentials) throws IOException {
         String teamId;
         try {
-            CxShragaClient shraga = new CxShragaClient(
-                    cxFullCredentials.getCxServerUrl().trim(),
-                    cxFullCredentials.getCxUsername(),
-                    cxFullCredentials.getCxPassword(),
-                    CxSonarConstants.CX_SONAR_ORIGIN,
-                    true,
-                    log);
+            CxShragaClient shraga;
+            ProxyParams proxyParam = HttpHelper.getProxyParam();
+            if (proxyParam == null) {
+                shraga = new CxShragaClient(
+                        cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true,
+                        log);
+            } else {
+                shraga = new CxShragaClient(
+                        cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true,
+                        log,
+                        proxyParam.getHost(),
+                        proxyParam.getPort(),
+                        proxyParam.getUser(),
+                        proxyParam.getPassword());
+            }
+
             shraga.login();
 
             teamId = shraga.getTeamIdByName(teamName);

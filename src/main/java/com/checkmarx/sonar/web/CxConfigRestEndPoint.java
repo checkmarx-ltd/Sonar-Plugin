@@ -58,6 +58,10 @@ public class CxConfigRestEndPoint implements WebService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    static {
+        System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+    }
+
     @Override
     public void define(Context context) {
         NewController controller = context.createController("api/checkmarx");
@@ -79,8 +83,9 @@ public class CxConfigRestEndPoint implements WebService {
                             URL url = new URL(cxFullCredentials.getCxServerUrl());
                             URLConnection urlConn;
 
-                            Proxy proxy = getProxy();
+                            Proxy proxy = HttpHelper.getProxy();
                             if (proxy != null) {
+                                logger.info("Using proxy to connect to SAST server");
                                 urlConn = url.openConnection(proxy);
                             } else {
                                 urlConn = url.openConnection();
@@ -90,7 +95,16 @@ public class CxConfigRestEndPoint implements WebService {
                                 ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
                             }
 
-                            shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(), cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger);
+                            ProxyParams proxyParam = HttpHelper.getProxyParam();
+                            if (proxy == null) {
+                                shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
+                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger);
+                            } else {
+                                shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
+                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
+                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
+                            }
+
                             shraga.login();
                             urlConn.connect();
 
@@ -347,41 +361,5 @@ public class CxConfigRestEndPoint implements WebService {
         return jsonArray.toString();
     }
 
-    private Proxy getProxy() {
-        final String HTTP_HOST = System.getProperty("http.proxyHost");
-        final String HTTP_PORT = System.getProperty("http.proxyPort");
-        final String HTTP_USERNAME = System.getProperty("http.proxyUser");
-        final String HTTP_PASSWORD = System.getProperty("http.proxyPassword");
-        final String HTTPS_HOST = System.getProperty("https.proxyHost");
-        final String HTTPS_PORT = System.getProperty("https.proxyPort");
-        final String HTTPS_USERNAME = System.getProperty("https.proxyUser");
-        final String HTTPS_PASSWORD = System.getProperty("https.proxyPassword");
-
-        Proxy proxy = null;
-        Authenticator authenticator;
-        if (isNotEmpty(HTTPS_HOST) && isNotEmpty(HTTPS_PORT)) {
-            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(HTTPS_HOST, Integer.parseInt(HTTPS_PORT)));
-            if (isNotEmpty(HTTPS_USERNAME) && isNotEmpty(HTTPS_PASSWORD)) {
-                authenticator = new Authenticator() {
-                    public PasswordAuthentication getPasswordAuthentication() {
-                        return (new PasswordAuthentication(HTTPS_USERNAME, HTTPS_PASSWORD.toCharArray()));
-                    }
-                };
-                Authenticator.setDefault(authenticator);
-            }
-        } else if (isNotEmpty(HTTP_HOST) && isNotEmpty(HTTP_PORT)) {
-            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(HTTP_HOST, Integer.parseInt(HTTP_PORT)));
-            if (isNotEmpty(HTTP_USERNAME) && isNotEmpty(HTTP_PASSWORD)) {
-                authenticator = new Authenticator() {
-                    public PasswordAuthentication getPasswordAuthentication() {
-                        return (new PasswordAuthentication(HTTP_USERNAME, HTTP_PASSWORD.toCharArray()));
-                    }
-                };
-                Authenticator.setDefault(authenticator);
-            }
-        }
-
-        return proxy;
-    }
 
 }
