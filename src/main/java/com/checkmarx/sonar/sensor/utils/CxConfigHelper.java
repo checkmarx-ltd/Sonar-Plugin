@@ -48,7 +48,10 @@ public class CxConfigHelper {
     private static final String VALUE = "value";
 
     private static final String ENCODING = StandardCharsets.UTF_8.name();
-    public static final String PROPERTIES_API_PATH = "api/properties";
+
+    public static final String SETTINGS_API_PATH = "api/settings";
+    public static final String SETTINGS_API_SET_PATH = SETTINGS_API_PATH + "/set";
+    public static final String SETTINGS_API_GET_PATH = SETTINGS_API_PATH + "/values";
 
     private Logger log;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -327,9 +330,9 @@ public class CxConfigHelper {
     public static String getPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {
         String result = null;
         try {
-            result = String.format("%s/%s?id=%s&resource=%s",
+            result = String.format("%s/%s?keys=%s&component=%s",
                     sonarBaseUrl,
-                    PROPERTIES_API_PATH,
+                    SETTINGS_API_GET_PATH,
                     URLEncoder.encode(propertyName, ENCODING),
                     URLEncoder.encode(componentKey, ENCODING));
         } catch (UnsupportedEncodingException ignored) {

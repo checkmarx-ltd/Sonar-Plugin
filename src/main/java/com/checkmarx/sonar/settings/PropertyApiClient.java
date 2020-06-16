@@ -60,7 +60,7 @@ public class PropertyApiClient {
         try {
             HttpResponse response = getResponse(request);
             root = objectMapper.readTree(response.getEntity().getContent());
-            value = root.at("/0/value").textValue();
+            value = root.at("/settings/0/value").textValue();
         } catch (Exception e) {
             String msgVal = "";
             if (root != null && StringUtils.isNotEmpty(root.toString())) {
@@ -72,13 +72,13 @@ public class PropertyApiClient {
     }
 
     public void setProperty(String name, String value) throws IOException {
-        String requestUrl = String.format("%s/%s", getSonarBaseUrl(), CxConfigHelper.PROPERTIES_API_PATH);
+        String requestUrl = String.format("%s/%s", getSonarBaseUrl(), CxConfigHelper.SETTINGS_API_SET_PATH);
         logger.info("Setting property: {} at {}", name, requestUrl);
 
         HttpPost request = new HttpPost(requestUrl);
         NameValuePair[] params = new NameValuePair[]{
-                new BasicNameValuePair("id", name),
-                new BasicNameValuePair("resource", getComponentKey()),
+                new BasicNameValuePair("component", getComponentKey()),
+                new BasicNameValuePair("key", name),
                 new BasicNameValuePair("value", value),
         };
         UrlEncodedFormEntity body = new UrlEncodedFormEntity(Arrays.asList(params));

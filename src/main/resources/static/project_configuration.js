@@ -690,9 +690,9 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function getSonarSettingResponse(key) {
-        return window.SonarRequest.getJSON('/api/properties', {
-            id: key,
-            resource: options.component.key
+        return window.SonarRequest.getJSON('/api/settings/values', {
+            component: options.component.key,
+            keys: key
         })
     }
 
@@ -722,17 +722,17 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     }
 
     function updateSonarSetting(id, newValue) {
-        return window.SonarRequest.post('/api/properties', {
-            id: id,
+        return window.SonarRequest.post('/api/settings/set', {
+            key: id,
             value: newValue,
-            resource: options.component.key
+            component: options.component.key
         });
     }
 
     function getSettingValue(response, defaultValue) {
         var result;
         try {
-            result = response[0].value;
+            result = response.settings[0].value;
         } catch (err) {
             result = defaultValue;
         }
