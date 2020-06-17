@@ -159,7 +159,7 @@ public class CxConfigHelper {
     private String getPropertyValue(String responseJson) {
         String value = null;
         try {
-            value = responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 3);
+            value = responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 4);
         } catch (StringIndexOutOfBoundsException e) {
             log.debug("Fail to retrieve property value");
         }
