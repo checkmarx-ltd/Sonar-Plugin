@@ -10,6 +10,8 @@ import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CredentialMigration;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.settings.PropertyApiClient;
+import com.checkmarx.sonar.web.HttpHelper;
+import com.checkmarx.sonar.web.ProxyParams;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
@@ -46,7 +48,10 @@ public class CxConfigHelper {
     private static final String VALUE = "value";
 
     private static final String ENCODING = StandardCharsets.UTF_8.name();
-    public static final String PROPERTIES_API_PATH = "api/properties";
+
+    public static final String SETTINGS_API_PATH = "api/settings";
+    public static final String SETTINGS_API_SET_PATH = SETTINGS_API_PATH + "/set";
+    public static final String SETTINGS_API_GET_PATH = SETTINGS_API_PATH + "/values";
 
     private Logger log;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -154,7 +159,7 @@ public class CxConfigHelper {
     private String getPropertyValue(String responseJson) {
         String value = null;
         try {
-            value = responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 3);
+            value = responseJson.substring(responseJson.indexOf(VALUE) + 8, responseJson.length() - 4);
         } catch (StringIndexOutOfBoundsException e) {
             log.debug("Fail to retrieve property value");
         }
@@ -261,13 +266,30 @@ public class CxConfigHelper {
     private String getTeamId(String teamName, CxFullCredentials cxFullCredentials) throws IOException {
         String teamId;
         try {
-            CxShragaClient shraga = new CxShragaClient(
-                    cxFullCredentials.getCxServerUrl().trim(),
-                    cxFullCredentials.getCxUsername(),
-                    cxFullCredentials.getCxPassword(),
-                    CxSonarConstants.CX_SONAR_ORIGIN,
-                    true,
-                    log);
+            CxShragaClient shraga;
+            ProxyParams proxyParam = HttpHelper.getProxyParam();
+            if (proxyParam == null) {
+                shraga = new CxShragaClient(
+                        cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true,
+                        log);
+            } else {
+                shraga = new CxShragaClient(
+                        cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true,
+                        log,
+                        proxyParam.getHost(),
+                        proxyParam.getPort(),
+                        proxyParam.getUser(),
+                        proxyParam.getPassword());
+            }
+
             shraga.login();
 
             teamId = shraga.getTeamIdByName(teamName);
@@ -308,9 +330,9 @@ public class CxConfigHelper {
     public static String getPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {
         String result = null;
         try {
-            result = String.format("%s/%s?id=%s&resource=%s",
+            result = String.format("%s/%s?keys=%s&component=%s",
                     sonarBaseUrl,
-                    PROPERTIES_API_PATH,
+                    SETTINGS_API_GET_PATH,
                     URLEncoder.encode(propertyName, ENCODING),
                     URLEncoder.encode(componentKey, ENCODING));
         } catch (UnsupportedEncodingException ignored) {
