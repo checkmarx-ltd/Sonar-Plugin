@@ -47,6 +47,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class CxConfigRestEndPoint implements WebService {
 
     private static final String COMPONENT_KEY_PARAM = "component";
+    private static final String CXVERSION = "SASTVERSION";
     private static final String CREDENTIALS_PARAM = "credentials";
 
     private static final String IS_SUCCESSFUL = "isSuccessful";
@@ -104,6 +105,7 @@ public class CxConfigRestEndPoint implements WebService {
                                         cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
                                         proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
                             }
+                          //  final String cxVersion = shraga.getCxVersion();
 
                             shraga.login();
                             urlConn.connect();

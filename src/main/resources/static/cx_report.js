@@ -147,7 +147,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     function metricRequest(metricKey) {
         return window.SonarRequest.getJSON('/api/measures/component', {
             resolved: false,
-            componentKey: options.component.key,
+            component: options.component.key,
             metricKeys: metricKey
         })}
     
@@ -178,7 +178,8 @@ window.registerExtension('checkmarx/cx_report', function (options) {
         ++queryPagesCounter;
         componentTreeRequest(queryPagesCounter).then(function (response) {
             var iii = response.components;
-            if (iii == undefined || iii.length == 0) {
+        /*    var resTest=response.paging;*/
+            if (iii == undefined || iii.length == 0 ) {
                 //for timely execution this code needs to be here
                 return new Promise(function () {
                     options.el.removeChild(spanSpinner);
@@ -202,11 +203,11 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     function componentTreeRequest(pageIdx) {
         return window.SonarRequest.getJSON('/api/measures/component_tree', {
             resolved: false,
-            baseComponentKey: options.component.key,
+            component: options.component.key,
             metricKeys: 'cx.sast.result.queries',
             qualifier: 'FIL',
             ps : 500,
-            pageIndex: pageIdx
+            p: pageIdx
         })}
 
     function addQueriesToSummery(queriesJson) {
