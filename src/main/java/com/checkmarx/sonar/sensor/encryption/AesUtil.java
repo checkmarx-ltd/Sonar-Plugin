@@ -26,7 +26,7 @@ public class AesUtil {
     
     public AesUtil() {
         try {
-            cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         }
         catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw fail(e);
