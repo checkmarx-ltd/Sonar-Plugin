@@ -22,6 +22,7 @@ import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.api.utils.text.JsonWriter;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -105,7 +106,7 @@ public class CxConfigRestEndPoint implements WebService {
                                         cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
                                         proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
                             }
-                          //  final String cxVersion = shraga.getCxVersion();
+                            //  final String cxVersion = shraga.getCxVersion();
 
                             shraga.login();
                             urlConn.connect();
@@ -129,25 +130,26 @@ public class CxConfigRestEndPoint implements WebService {
                     public void handle(Request request, Response response) {
 
                         logger.info("Retrieving Cx server projects.");
+                        JsonWriter js = response.newJsonWriter();
                         try {
                             String projects = getProjects();
-                            response.newJsonWriter()
-                                    .beginObject()
+                            js.beginObject()
                                     .prop("projects", projects)
                                     .prop(IS_SUCCESSFUL, true)
-                                    .endObject()
-                                    .close();
+                                    .endObject();
                         } catch (Exception e) {
                             e.printStackTrace();
                             logger.error("Projects retrieval failed due to Exception: " + e.getMessage());
-                            response.newJsonWriter()
-                                    .beginObject()
+                            js.beginObject()
                                     .prop("projects", "")
                                     .prop(IS_SUCCESSFUL, false)
                                     .prop(ERROR_MESSAGE, e.getMessage())
-                                    .endObject()
-                                    .close();
+                                    .endObject();
+                        } finally {
+                            js.close();
+
                         }
+
                     }
                 });
 
@@ -246,22 +248,29 @@ public class CxConfigRestEndPoint implements WebService {
     }
 
     private void sendSuccess(Response response) {
-        response.newJsonWriter()
-                .beginObject()
+
+        try(JsonWriter js1 = response.newJsonWriter()){
+             js1.beginObject()
                 .prop(IS_SUCCESSFUL, true)
-                .endObject()
-                .close();
+                .endObject();
+        }catch (Exception e)
+        {
+            sendError(response, "success message failed.", e);
+        }
+
     }
 
     private void sendError(Response response, String message, Exception exception) {
         logger.error(message, exception);
 
-        response.newJsonWriter()
-                .beginObject()
+        try(JsonWriter js1 = response.newJsonWriter()){
+                js1.beginObject()
                 .prop(IS_SUCCESSFUL, false)
                 .prop(ERROR_MESSAGE, message)
-                .endObject()
-                .close();
+                .endObject();}
+        catch (Exception e){
+            sendError(response, "failed to show message", e);
+        }
     }
 
     private void setPasswordIfMissing(CxFullCredentials credentialsFromRequest, Request request) throws URISyntaxException, IOException {
