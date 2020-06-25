@@ -295,7 +295,14 @@ public class CxConfigRestEndPoint implements WebService {
         String componentKey = request.getParam(COMPONENT_KEY_PARAM).getValue();
         result.setComponentKey(componentKey);
 
-        String baseUrl = String.format("%s://%s", refererUri.getScheme(), refererUri.getAuthority());
+        String contextPath = "";
+        String urlPath = refererUri.getPath();
+        if (!(urlPath.startsWith("/static") || urlPath.startsWith("/project"))) {
+            String prefix = urlPath.contains("/project") ? "/project" : "/static";
+            contextPath = urlPath.substring(0, urlPath.indexOf(prefix));
+        }
+
+        String baseUrl = String.format("%s://%s%s", refererUri.getScheme(), refererUri.getAuthority(), contextPath);
         result.setSonarBaseUrl(baseUrl);
 
         Cookie[] requiredCookies = getRequiredCookies(request, refererUri);
