@@ -20,7 +20,7 @@ public class SecretKeyStore {
     // This type allows storing keys for symmetric encryption.
     private static final String KEY_STORE_TYPE = "JCEKS";
 
-    private static final char[] PASSWORD = "RksdGtdBvkJmetJ-ieQX95FtN8Ozac".toCharArray();
+    private static final char[] PSSD = "RksdGtdBvkJmetJ-ieQX95FtN8Ozac".toCharArray();
 
     private static final int KEY_SIZE = 128;
 
@@ -34,7 +34,7 @@ public class SecretKeyStore {
         try {
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
             try (InputStream storeFile = getClass().getClassLoader().getResourceAsStream(KEYSTORE_FILENAME)) {
-                keyStore.load(storeFile, PASSWORD);
+                keyStore.load(storeFile, PSSD);
             }
             KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) keyStore.getEntry(KEY_ALIAS, getProtection());
 
@@ -67,7 +67,7 @@ public class SecretKeyStore {
 
             File fileToCreate = new File(targetDir, KEYSTORE_FILENAME);
             try (FileOutputStream output = new FileOutputStream(fileToCreate)) {
-                keyStore.store(output, PASSWORD);
+                keyStore.store(output, PSSD);
             }
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             throw new IOException("Error creating KeyStore.", e);
@@ -92,6 +92,6 @@ public class SecretKeyStore {
     }
 
     private KeyStore.PasswordProtection getProtection() {
-        return new KeyStore.PasswordProtection(PASSWORD);
+        return new KeyStore.PasswordProtection(PSSD);
     }
 }

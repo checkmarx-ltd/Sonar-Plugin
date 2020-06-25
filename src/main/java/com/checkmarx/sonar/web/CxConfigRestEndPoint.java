@@ -104,7 +104,7 @@ public class CxConfigRestEndPoint implements WebService {
                             } else {
                                 shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
                                         cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
-                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
+                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
                             }
                             //  final String cxVersion = shraga.getCxVersion();
 

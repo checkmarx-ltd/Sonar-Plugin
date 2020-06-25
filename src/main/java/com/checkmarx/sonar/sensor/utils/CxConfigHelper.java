@@ -287,7 +287,7 @@ public class CxConfigHelper {
                         proxyParam.getHost(),
                         proxyParam.getPort(),
                         proxyParam.getUser(),
-                        proxyParam.getPassword());
+                        proxyParam.getPssd());
             }
 
             shraga.login();
