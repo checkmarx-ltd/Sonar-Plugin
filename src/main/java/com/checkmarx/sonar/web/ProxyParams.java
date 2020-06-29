@@ -5,7 +5,8 @@ public class ProxyParams {
     private String host;
     private int port;
     private String user;
-    private String password;
+    private String pssd;
+
 
     public ProxyParams(String host, int port) {
         this.host = host;
@@ -16,7 +17,7 @@ public class ProxyParams {
         this.host = host;
         this.port = port;
         this.user = user;
-        this.password = password;
+        this.pssd = password;
     }
 
     public String getHost() {
@@ -43,12 +44,12 @@ public class ProxyParams {
         this.user = user;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPssd() {
+        return pssd;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPssd(String pssd) {
+        this.pssd = pssd;
     }
 
 }

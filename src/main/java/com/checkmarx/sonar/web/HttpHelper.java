@@ -30,7 +30,7 @@ public class HttpHelper {
             params = new ProxyParams(CX_HTTP_HOST, Integer.parseInt(CX_HTTP_PORT));
             if (isNotEmpty(CX_HTTP_USERNAME) && isNotEmpty(CX_HTTP_PASSWORD)) {
                 params.setUser(CX_HTTP_USERNAME);
-                params.setPassword(CX_HTTP_PASSWORD);
+                params.setPssd(CX_HTTP_PASSWORD);
             }
         }
 
@@ -43,13 +43,13 @@ public class HttpHelper {
             params = new ProxyParams(HTTPS_HOST, Integer.parseInt(HTTPS_PORT));
             if (isNotEmpty(HTTPS_USERNAME) && isNotEmpty(HTTPS_PASSWORD)) {
                 params.setUser(HTTPS_USERNAME);
-                params.setPassword(HTTPS_PASSWORD);
+                params.setPssd(HTTPS_PASSWORD);
             }
         } else if (isNotEmpty(HTTP_HOST) && isNotEmpty(HTTP_PORT)) {
             params = new ProxyParams(HTTP_HOST, Integer.parseInt(HTTP_PORT));
             if (isNotEmpty(HTTP_USERNAME) && isNotEmpty(HTTP_PASSWORD)) {
                 params.setUser(HTTP_USERNAME);
-                params.setPassword(HTTP_PASSWORD);
+                params.setPssd(HTTP_PASSWORD);
             }
         }
 

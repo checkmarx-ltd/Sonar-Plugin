@@ -1,31 +1,34 @@
 package com.checkmarx.sonar.sensor.encryption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.SecretKey;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.util.Properties;
 
 /**
  * Represents a file-based storage for a single secret key.
  */
 public class SecretKeyStore {
-    private static final String KEY_ALIAS = "CxCredentials";
+    private static final String KY_ALIAS = "CxCredentials";
+    private static final String CONFIG_FILE = "project.properties";
 
     // This type allows storing keys for symmetric encryption.
     private static final String KEY_STORE_TYPE = "JCEKS";
 
-    private static final char[] PASSWORD = "RksdGtdBvkJmetJ-ieQX95FtN8Ozac".toCharArray();
-
+    private static final String STORED_P = "RksdGtdBvkJmetJ-ieQX95FtN8Ozac";
+    private static final char[] PASD = STORED_P.toCharArray();
     private static final int KEY_SIZE = 128;
 
     private static final String KEYSTORE_FILENAME = "keystore.bin";
 
+    private Properties applicationProperties;
     /**
      * Loads the secret key from the key store file.
      */
@@ -34,9 +37,9 @@ public class SecretKeyStore {
         try {
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
             try (InputStream storeFile = getClass().getClassLoader().getResourceAsStream(KEYSTORE_FILENAME)) {
-                keyStore.load(storeFile, PASSWORD);
+                keyStore.load(storeFile, PASD);
             }
-            KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) keyStore.getEntry(KEY_ALIAS, getProtection());
+            KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) keyStore.getEntry(KY_ALIAS, getProtection());
 
             result = entry.getSecretKey();
 
@@ -45,6 +48,7 @@ public class SecretKeyStore {
         }
         return result;
     }
+
 
     /**
      * Creates a secret key and stores it in a new file-based KeyStore.
@@ -63,11 +67,11 @@ public class SecretKeyStore {
 
             KeyStore.SecretKeyEntry entry = new KeyStore.SecretKeyEntry(key);
 
-            keyStore.setEntry(KEY_ALIAS, entry, getProtection());
+            keyStore.setEntry(KY_ALIAS, entry, getProtection());
 
             File fileToCreate = new File(targetDir, KEYSTORE_FILENAME);
             try (FileOutputStream output = new FileOutputStream(fileToCreate)) {
-                keyStore.store(output, PASSWORD);
+                keyStore.store(output, PASD);
             }
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             throw new IOException("Error creating KeyStore.", e);
@@ -92,6 +96,6 @@ public class SecretKeyStore {
     }
 
     private KeyStore.PasswordProtection getProtection() {
-        return new KeyStore.PasswordProtection(PASSWORD);
+        return new KeyStore.PasswordProtection(PASD);
     }
 }

@@ -22,6 +22,7 @@ import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.api.utils.text.JsonWriter;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -103,9 +104,9 @@ public class CxConfigRestEndPoint implements WebService {
                             } else {
                                 shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
                                         cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
-                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPassword());
+                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
                             }
-                          //  final String cxVersion = shraga.getCxVersion();
+                            //  final String cxVersion = shraga.getCxVersion();
 
                             shraga.login();
                             urlConn.connect();
@@ -129,25 +130,26 @@ public class CxConfigRestEndPoint implements WebService {
                     public void handle(Request request, Response response) {
 
                         logger.info("Retrieving Cx server projects.");
+                        JsonWriter js = response.newJsonWriter();
                         try {
                             String projects = getProjects();
-                            response.newJsonWriter()
-                                    .beginObject()
+                            js.beginObject()
                                     .prop("projects", projects)
                                     .prop(IS_SUCCESSFUL, true)
-                                    .endObject()
-                                    .close();
+                                    .endObject();
                         } catch (Exception e) {
                             e.printStackTrace();
                             logger.error("Projects retrieval failed due to Exception: " + e.getMessage());
-                            response.newJsonWriter()
-                                    .beginObject()
+                            js.beginObject()
                                     .prop("projects", "")
                                     .prop(IS_SUCCESSFUL, false)
                                     .prop(ERROR_MESSAGE, e.getMessage())
-                                    .endObject()
-                                    .close();
+                                    .endObject();
+                        } finally {
+                            js.close();
+
                         }
+
                     }
                 });
 
@@ -246,22 +248,29 @@ public class CxConfigRestEndPoint implements WebService {
     }
 
     private void sendSuccess(Response response) {
-        response.newJsonWriter()
-                .beginObject()
+
+        try(JsonWriter js1 = response.newJsonWriter()){
+             js1.beginObject()
                 .prop(IS_SUCCESSFUL, true)
-                .endObject()
-                .close();
+                .endObject();
+        }catch (Exception e)
+        {
+            sendError(response, "success message failed.", e);
+        }
+
     }
 
     private void sendError(Response response, String message, Exception exception) {
         logger.error(message, exception);
 
-        response.newJsonWriter()
-                .beginObject()
+        try(JsonWriter js1 = response.newJsonWriter()){
+                js1.beginObject()
                 .prop(IS_SUCCESSFUL, false)
                 .prop(ERROR_MESSAGE, message)
-                .endObject()
-                .close();
+                .endObject();}
+        catch (Exception e){
+            sendError(response, "failed to show message", e);
+        }
     }
 
     private void setPasswordIfMissing(CxFullCredentials credentialsFromRequest, Request request) throws URISyntaxException, IOException {
@@ -286,7 +295,14 @@ public class CxConfigRestEndPoint implements WebService {
         String componentKey = request.getParam(COMPONENT_KEY_PARAM).getValue();
         result.setComponentKey(componentKey);
 
-        String baseUrl = String.format("%s://%s", refererUri.getScheme(), refererUri.getAuthority());
+        String contextPath = "";
+        String urlPath = refererUri.getPath();
+        if (!(urlPath.startsWith("/static") || urlPath.startsWith("/project"))) {
+            String prefix = urlPath.contains("/project") ? "/project" : "/static";
+            contextPath = urlPath.substring(0, urlPath.indexOf(prefix));
+        }
+
+        String baseUrl = String.format("%s://%s%s", refererUri.getScheme(), refererUri.getAuthority(), contextPath);
         result.setSonarBaseUrl(baseUrl);
 
         Cookie[] requiredCookies = getRequiredCookies(request, refererUri);
