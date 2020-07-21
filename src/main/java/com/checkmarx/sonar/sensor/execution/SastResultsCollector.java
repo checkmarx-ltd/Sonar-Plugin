@@ -63,11 +63,11 @@ public class SastResultsCollector {
             currFileQueriesCollector = new FileQueriesCollector();
 
             FileIssueLocationsCreator fileLocationsCreator = new FileIssueLocationsCreator(file);
-            for(int i=0;i<testFilesList.size();i++)
-            {
+           /* for(int i=0;i<testFilesList.size();i++)
+            {*/
             if (!file.isEmpty() && file.isFile()) {
-               // List<CxResultToSonarResult> resultsForCurrFile = CxSonarFilePathUtil.findResultsByFilePath(cxReport, file.absolutePath());
-                List<CxResultToSonarResult> resultsForCurrFile = CxSonarFilePathUtil.findResultsByFilePath(cxReport, testFilesList.get(i));
+                List<CxResultToSonarResult> resultsForCurrFile = CxSonarFilePathUtil.findResultsByFilePath(cxReport, file.absolutePath());
+               // List<CxResultToSonarResult> resultsForCurrFile = CxSonarFilePathUtil.findResultsByFilePath(cxReport, testFilesList.get(i));
                 if (resultsForCurrFile == null) {
                     continue;
                 }
@@ -103,11 +103,11 @@ public class SastResultsCollector {
                 }//result loop
             }//if !file.isEmpty() && file.isFile())
                 //send list.get(i)
-//            saveCxCustomMetrics(context, file);
-//            saveCxQueriesMeasure(context, file);
+            saveCxCustomMetrics(context, file);
+            saveCxQueriesMeasure(context, file);
         }//files loop
     }
-    }
+
 
     private List<String> getFilesByPath(String path) {
         List<String> result = new ArrayList<>();
@@ -137,9 +137,9 @@ public class SastResultsCollector {
         //find next path and add to the array list .next path C:\Users\morada\IdeaProjects\SDK\CX-SDK-Application\src\main\java
         //loop to go over all moudles and call the method ggetfilesbypath
 
-        testFilesList = getFilesByPath("C:\\Users\\morada\\IdeaProjects\\SDK");
+      //  testFilesList = getFilesByPath("C:\\Users\\morada\\IdeaProjects\\SDK");
         mainFiles = getMainFiles(context);
-        //mainFiles = convertArrayToInputFileType(testFilesList,context);
+       // mainFiles = convertArrayToInputFileType(testFilesList,context);
         activeRules = context.activeRules();
         setRemediationEffortPerVulnerability(context);
     }
