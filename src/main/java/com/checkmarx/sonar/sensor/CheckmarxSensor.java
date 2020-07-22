@@ -27,11 +27,9 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
-
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
 import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_RESULTS;
 
@@ -53,7 +51,7 @@ public class CheckmarxSensor implements Sensor {
 
     @Override
     public void describe(SensorDescriptor descriptor) {
-        descriptor.name("Import Checkmarx scan results to SonarQube");
+        descriptor.name("Import Checkmarx scan results to SonarQube").global();
     }
 
     @Override
