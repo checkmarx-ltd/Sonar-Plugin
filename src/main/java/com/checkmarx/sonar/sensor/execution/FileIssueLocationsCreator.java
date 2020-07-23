@@ -22,7 +22,7 @@ class FileIssueLocationsCreator {
 
     private InputFile file;
     private final static String LINE = " line: ";
-    private final static String FILE = " ; file: ";
+    private final static String SEMI_COLON_FILE = " ; file: ";
 
     FileIssueLocationsCreator(InputFile file) {
         this.file = file;
@@ -55,7 +55,7 @@ class FileIssueLocationsCreator {
                         nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
 
                         if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopEndIdx).getFileName(), file.absolutePath())) {
-                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + FILE +
+                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + SEMI_COLON_FILE +
                                     resultsNodes.get(nodeLoopEndIdx).getFileName() + LINE + resultsNodes.get(nodeLoopEndIdx).getLine();
                             ++nodeLoopEndIdx;
                         }
@@ -82,9 +82,9 @@ class FileIssueLocationsCreator {
                         continue;
                     }
                     //next and prev in messages are to be opposites to next and prev in loop booleans(because iteration is end to start)
-                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + FILE +
+                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + SEMI_COLON_FILE +
                             resultsNodes.get(i - 1).getFileName() + LINE + resultsNodes.get(i - 1).getLine();
-                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + FILE +
+                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + SEMI_COLON_FILE +
                             resultsNodes.get(i + 1).getFileName() + LINE + resultsNodes.get(i + 1).getLine();
                     String msg = currNode.getName() + msgPrev + msgNext;
                     allLocationsInFile.add(defaultIssueLocation.message(msg));
