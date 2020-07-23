@@ -31,7 +31,7 @@ public class OsaScanClient implements Closeable {
     private static final String AUTHENTICATION_PATH = "auth/login";
     private static final String ANALYZE_SUMMARY_PATH = "osa/reports";
     private static final String LIBRARIES_PATH = "osa/libraries";
-    private static final String CVEs_PATH = "osa/vulnerabilities";
+    private static final String CVES_PATH = "osa/vulnerabilities";
     private static final String FAILED_TO_CONNECT_CX_SERVER_ERROR = "connection to checkmarx server failed";
     private static final String CX_COOKIE = "cxCookie";
     private static final String CSRF_COOKIE = "CXCSRFToken";
@@ -145,7 +145,7 @@ public class OsaScanClient implements Closeable {
         int lastListSize = ITEMS_PER_PAGE;
         int currentPage = 1;
         while (lastListSize == ITEMS_PER_PAGE) {
-            Invocation invocation = getPageRequestInvocation(CVEs_PATH, currentPage, scanId);
+            Invocation invocation = getPageRequestInvocation(CVES_PATH, currentPage, scanId);
             logger.info("sending request for CVE's page number " + currentPage);
             Response response = invokeRequest(invocation);
             validateResponse(response, Response.Status.OK, "fail get OSA scan CVE's");
@@ -210,12 +210,12 @@ public class OsaScanClient implements Closeable {
 
     private boolean isScanFailed(OsaScan osaScan){
         ScanStatus scanStatus = ScanStatus.fromId(osaScan.getState().getId());
-        return scanStatus == ScanStatus.Failed;
+        return scanStatus == ScanStatus.FAILED;
     }
 
     private boolean isScanSucceeded(OsaScan osaScan) {
         ScanStatus scanStatus = ScanStatus.fromId(osaScan.getState().getId());
-        return scanStatus != null && scanStatus == ScanStatus.Finished;
+        return scanStatus != null && scanStatus == ScanStatus.FINISHED;
     }
 
     private void validateResponse(Response response, Response.Status expectedStatus, String message) throws WebApplicationException {
