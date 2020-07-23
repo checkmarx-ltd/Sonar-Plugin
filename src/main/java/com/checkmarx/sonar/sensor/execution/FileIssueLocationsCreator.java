@@ -21,6 +21,8 @@ class FileIssueLocationsCreator {
     private CxLogger logger = new CxLogger(FileIssueLocationsCreator.class);
 
     private InputFile file;
+    private final static String LINE = " line: ";
+    private final static String FILE = " ; file: ";
 
     FileIssueLocationsCreator(InputFile file) {
         this.file = file;
@@ -41,7 +43,7 @@ class FileIssueLocationsCreator {
             if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(0).getFileName(), file.absolutePath())) {
                 logger.debug("Creating highlight for the first location in file:");
                 //a message stating the location of the first node
-                String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
+                String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + LINE + resultsNodes.get(0).getLine();
                 //find the first node that do appear in the file, create location for it, and add to it the above message
                 for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()) {
                     if (CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(node.getFileName(), file.absolutePath())) {
@@ -53,8 +55,8 @@ class FileIssueLocationsCreator {
                         nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
 
                         if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopEndIdx).getFileName(), file.absolutePath())) {
-                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + " ; file: " +
-                                    resultsNodes.get(nodeLoopEndIdx).getFileName() + " line: " + resultsNodes.get(nodeLoopEndIdx).getLine();
+                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + FILE +
+                                    resultsNodes.get(nodeLoopEndIdx).getFileName() + LINE + resultsNodes.get(nodeLoopEndIdx).getLine();
                             ++nodeLoopEndIdx;
                         }
                         firstLocationInFile.message(node.getName() + msg);
@@ -80,10 +82,10 @@ class FileIssueLocationsCreator {
                         continue;
                     }
                     //next and prev in messages are to be opposites to next and prev in loop booleans(because iteration is end to start)
-                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + " ; file: " +
-                            resultsNodes.get(i - 1).getFileName() + " line: " + resultsNodes.get(i - 1).getLine();
-                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + " ; file: " +
-                            resultsNodes.get(i + 1).getFileName() + " line: " + resultsNodes.get(i + 1).getLine();
+                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + FILE +
+                            resultsNodes.get(i - 1).getFileName() + LINE + resultsNodes.get(i - 1).getLine();
+                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + FILE +
+                            resultsNodes.get(i + 1).getFileName() + LINE + resultsNodes.get(i + 1).getLine();
                     String msg = currNode.getName() + msgPrev + msgNext;
                     allLocationsInFile.add(defaultIssueLocation.message(msg));
 

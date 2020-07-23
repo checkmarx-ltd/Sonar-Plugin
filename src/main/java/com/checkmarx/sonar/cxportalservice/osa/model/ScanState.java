@@ -1,7 +1,10 @@
 package com.checkmarx.sonar.cxportalservice.osa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.logging.Logger;
 
 /**
  * Created by: zoharby.
@@ -16,7 +19,12 @@ public class ScanState {
     @JsonProperty("failureReason")
     String failureReason;
 
+    @JsonIgnore
+    private
+    Logger logger = Logger.getLogger(ScanState.class.getName());
+
     public ScanState() {
+        logger.info("ScanState empty constructor");
     }
 
     public int getId() {

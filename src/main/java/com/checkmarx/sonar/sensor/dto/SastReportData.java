@@ -1,12 +1,20 @@
 package com.checkmarx.sonar.sensor.dto;
 
+import com.checkmarx.sonar.cxportalservice.osa.model.OsaScan;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.logging.Logger;
 
 /**
  * Created by: Zoharby.
  * Date: 14/06/2017.
  */
 public class SastReportData {
+
+    @JsonIgnore
+    private
+    Logger logger = Logger.getLogger(SastReportData.class.getName());
 
     @JsonProperty("scanStart")
     private String scanStart;
@@ -22,6 +30,7 @@ public class SastReportData {
     private String viewerUri;
 
     public SastReportData() {
+        logger.info("SastReportData empty constructor");
     }
 
     public String getScanStart() {

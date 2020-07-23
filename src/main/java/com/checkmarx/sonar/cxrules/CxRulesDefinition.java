@@ -19,7 +19,7 @@ public class CxRulesDefinition implements RulesDefinition {
     public void define(Context context) {
 
         for (CXProgrammingLanguage language : CXProgrammingLanguage.values()) {
-            logger.info("Creating rule repository for: " + language.getName() + " language.");
+            logger.info("Creating rule repository for: " + language.getName() +CxSonarConstants.LANGUAGE);
             NewRepository repository = context.createRepository(CxSonarConstants.RULES_REPOSITORY_PREFIX + language.getName().toLowerCase(), language.getSonarName()).setName("Checkmarx");
             try {
                 InputStream rulesXml = this.getClass().getResourceAsStream(getLanguageRulesPath(language));
@@ -27,10 +27,10 @@ public class CxRulesDefinition implements RulesDefinition {
                     RulesDefinitionXmlLoader rulesLoader = new RulesDefinitionXmlLoader();
                     rulesLoader.load(repository, rulesXml, StandardCharsets.UTF_8.name());
                 } else {
-                    logger.error("Could not load rules xml for: " + language.getName() + " language.");
+                    logger.error("Could not load rules xml for: " + language.getName() + CxSonarConstants.LANGUAGE);
                 }
             } catch (Exception e) {
-                logger.error("Could create rules repository for: " + language.getName() + " language.");
+                logger.error("Could create rules repository for: " + language.getName() + CxSonarConstants.LANGUAGE);
                 e.printStackTrace();
             }
 

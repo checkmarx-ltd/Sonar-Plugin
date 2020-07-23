@@ -1,7 +1,10 @@
 package com.checkmarx.sonar.cxportalservice.osa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.logging.Logger;
 
 /**
  * Created by: zoharby.
@@ -10,8 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OsaScan {
 
-    public OsaScan() {
-    }
+    @JsonIgnore
+    private
+    Logger logger = Logger.getLogger(OsaScan.class.getName());
 
     @JsonProperty("id")
     private String id;
@@ -24,6 +28,10 @@ public class OsaScan {
 
     @JsonProperty("state")
     private ScanState state;
+
+    public OsaScan() {
+        logger.info(" OsaScan empty constructor");
+    }
 
     public String getId() {
         return id;

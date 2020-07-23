@@ -175,6 +175,9 @@ public class SastResultsCollector {
                         break;
                     case SAST_LOW:
                         currFileQueriesCollector.addLowQuery(nonIssueResult.getQuery().getName());
+                        break;
+                default:
+                    break;
                 }
         }
 
@@ -204,6 +207,9 @@ public class SastResultsCollector {
                     if (isNew) {
                         currFileNewVulnerabilityCounter.incrementLow();
                     }
+                    break;
+                default:
+                    break;
             }
         }
 

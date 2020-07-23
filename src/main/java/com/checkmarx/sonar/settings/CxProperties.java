@@ -1,10 +1,13 @@
 package com.checkmarx.sonar.settings;
 
+import com.checkmarx.sonar.cxportalservice.osa.model.OsaScan;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by: zoharby.
@@ -17,7 +20,12 @@ public class CxProperties {
 
     public static final String CREDENTIALS_KEY = "checkmarx.server.credentials";
 
+    @JsonIgnore
+    private
+    Logger logger = Logger.getLogger(CxProperties.class.getName());
+
     public CxProperties() {
+        logger.info("CxProperties empty Constructor");
     }
 
     public static List<PropertyDefinition> getProperties() {

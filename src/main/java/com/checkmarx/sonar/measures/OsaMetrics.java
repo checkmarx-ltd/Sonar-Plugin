@@ -17,22 +17,24 @@ public class OsaMetrics implements Metrics {
 
     public static String OSA_BASE_KEY = "cx.osa.result";
 
+    private static final String NON_COMMENTING = "Non commenting lines of code";
+
     public static final Metric<Integer> OSA_HIGH_VULNERABILITIES = new Metric.Builder(OSA_BASE_KEY +".high", "High Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTING)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_OSA_DOMAIN)
             .create();
 
     public static final Metric<Integer> OSA_MEDIUM_VULNERABILITIES = new Metric.Builder(OSA_BASE_KEY +".medium", "Medium Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTING)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_OSA_DOMAIN)
             .create();
 
     public static final Metric<Integer> OSA_LOW_VULNERABILITIES = new Metric.Builder(OSA_BASE_KEY +".low", "Low Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTING)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_OSA_DOMAIN)
@@ -41,7 +43,7 @@ public class OsaMetrics implements Metrics {
 
 
     public static final Metric<Integer> OSA_TOTAL_VULNERABILITIES = new Metric.Builder(OSA_BASE_KEY +".total", "Total Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTING)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_OSA_DOMAIN)
