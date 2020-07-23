@@ -72,10 +72,8 @@ class FileIssueLocationsCreator {
 
             //iteration from end to start because sonar inserts the list in that order
             iterateFromEndToStart(nodeLoopStartIdx,nodeLoopEndIdx,resultsNodes,isCurrNodeInFile,isPrevNodeInFile,allLocationsInFile);
+            addFileLocation(firstLocationInFile,allLocationsInFile);
 
-            if (firstLocationInFile != null) {
-                allLocationsInFile.add(firstLocationInFile);
-            }
 
         }catch (Exception e){
             logger.warn("Could not highlight locations for vulnerability: "+ result.getQuery().getName() + " on file: "+file.absolutePath());
@@ -83,6 +81,12 @@ class FileIssueLocationsCreator {
         }
 
         return allLocationsInFile;
+    }
+
+    private void addFileLocation(DefaultIssueLocation firstLocationInFile,List<NewIssueLocation> allLocationsInFile){
+        if (firstLocationInFile != null) {
+            allLocationsInFile.add(firstLocationInFile);
+        }
     }
 
     private void iterateFromEndToStart(int nodeLoopStartIdx,int nodeLoopEndIdx,List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes,boolean isCurrNodeInFile,boolean isPrevNodeInFile,List<NewIssueLocation> allLocationsInFile){
