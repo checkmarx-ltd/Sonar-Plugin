@@ -17,23 +17,24 @@ public class SastMetrics implements Metrics {
     public static String CX_SAST_DOMAIN = CoreMetrics.DOMAIN_SECURITY;
 
     public static String SAST_BASE_KEY = "cx.sast.result";
+    public static String NON_COMMENTIOG_LINES_OF_CODE = "Non commenting lines of code";
 
     public static final Metric<Integer> SAST_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY+".high", "Checkmarx - 1. High Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY+".medium", "Checkmarx - 2. Medium Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY +".low", "Checkmarx - 3. Low Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
@@ -42,35 +43,35 @@ public class SastMetrics implements Metrics {
 
 
     public static final Metric<Integer> SAST_TOTAL_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY +".total", "Checkmarx - 4. Total Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_NEW_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY+"new.high", "Checkmarx - 5. New High Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_NEW_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY+"new.medium", "Checkmarx - 6. New Medium Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_NEW_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY +"new.low", "Checkmarx - 7. New Low Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
     public static final Metric<Integer> SAST_TOTAL_NEW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY +".new.total", "Checkmarx - 8. Total New Vulnerabilities", Metric.ValueType.INT)
-            .setDescription("Non commenting lines of code")
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)

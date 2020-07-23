@@ -4,7 +4,7 @@ package com.checkmarx.sonar.cxportalservice.osa.model;
  * Created by tsahib on 9/27/2016.
  */
 public enum ScanStatus {
-    NotStarted(0), InProgress(1), Finished(2), Failed(3);
+    NOTSTARTED(0), INPROGRESS(1), FINISHED(2), FAILED(3);
 
     private int value;
 
