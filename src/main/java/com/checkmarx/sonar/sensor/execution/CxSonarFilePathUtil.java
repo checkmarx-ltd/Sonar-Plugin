@@ -5,6 +5,7 @@ import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Created by: zoharby.
@@ -19,7 +20,7 @@ class CxSonarFilePathUtil {
 
         //in a case where sonar and cx wrote the file directories from different starting point
         if(toRet == null)
-            for (HashMap.Entry<String, List<CxResultToSonarResult>> entry : cxReport.getResultsMappedByFileDir().entrySet()) {
+            for (Entry<String, List<CxResultToSonarResult>> entry : cxReport.getResultsMappedByFileDir().entrySet()) {
                 String cxFilePath = entry.getKey();
                 if(formattedSonarFilePath.length() == cxFilePath.length()){
                     //if the paths were identical the path would have been retrieved from map (toRet would not be null)

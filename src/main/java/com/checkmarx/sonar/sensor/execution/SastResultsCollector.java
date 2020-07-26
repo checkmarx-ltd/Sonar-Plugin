@@ -59,39 +59,48 @@ public class SastResultsCollector {
                 }
 
                 for (CxResultToSonarResult result : resultsForCurrFile) {
-                        if("1".equals(result.getResultData().getState())){
-                            //continue if result state is "Not Exploitable"
-                            continue;
-                        }
 
-                        ActiveRule rule = findRuleAndHandleErrors(activeRules, result.getQuery());
-                        if (rule == null) {
-                            continue;
-                        }
+                    ActiveRule rule = findRuleAndHandleErrors(activeRules, result.getQuery());
+                    SastSeverity sastSeverity = getSastSeverity(result);
+                    if(!checkValidity(result,rule,sastSeverity)){
+                        continue;
+                    }
 
-                        SastSeverity sastSeverity = getSastSeverity(result);
-                        if(SastSeverity.SAST_INFO.equals(sastSeverity) || sastSeverity == null){
-                            continue;
-                        }
+                    List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
+                    DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
+                    context.newIssue()
+                            .forRule(rule.ruleKey())
+                            .overrideSeverity(sastSeverity.getSonarSeverity())
+                            .gap(remediationEffortPerVulnerability)
+                            .at(issueLocation)
+                            .addFlow(flowLocationsInFile)
+                            .save();
 
-                        List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
-                        DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
-                        context.newIssue()
-                                .forRule(rule.ruleKey())
-                                .overrideSeverity(sastSeverity.getSonarSeverity())
-                                .gap(remediationEffortPerVulnerability)
-                                .at(issueLocation)
-                                .addFlow(flowLocationsInFile)
-                                .save();
+                    updateCurrFileVulnerabilities(result);
+                    updateQueryToCurrFile(result);
+                }//result loop
+            }//if !file.isEmpty() && file.isFile())
+            saveCxCustomMetrics(context, file);
+            saveCxQueriesMeasure(context, file);
+        }//files loop
+    }
 
-                        updateCurrFileVulnerabilities(result);
-                        updateQueryToCurrFile(result);
-                    }//result loop
-                }//if !file.isEmpty() && file.isFile())
-                saveCxCustomMetrics(context, file);
-                saveCxQueriesMeasure(context, file);
-            }//files loop
+    private boolean checkValidity(CxResultToSonarResult result,ActiveRule rule,SastSeverity sastSeverity){
+        if ("1".equals(result.getResultData().getState())) {
+            //continue if result state is "Not Exploitable"
+            return false;
         }
+
+        if (rule == null) {
+            return false;
+        }
+
+        if (SastSeverity.SAST_INFO.equals(sastSeverity) || sastSeverity == null) {
+            return false;
+        }
+
+        return true;
+    }
 
     private void init(SensorContext context){
         mainFiles = getMainFiles(context);
@@ -175,6 +184,9 @@ public class SastResultsCollector {
                         break;
                     case SAST_LOW:
                         currFileQueriesCollector.addLowQuery(nonIssueResult.getQuery().getName());
+                        break;
+                default:
+                    break;
                 }
         }
 
@@ -204,6 +216,9 @@ public class SastResultsCollector {
                     if (isNew) {
                         currFileNewVulnerabilityCounter.incrementLow();
                     }
+                    break;
+                default:
+                    break;
             }
         }
 

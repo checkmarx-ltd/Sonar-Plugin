@@ -21,6 +21,8 @@ class FileIssueLocationsCreator {
     private CxLogger logger = new CxLogger(FileIssueLocationsCreator.class);
 
     private InputFile file;
+    private final static String LINE = " line: ";
+    private final static String SEMI_COLON_FILE = " ; file: ";
 
     FileIssueLocationsCreator(InputFile file) {
         this.file = file;
@@ -41,7 +43,7 @@ class FileIssueLocationsCreator {
             if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(0).getFileName(), file.absolutePath())) {
                 logger.debug("Creating highlight for the first location in file:");
                 //a message stating the location of the first node
-                String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + " line: " + resultsNodes.get(0).getLine();
+                String msg = " ; Origin - file: " + resultsNodes.get(0).getFileName() + LINE + resultsNodes.get(0).getLine();
                 //find the first node that do appear in the file, create location for it, and add to it the above message
                 for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()) {
                     if (CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(node.getFileName(), file.absolutePath())) {
@@ -53,8 +55,8 @@ class FileIssueLocationsCreator {
                         nodeLoopEndIdx = resultsNodes.indexOf(node) + 1;
 
                         if (!CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopEndIdx).getFileName(), file.absolutePath())) {
-                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + " ; file: " +
-                                    resultsNodes.get(nodeLoopEndIdx).getFileName() + " line: " + resultsNodes.get(nodeLoopEndIdx).getLine();
+                            msg = msg + " ; Next location: " + resultsNodes.get(nodeLoopEndIdx).getName() + SEMI_COLON_FILE +
+                                    resultsNodes.get(nodeLoopEndIdx).getFileName() + LINE + resultsNodes.get(nodeLoopEndIdx).getLine();
                             ++nodeLoopEndIdx;
                         }
                         firstLocationInFile.message(node.getName() + msg);
@@ -67,36 +69,11 @@ class FileIssueLocationsCreator {
             //set isPrevInFile as true to stay within legal index in resultsNodes
             boolean isPrevNodeInFile = true;
             boolean isCurrNodeInFile = CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopStartIdx).getFileName(), file.absolutePath());
-            boolean isNextNodeInFile;
+
             //iteration from end to start because sonar inserts the list in that order
-            for (int i = nodeLoopStartIdx; i >= nodeLoopEndIdx; --i) {
-                //set isNextNodeInFile as true in last node to stay within legal index in resultsNodes
-                isNextNodeInFile = i <= 0 || CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(i - 1).getFileName(), file.absolutePath());
-                CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
-                if (isCurrNodeInFile) {
-                    DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(currNode);
-                    if (defaultIssueLocation == null) {
-                        isCurrNodeInFile = isNextNodeInFile;
-                        continue;
-                    }
-                    //next and prev in messages are to be opposites to next and prev in loop booleans(because iteration is end to start)
-                    String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + " ; file: " +
-                            resultsNodes.get(i - 1).getFileName() + " line: " + resultsNodes.get(i - 1).getLine();
-                    String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + " ; file: " +
-                            resultsNodes.get(i + 1).getFileName() + " line: " + resultsNodes.get(i + 1).getLine();
-                    String msg = currNode.getName() + msgPrev + msgNext;
-                    allLocationsInFile.add(defaultIssueLocation.message(msg));
+            iterateFromEndToStart(nodeLoopStartIdx,nodeLoopEndIdx,resultsNodes,isCurrNodeInFile,isPrevNodeInFile,allLocationsInFile);
+            addFileLocation(firstLocationInFile,allLocationsInFile);
 
-                    isPrevNodeInFile = true;
-                } else {
-                    isPrevNodeInFile = false;
-                }
-                isCurrNodeInFile = isNextNodeInFile;
-            }
-
-            if (firstLocationInFile != null) {
-                allLocationsInFile.add(firstLocationInFile);
-            }
 
         }catch (Exception e){
             logger.warn("Could not highlight locations for vulnerability: "+ result.getQuery().getName() + " on file: "+file.absolutePath());
@@ -104,6 +81,40 @@ class FileIssueLocationsCreator {
         }
 
         return allLocationsInFile;
+    }
+
+    private void addFileLocation(DefaultIssueLocation firstLocationInFile,List<NewIssueLocation> allLocationsInFile){
+        if (firstLocationInFile != null) {
+            allLocationsInFile.add(firstLocationInFile);
+        }
+    }
+
+    private void iterateFromEndToStart(int nodeLoopStartIdx,int nodeLoopEndIdx,List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes,boolean isCurrNodeInFile,boolean isPrevNodeInFile,List<NewIssueLocation> allLocationsInFile){
+        boolean isNextNodeInFile;
+        for (int i = nodeLoopStartIdx; i >= nodeLoopEndIdx; --i) {
+            //set isNextNodeInFile as true in last node to stay within legal index in resultsNodes
+            isNextNodeInFile = i <= 0 || CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(i - 1).getFileName(), file.absolutePath());
+            CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
+            if (isCurrNodeInFile) {
+                DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(currNode);
+                if (defaultIssueLocation == null) {
+                    isCurrNodeInFile = isNextNodeInFile;
+                    continue;
+                }
+                //next and prev in messages are to be opposites to next and prev in loop booleans(because iteration is end to start)
+                String msgPrev = isNextNodeInFile ? "" : " ; Previous location: " + resultsNodes.get(i - 1).getName() + SEMI_COLON_FILE +
+                        resultsNodes.get(i - 1).getFileName() + LINE + resultsNodes.get(i - 1).getLine();
+                String msgNext = isPrevNodeInFile ? "" : " ; Next location: " + resultsNodes.get(i + 1).getName() + SEMI_COLON_FILE +
+                        resultsNodes.get(i + 1).getFileName() + LINE + resultsNodes.get(i + 1).getLine();
+                String msg = currNode.getName() + msgPrev + msgNext;
+                allLocationsInFile.add(defaultIssueLocation.message(msg));
+
+                isPrevNodeInFile = true;
+            } else {
+                isPrevNodeInFile = false;
+            }
+            isCurrNodeInFile = isNextNodeInFile;
+        }
     }
 
     DefaultIssueLocation createIssueLocation(CxResultToSonarResult result){

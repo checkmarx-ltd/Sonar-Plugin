@@ -59,6 +59,8 @@ public class CxConfigRestEndPoint implements WebService {
     private CxShragaClient shraga;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String PROJECTS = "projects";
+    private static final String PROJECT_PATH = "/project";
 
     static {
         System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
@@ -121,7 +123,7 @@ public class CxConfigRestEndPoint implements WebService {
         testConnection.createParam(CREDENTIALS_PARAM).setDescription("cx credentials").setRequired(true);
         testConnection.createParam(COMPONENT_KEY_PARAM).setDescription("Current component key").setRequired(true);
 
-        controller.createAction("projects")
+        controller.createAction(PROJECTS)
                 .setPost(true)
                 .setDescription("Return projects of default Checkmarx server (the server that was configured by SonarQube administrator).")
                 .setInternal(true)
@@ -134,14 +136,14 @@ public class CxConfigRestEndPoint implements WebService {
                         try {
                             String projects = getProjects();
                             js.beginObject()
-                                    .prop("projects", projects)
+                                    .prop(PROJECTS, projects)
                                     .prop(IS_SUCCESSFUL, true)
                                     .endObject();
                         } catch (Exception e) {
                             e.printStackTrace();
                             logger.error("Projects retrieval failed due to Exception: " + e.getMessage());
                             js.beginObject()
-                                    .prop("projects", "")
+                                    .prop(PROJECTS, "")
                                     .prop(IS_SUCCESSFUL, false)
                                     .prop(ERROR_MESSAGE, e.getMessage())
                                     .endObject();
@@ -171,7 +173,7 @@ public class CxConfigRestEndPoint implements WebService {
                     }
                 });
 
-        NewAction getCredentials = controller.createAction("credentials")
+        NewAction getCredentials = controller.createAction(CREDENTIALS_PARAM)
                 .setInternal(true)
                 .setHandler(this::getCredentials);
         getCredentials.createParam(COMPONENT_KEY_PARAM).setRequired(true);
@@ -297,8 +299,8 @@ public class CxConfigRestEndPoint implements WebService {
 
         String contextPath = "";
         String urlPath = refererUri.getPath();
-        if (!(urlPath.startsWith("/static") || urlPath.startsWith("/project"))) {
-            String prefix = urlPath.contains("/project") ? "/project" : "/static";
+        if (!(urlPath.startsWith("/static") || urlPath.startsWith(PROJECT_PATH))) {
+            String prefix = urlPath.contains(PROJECT_PATH) ? PROJECT_PATH : "/static";
             contextPath = urlPath.substring(0, urlPath.indexOf(prefix));
         }
 
