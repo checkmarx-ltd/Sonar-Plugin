@@ -5,7 +5,6 @@ import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.dto.RestEndpointContext;
 import com.checkmarx.sonar.sensor.dto.ProjectDetails;
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
-import com.checkmarx.sonar.sensor.encryption.SecretKeyStore;
 import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CredentialMigration;
 import com.checkmarx.sonar.settings.CxProperties;
@@ -74,7 +73,7 @@ public class CxConfigHelper {
 
             if (StringUtils.isNotEmpty(credentialsJson)) {
                 credentials = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
-                String plaintextPassword = decrypt(credentials.getCxPassword());
+                String plaintextPassword = decrypt(credentials.getCxPassword(),credentials.getCxUsername());
                 credentials.setCxPassword(plaintextPassword);
             } else {
                 logErrorAndNotifyContext(CxSonarConstants.CANCEL_MESSAGE + "Error while retrieving Checkmarx settings from Sonar database.\n" +
@@ -309,7 +308,7 @@ public class CxConfigHelper {
         String plaintextPassword = null;
         String encryptedPassword = credentials.getCxPassword();
         if (StringUtils.isNotEmpty(encryptedPassword)) {
-            plaintextPassword = decrypt(encryptedPassword);
+            plaintextPassword = decrypt(encryptedPassword,credentials.getCxUsername());
         }
         return plaintextPassword;
     }
@@ -321,7 +320,7 @@ public class CxConfigHelper {
         storedCredentials.setCxUsername(credentials.getCxUsername());
 
         if (StringUtils.isNotEmpty(credentials.getCxPassword())) {
-            String encryptedPassword = encrypt(credentials.getCxPassword());
+            String encryptedPassword = encrypt(credentials.getCxPassword(),credentials.getCxUsername());
             storedCredentials.setCxPassword(encryptedPassword);
         }
 
@@ -343,25 +342,14 @@ public class CxConfigHelper {
         return result;
     }
 
-    public static String encrypt(String plaintext) throws IOException {
-        SecretKeyStore keyStore = new SecretKeyStore();
-        SecretKey key = keyStore.getSecretKey();
-        AesUtil util = new AesUtil();
-        String iv = AesUtil.random(AesUtil.IV_LENGTH_IN_BYTES);
-        return iv + util.encrypt(key, iv, plaintext);
+    public static String encrypt(String plaintext,String key) throws IOException {
+        return AesUtil.encrypt(plaintext,key);
+
     }
 
-    private String decrypt(String cryptoText) throws IOException {
-        final int IV_LENGTH_IN_CHARS = AesUtil.IV_LENGTH_IN_BYTES * 2;
-
+    private String decrypt(String cryptoText,String key) throws IOException {
         try {
-            SecretKeyStore keyStore = new SecretKeyStore();
-            SecretKey key = keyStore.getSecretKey();
-
-            String iv = cryptoText.substring(0, IV_LENGTH_IN_CHARS);
-            String workload = cryptoText.substring(IV_LENGTH_IN_CHARS);
-            AesUtil util = new AesUtil();
-            return util.decrypt(key, iv, workload);
+            return AesUtil.decrypt(cryptoText,key);
         } catch (Exception e) {
             throw new IOException("Decryption error.", e);
         }

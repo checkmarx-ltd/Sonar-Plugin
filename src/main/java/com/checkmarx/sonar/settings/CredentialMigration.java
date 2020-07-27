@@ -2,14 +2,12 @@ package com.checkmarx.sonar.settings;
 
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
-import com.checkmarx.sonar.sensor.encryption.SecretKeyStore;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 
 public class CredentialMigration {
@@ -48,20 +46,23 @@ public class CredentialMigration {
         if (StringUtils.isNotEmpty(encryptedLegacyCredentials)) {
             logger.info("Found credentials in legacy format. Starting the migration.");
 
-            SecretKeyStore keyStore = new SecretKeyStore();
+            /*SecretKeyStore keyStore = new SecretKeyStore();
             SecretKey key = keyStore.getSecretKey();
 
             AesUtil util = new AesUtil();
-            String legacyCredentials = util.decrypt(key, IV, encryptedLegacyCredentials);
+            String legacyCredentials = util.decrypt(key, IV, encryptedLegacyCredentials);*/
+
+            String key = AesUtil.generateKey();
+            String legacyCredentials = AesUtil.decrypt(encryptedLegacyCredentials,key);
 
             JsonNode root = objectMapper.readTree(legacyCredentials);
 
             CxFullCredentials credentialsToSave = new CxFullCredentials();
             credentialsToSave.setCxServerUrl(root.get("cxServerUrl").textValue());
             credentialsToSave.setCxUsername(root.get("cxUsername").textValue());
-
+            String plainUsername = root.get("cxUsername") .textValue();
             String plainPassword = root.get("cxPassword").textValue();
-            String encryptedPassword = CxConfigHelper.encrypt(plainPassword);
+            String encryptedPassword = CxConfigHelper.encrypt(plainPassword,plainUsername);
             credentialsToSave.setCxPassword(encryptedPassword);
 
             String credentialsJson = objectMapper.writeValueAsString(credentialsToSave);

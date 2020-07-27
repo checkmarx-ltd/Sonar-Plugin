@@ -1,101 +1,98 @@
 package com.checkmarx.sonar.sensor.encryption;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
+import java.util.Base64;
 
 // TODO: Implement 256-bit version like: http://securejava.wordpress.com/2012/10/25/aes-256/
 public class AesUtil {
-    public static final int IV_LENGTH_IN_BYTES = 16;
+    private static SecretKeySpec secretKey;
+    private static byte[] key;
+    private static final int GCM_IV_LENGTH = 12;
+    private static final int GCM_TAG_LENGTH = 16;
+    private static final String CHARSET = "UTF-8";
+    private static final String ALGORITHM = "SHA-1";
+    private static final int LENGTH = 16;
+    private static final String AES = "AES";
 
-    private static final String KEY_FACTORY_TYPE = "PBKDF2WithHmacSHA1";
+    private static void setKey(String myKey) {
+        MessageDigest sha = null;
+        try {
+            key = myKey.getBytes(CHARSET);
+            sha = MessageDigest.getInstance(ALGORITHM);
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, LENGTH);
+            secretKey = new SecretKeySpec(key, AES);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            System.err.println("Error while setting key: " + e.toString());
+        }
+    }
 
-    private final Cipher cipher;
-    
-    public AesUtil() {
+    public static String encrypt(String strToEncrypt, String secret) {
         try {
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            setKey(secret);
+
+            byte[] iv = new byte[GCM_IV_LENGTH];
+            (new SecureRandom()).nextBytes(iv);
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            GCMParameterSpec ivSpec = new GCMParameterSpec(GCM_TAG_LENGTH * Byte.SIZE, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey,ivSpec);
+
+            byte[] cipherText = cipher.doFinal(strToEncrypt.getBytes("UTF8"));
+            byte[] encrypted = new byte[iv.length + cipherText.length];
+
+            System.arraycopy(iv, 0, encrypted, 0, iv.length);
+            System.arraycopy(cipherText, 0, encrypted, iv.length, cipherText.length);
+
+            return java.util.Base64.getEncoder().encodeToString(encrypted);
+        } catch (Exception e) {
+            System.err.println("Error while encrypting: " + e.toString());
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw fail(e);
-        }
+        return null;
     }
-    
-    public String encrypt(SecretKey key, String iv, String plaintext) {
-        byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, iv, plaintext.getBytes(StandardCharsets.UTF_8));
-        return base64(encrypted);
-    }
-    
-    public String decrypt(SecretKey key, String iv, String ciphertext) {
-        byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, iv, base64(ciphertext));
-        return new String(decrypted, StandardCharsets.UTF_8);
-    }
-    
-    private byte[] doFinal(int encryptMode, SecretKey key, String iv, byte[] bytes) {
+
+    public static String decrypt(String strToDecrypt, String secret) {
         try {
-            cipher.init(encryptMode, key, new IvParameterSpec(hex(iv)));
-            return cipher.doFinal(bytes);
+            setKey(secret);
+
+            byte[] decoded = Base64.getDecoder().decode(strToDecrypt);
+
+            byte[] iv = Arrays.copyOfRange(decoded, 0, GCM_IV_LENGTH);
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPADDING");
+            GCMParameterSpec ivSpec = new GCMParameterSpec(GCM_TAG_LENGTH * Byte.SIZE, iv);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey,ivSpec);
+
+            byte[] cipherText = cipher.doFinal(decoded, GCM_IV_LENGTH, decoded.length - GCM_IV_LENGTH);
+
+            return new String(cipherText, "UTF8");
+        } catch (Exception e) {
+            System.err.println("Error while decrypting: " + e.toString());
         }
-        catch (InvalidKeyException
-                | InvalidAlgorithmParameterException
-                | IllegalBlockSizeException
-                | BadPaddingException e) {
-            throw fail(e);
-        }
+        return null;
     }
-    
-    public SecretKey generateKey(String passphrase, String salt, int iterationCount, int keySize) {
+
+    public static String generateKey() {
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(KEY_FACTORY_TYPE);
-            KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), hex(salt), iterationCount, keySize);
-            SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-            return key;
-        }
-        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw fail(e);
+            KeyGenerator kgen = KeyGenerator.getInstance("AES");
+            kgen.init(128);
+            return Base64.getEncoder().encodeToString(kgen.generateKey().getEncoded());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e.toString());
         }
     }
-    
-    public static String random(int length) {
-        byte[] salt = new byte[length];
-        new SecureRandom().nextBytes(salt);
-        return hex(salt);
-    }
-    
-    public static String base64(byte[] bytes) {
-        return Base64.encodeBase64String(bytes);
-    }
-    
-    public static byte[] base64(String str) {
-        return Base64.decodeBase64(str);
-    }
-    
-    public static String hex(byte[] bytes) {
-        return Hex.encodeHexString(bytes);
-    }
-    
-    public static byte[] hex(String str) {
-        try {
-            return Hex.decodeHex(str.toCharArray());
-        }
-        catch (DecoderException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-    
-    private IllegalStateException fail(Exception e) {
-        return new IllegalStateException(e);
-    }
+
 }
