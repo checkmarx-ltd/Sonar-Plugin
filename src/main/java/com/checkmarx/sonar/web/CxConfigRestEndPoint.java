@@ -84,7 +84,7 @@ public class CxConfigRestEndPoint implements WebService {
 
                             validateCredentials(cxFullCredentials);
 
-                            URL url = new URL(cxFullCredentials.getCxServerUrl());
+/*                            URL url = new URL(cxFullCredentials.getCxServerUrl());
                             URLConnection urlConn;
 
                             Proxy proxy = HttpHelper.getProxy();
@@ -97,21 +97,21 @@ public class CxConfigRestEndPoint implements WebService {
                             if (url.getProtocol().equalsIgnoreCase("https")) {
                                 ((HttpsURLConnection) urlConn).setSSLSocketFactory(getSSLSocketFactory());
                                 ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
-                            }
+                            }*/
 
                             ProxyParams proxyParam = HttpHelper.getProxyParam();
-                            if (proxy == null) {
+                            if (proxyParam == null) {
                                 shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
-                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger);
+                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, false, logger);
                             } else {
                                 shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
-                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger,
+                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger, true,
                                         proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
                             }
                             //  final String cxVersion = shraga.getCxVersion();
 
                             shraga.login();
-                            urlConn.connect();
+//                            urlConn.connect();
 
                             // read request parameters and generates response output
                             sendSuccess(response);
@@ -251,12 +251,11 @@ public class CxConfigRestEndPoint implements WebService {
 
     private void sendSuccess(Response response) {
 
-        try(JsonWriter js1 = response.newJsonWriter()){
-             js1.beginObject()
-                .prop(IS_SUCCESSFUL, true)
-                .endObject();
-        }catch (Exception e)
-        {
+        try (JsonWriter js1 = response.newJsonWriter()) {
+            js1.beginObject()
+                    .prop(IS_SUCCESSFUL, true)
+                    .endObject();
+        } catch (Exception e) {
             sendError(response, "success message failed.", e);
         }
 
@@ -265,12 +264,12 @@ public class CxConfigRestEndPoint implements WebService {
     private void sendError(Response response, String message, Exception exception) {
         logger.error(message, exception);
 
-        try(JsonWriter js1 = response.newJsonWriter()){
-                js1.beginObject()
-                .prop(IS_SUCCESSFUL, false)
-                .prop(ERROR_MESSAGE, message)
-                .endObject();}
-        catch (Exception e){
+        try (JsonWriter js1 = response.newJsonWriter()) {
+            js1.beginObject()
+                    .prop(IS_SUCCESSFUL, false)
+                    .prop(ERROR_MESSAGE, message)
+                    .endObject();
+        } catch (Exception e) {
             sendError(response, "failed to show message", e);
         }
     }

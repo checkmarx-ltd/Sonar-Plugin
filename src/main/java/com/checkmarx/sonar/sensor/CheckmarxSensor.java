@@ -77,9 +77,9 @@ public class CheckmarxSensor implements Sensor {
             logger.info("Connecting to {}", config.getUrl());
             ProxyParams proxyParam = HttpHelper.getProxyParam();
             if (proxyParam == null) {
-                shraga = new CxShragaClient(config, logger);
+                shraga = new CxShragaClient(config, false, logger);
             } else {
-                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
+                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd(), true);
             }
 
             shraga.init();

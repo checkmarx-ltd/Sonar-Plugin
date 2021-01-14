@@ -160,8 +160,8 @@ public class CxConfigHelper {
         String value = null;
         try {
             int valueIdx = responseJson.indexOf(VALUE);
-            if(valueIdx >= 0) {
-                value = responseJson.substring(valueIdx+8, responseJson.length() - 4);
+            if (valueIdx >= 0) {
+                value = responseJson.substring(valueIdx + 8, responseJson.length() - 4);
             }
         } catch (StringIndexOutOfBoundsException e) {
             log.debug("Fail to retrieve property value");
@@ -278,6 +278,7 @@ public class CxConfigHelper {
                         cxFullCredentials.getCxPassword(),
                         CxSonarConstants.CX_SONAR_ORIGIN,
                         true,
+                        false,
                         log);
             } else {
                 shraga = new CxShragaClient(
@@ -287,6 +288,7 @@ public class CxConfigHelper {
                         CxSonarConstants.CX_SONAR_ORIGIN,
                         true,
                         log,
+                        true,
                         proxyParam.getHost(),
                         proxyParam.getPort(),
                         proxyParam.getUser(),
