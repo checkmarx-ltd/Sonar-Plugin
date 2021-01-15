@@ -84,7 +84,7 @@ public class CxConfigRestEndPoint implements WebService {
 
                             validateCredentials(cxFullCredentials);
 
-/*                            URL url = new URL(cxFullCredentials.getCxServerUrl());
+                            URL url = new URL(cxFullCredentials.getCxServerUrl());
                             URLConnection urlConn;
 
                             Proxy proxy = HttpHelper.getProxy();
@@ -97,7 +97,7 @@ public class CxConfigRestEndPoint implements WebService {
                             if (url.getProtocol().equalsIgnoreCase("https")) {
                                 ((HttpsURLConnection) urlConn).setSSLSocketFactory(getSSLSocketFactory());
                                 ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
-                            }*/
+                            }
 
                             ProxyParams proxyParam = HttpHelper.getProxyParam();
                             if (proxyParam == null) {
@@ -111,7 +111,7 @@ public class CxConfigRestEndPoint implements WebService {
                             //  final String cxVersion = shraga.getCxVersion();
 
                             shraga.login();
-//                            urlConn.connect();
+                            urlConn.connect();
 
                             // read request parameters and generates response output
                             sendSuccess(response);
