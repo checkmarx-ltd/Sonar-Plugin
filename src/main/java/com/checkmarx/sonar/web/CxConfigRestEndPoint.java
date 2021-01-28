@@ -149,9 +149,7 @@ public class CxConfigRestEndPoint implements WebService {
                                     .endObject();
                         } finally {
                             js.close();
-
                         }
-
                     }
                 });
 
@@ -379,6 +377,5 @@ public class CxConfigRestEndPoint implements WebService {
         JSONArray jsonArray = new JSONArray(listToConvert);
         return jsonArray.toString();
     }
-
 
 }
