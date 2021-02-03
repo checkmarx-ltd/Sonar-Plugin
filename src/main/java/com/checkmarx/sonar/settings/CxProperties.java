@@ -1,6 +1,5 @@
 package com.checkmarx.sonar.settings;
 
-import com.checkmarx.sonar.cxportalservice.osa.model.OsaScan;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;

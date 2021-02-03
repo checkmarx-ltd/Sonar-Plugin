@@ -198,7 +198,8 @@ public class CxConfigHelper {
 
             if (isOk(response)) {
                 return createStringFromResponse(response);
-            } else if (response.getStatusLine().getStatusCode() == 401) {
+            } else if (response.getStatusLine().getStatusCode() == 401 ||
+                    response.getStatusLine().getStatusCode() == 403) {
                 log.info("Forced authentication is enabled: Sonar credentials must be provided");
                 HttpResponse retResponse;
 
