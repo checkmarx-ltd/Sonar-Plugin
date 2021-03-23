@@ -94,6 +94,10 @@ public class PropertyApiClient {
         HttpUriRequest request = new HttpDelete(requestUrl);
 
         HttpResponse response = getResponse(request);
+        if (response.getStatusLine().getStatusCode() != Response.Status.NO_CONTENT.getStatusCode()) {
+            requestUrl = CxConfigHelper.resetPropertyUrl(getSonarBaseUrl(), name, getComponentKey());
+            response = getResponse(new HttpPost(requestUrl));
+        }
         throwOnFailure(response, name);
     }
 
@@ -157,6 +161,7 @@ public class PropertyApiClient {
 
     private void throwOnFailure(HttpResponse response, String propertyName) throws IOException {
         int statusCode = response.getStatusLine().getStatusCode();
+        logger.info("Response code for '" + propertyName + "': " + statusCode);
         if (statusCode != Response.Status.NO_CONTENT.getStatusCode()) {
             throw new IOException(String.format("Error setting property: %s, HTTP status code: %d", propertyName, statusCode));
         }
