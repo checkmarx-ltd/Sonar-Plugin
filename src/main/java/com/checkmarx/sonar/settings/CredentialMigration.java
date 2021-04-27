@@ -67,11 +67,15 @@ public class CredentialMigration {
 
                 String credentialsJson = objectMapper.writeValueAsString(credentialsToSave);
                 client.setProperty(CxProperties.CREDENTIALS_KEY, credentialsJson);
-
-                client.deleteProperty(LEGACY_CREDENTIALS_KEY);
             } catch (Exception e) {
                 logger.error("Fail to migrate credentials, message: " + e.getMessage());
                 return;
+            } finally {
+                try {
+                    client.deleteProperty(LEGACY_CREDENTIALS_KEY);
+                } catch (Exception ex) {
+                    logger.error("Failed to delete legacy credentials");
+                }
             }
 
             logger.info("Migration completed successfully.");

@@ -330,6 +330,7 @@ public class CxConfigHelper {
 
         if (StringUtils.isNotEmpty(credentials.getCxPassword())) {
             String encryptedPassword = encrypt(credentials.getCxPassword());
+            log.debug("Updating encrypted password: " + encryptedPassword);
             storedCredentials.setCxPassword(encryptedPassword);
         }
 
