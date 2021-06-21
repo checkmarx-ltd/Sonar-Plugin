@@ -52,6 +52,7 @@ public class CxConfigHelper {
     public static final String SETTINGS_API_PATH = "api/settings";
     public static final String SETTINGS_API_SET_PATH = SETTINGS_API_PATH + "/set";
     public static final String SETTINGS_API_GET_PATH = SETTINGS_API_PATH + "/values";
+    public static final String SETTINGS_API_RESET_PATH = SETTINGS_API_PATH + "/reset";
 
     private Logger log;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -103,11 +104,13 @@ public class CxConfigHelper {
     private CxFullCredentials getStoredCredentials(PropertyApiClient client) throws IOException {
         CxFullCredentials result;
         String credentialsJson = client.getProperty(CxProperties.CREDENTIALS_KEY);
+        log.info("Stored credentials json returned.");
         if (StringUtils.isNotEmpty(credentialsJson)) {
             result = objectMapper.readValue(credentialsJson, CxFullCredentials.class);
         } else {
             result = new CxFullCredentials();
         }
+        log.info("Stored credentials username: " + result.getCxUsername() + ", encrypted password: " + result.getCxPassword());
         return result;
     }
 
@@ -160,8 +163,8 @@ public class CxConfigHelper {
         String value = null;
         try {
             int valueIdx = responseJson.indexOf(VALUE);
-            if(valueIdx >= 0) {
-                value = responseJson.substring(valueIdx+8, responseJson.length() - 4);
+            if (valueIdx >= 0) {
+                value = responseJson.substring(valueIdx + 8, responseJson.length() - 4);
             }
         } catch (StringIndexOutOfBoundsException e) {
             log.debug("Fail to retrieve property value");
@@ -198,7 +201,8 @@ public class CxConfigHelper {
 
             if (isOk(response)) {
                 return createStringFromResponse(response);
-            } else if (response.getStatusLine().getStatusCode() == 401) {
+            } else if (response.getStatusLine().getStatusCode() == 401 ||
+                    response.getStatusLine().getStatusCode() == 403) {
                 log.info("Forced authentication is enabled: Sonar credentials must be provided");
                 HttpResponse retResponse;
 
@@ -233,6 +237,7 @@ public class CxConfigHelper {
             }
             return "";
         } catch (IOException e) {
+            log.error("");
             return null;
         } finally {
             if (response != null) {
@@ -278,6 +283,7 @@ public class CxConfigHelper {
                         cxFullCredentials.getCxPassword(),
                         CxSonarConstants.CX_SONAR_ORIGIN,
                         true,
+                        false,
                         log);
             } else {
                 shraga = new CxShragaClient(
@@ -287,6 +293,7 @@ public class CxConfigHelper {
                         CxSonarConstants.CX_SONAR_ORIGIN,
                         true,
                         log,
+                        true,
                         proxyParam.getHost(),
                         proxyParam.getPort(),
                         proxyParam.getUser(),
@@ -319,6 +326,7 @@ public class CxConfigHelper {
         CxFullCredentials storedCredentials = getStoredCredentials(client);
         storedCredentials.setCxServerUrl(credentials.getCxServerUrl());
         storedCredentials.setCxUsername(credentials.getCxUsername());
+        log.info("Updating username: " + credentials.getCxUsername());
 
         if (StringUtils.isNotEmpty(credentials.getCxPassword())) {
             String encryptedPassword = encrypt(credentials.getCxPassword());
@@ -328,6 +336,19 @@ public class CxConfigHelper {
         String credentialsJson = objectMapper.writeValueAsString(storedCredentials);
 
         client.setProperty(CxProperties.CREDENTIALS_KEY, credentialsJson);
+    }
+
+    public static String resetPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {
+        String result = null;
+        try {
+            result = String.format("%s/%s?keys=%s&component=%s",
+                    sonarBaseUrl,
+                    SETTINGS_API_RESET_PATH,
+                    URLEncoder.encode(propertyName, ENCODING),
+                    URLEncoder.encode(componentKey, ENCODING));
+        } catch (UnsupportedEncodingException ignored) {
+        }
+        return result;
     }
 
     public static String getPropertyUrl(String sonarBaseUrl, String propertyName, String componentKey) {

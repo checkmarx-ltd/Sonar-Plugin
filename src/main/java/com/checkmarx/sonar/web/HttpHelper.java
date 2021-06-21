@@ -9,6 +9,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class HttpHelper {
 
+    public static final String CX_PROXY_BYPASS = System.getProperty("cx.proxyBypass");
     public static final String CX_HTTP_HOST = System.getProperty("cx.proxyHost");
     public static final String CX_HTTP_PORT = System.getProperty("cx.proxyPort");
     public static final String CX_HTTP_USERNAME = System.getProperty("cx.proxyUser");
@@ -57,6 +58,9 @@ public class HttpHelper {
     }
 
     public static ProxyParams getProxyParam() {
+        if (CX_PROXY_BYPASS != null) {
+            return null;
+        }
         ProxyParams params = getCustomProxyParam();
         if (params == null) {
             params = getHttpProxyParam();
@@ -111,6 +115,9 @@ public class HttpHelper {
     }
 
     public static Proxy getProxy() {
+        if (CX_PROXY_BYPASS != null) {
+            return null;
+        }
         Proxy proxy = getCustomProxy();
         if (proxy == null) {
             proxy = getHttpProxy();

@@ -27,9 +27,11 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
+
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
 import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_RESULTS;
 
@@ -75,13 +77,21 @@ public class CheckmarxSensor implements Sensor {
             logger.info("Connecting to {}", config.getUrl());
             ProxyParams proxyParam = HttpHelper.getProxyParam();
             if (proxyParam == null) {
-                shraga = new CxShragaClient(config, logger);
+                shraga = new CxShragaClient(config, false, logger);
             } else {
-                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
+                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd(), true);
             }
 
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestSASTResults();
+            logger.info("Checkmarx High vulnerabilities: " + latestSASTResults.getHigh());
+            logger.info("Checkmarx New-High vulnerabilities: " + latestSASTResults.getNewHigh());
+            logger.info("Checkmarx Medium vulnerabilities: " + latestSASTResults.getMedium());
+            logger.info("Checkmarx New-Medium vulnerabilities: " + latestSASTResults.getNewMedium());
+            logger.info("Checkmarx Low vulnerabilities: " + latestSASTResults.getLow());
+            logger.info("Checkmarx New-Low vulnerabilities: " + latestSASTResults.getNewLow());
+            logger.info("Checkmarx scan link: " + latestSASTResults.getSastScanLink());
+
 //            shraga.generateHTMLSummary(latestSASTResults, new OSAResults());
             CxXMLResults cxXMLResults = convertToXMLResult(latestSASTResults.getRawXMLReport());
             CxReportToSonarReport cxReportToSonarReport = CxResultsAdapter.adaptCxXmlResultsForSonar(cxXMLResults);

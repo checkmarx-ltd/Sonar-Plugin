@@ -48,26 +48,31 @@ public class CredentialMigration {
         if (StringUtils.isNotEmpty(encryptedLegacyCredentials)) {
             logger.info("Found credentials in legacy format. Starting the migration.");
 
-            SecretKeyStore keyStore = new SecretKeyStore();
-            SecretKey key = keyStore.getSecretKey();
+            try {
+                SecretKeyStore keyStore = new SecretKeyStore();
+                SecretKey key = keyStore.getSecretKey();
 
-            AesUtil util = new AesUtil();
-            String legacyCredentials = util.decrypt(key, IV, encryptedLegacyCredentials);
+                AesUtil util = new AesUtil();
+                String legacyCredentials = util.decrypt(key, IV, encryptedLegacyCredentials);
 
-            JsonNode root = objectMapper.readTree(legacyCredentials);
+                JsonNode root = objectMapper.readTree(legacyCredentials);
 
-            CxFullCredentials credentialsToSave = new CxFullCredentials();
-            credentialsToSave.setCxServerUrl(root.get("cxServerUrl").textValue());
-            credentialsToSave.setCxUsername(root.get("cxUsername").textValue());
+                CxFullCredentials credentialsToSave = new CxFullCredentials();
+                credentialsToSave.setCxServerUrl(root.get("cxServerUrl").textValue());
+                credentialsToSave.setCxUsername(root.get("cxUsername").textValue());
 
-            String plainPassword = root.get("cxPassword").textValue();
-            String encryptedPassword = CxConfigHelper.encrypt(plainPassword);
-            credentialsToSave.setCxPassword(encryptedPassword);
+                String plainPassword = root.get("cxPassword").textValue();
+                String encryptedPassword = CxConfigHelper.encrypt(plainPassword);
+                credentialsToSave.setCxPassword(encryptedPassword);
 
-            String credentialsJson = objectMapper.writeValueAsString(credentialsToSave);
-            client.setProperty(CxProperties.CREDENTIALS_KEY, credentialsJson);
+                String credentialsJson = objectMapper.writeValueAsString(credentialsToSave);
+                client.setProperty(CxProperties.CREDENTIALS_KEY, credentialsJson);
 
-            client.deleteProperty(LEGACY_CREDENTIALS_KEY);
+                client.deleteProperty(LEGACY_CREDENTIALS_KEY);
+            } catch (Exception e) {
+                logger.error("Fail to migrate credentials, message: " + e.getMessage());
+                return;
+            }
 
             logger.info("Migration completed successfully.");
         } else {

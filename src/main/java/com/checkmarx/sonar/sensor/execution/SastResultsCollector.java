@@ -162,7 +162,7 @@ public class SastResultsCollector {
             }
 
             if(rule == null){
-                logger.info("Rule: " + ":checkmarx_" + query.getId() + "is not active or not existing. It will not appear in Checkmarx scan results.");
+                logger.info("Rule: " + "checkmarx_" + query.getId() + " is not active or not existing. It will not appear in Checkmarx scan results.");
                 logger.info("If rule exists in " + language.getSonarRuleRepository() + " rule repository, you can update it to your quality profile.");
             }
 
