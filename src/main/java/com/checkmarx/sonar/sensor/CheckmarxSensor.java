@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.fs.internal.DefaultInputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
@@ -116,6 +117,10 @@ public class CheckmarxSensor implements Sensor {
         Iterable<InputFile> mainfiles = getMainFiles(context);
         for (InputFile file : mainfiles) {
             context.<Integer>newMeasure().on(file).forMetric(SONAR_PROJECT_HAVE_SAST_RESULTS).withValue(1).save();
+            String prjPath = ((DefaultInputFile) file).getProjectRelativePath();
+            String mdlPath = ((DefaultInputFile) file).getModuleRelativePath();
+            String absPath = ((DefaultInputFile) file).absolutePath();
+            logger.info("[CHECKMARX] Sonar project have SAST results metric on file:\nProject path: " + prjPath + "\nModule path: " + mdlPath + "\nAbsolute path: " + absPath);
         }
     }
 
@@ -135,6 +140,7 @@ public class CheckmarxSensor implements Sensor {
     private void saveSastForDetailReport(SensorContext context, SastReportData sastReportData) throws JsonProcessingException {
         String scanDetails = mapper.writeValueAsString(sastReportData);
         context.<String>newMeasure().on(context.module()).forMetric(SAST_SCAN_DETAILS).withValue(scanDetails).save();
+        logger.info("[CHECKMARX] Scan report details: " + scanDetails);
     }
 
     private com.cx.restclient.sast.dto.CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException, CxClientException {
