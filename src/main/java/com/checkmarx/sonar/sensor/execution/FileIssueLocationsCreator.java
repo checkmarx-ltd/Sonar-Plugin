@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by: zoharby.
  * Date: 23/08/2017.
- *
+ * <p>
  * creates Issue locations that will be presented in sonar UI on the presented project code
  */
 class FileIssueLocationsCreator {
@@ -28,7 +28,7 @@ class FileIssueLocationsCreator {
         this.file = file;
     }
 
-    List<NewIssueLocation> createFlowLocations(CxResultToSonarResult result){
+    List<NewIssueLocation> createFlowLocations(CxResultToSonarResult result) {
         List<NewIssueLocation> allLocationsInFile = new LinkedList<>();
 
         try {
@@ -71,25 +71,25 @@ class FileIssueLocationsCreator {
             boolean isCurrNodeInFile = CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopStartIdx).getFileName(), file.absolutePath());
 
             //iteration from end to start because sonar inserts the list in that order
-            iterateFromEndToStart(nodeLoopStartIdx,nodeLoopEndIdx,resultsNodes,isCurrNodeInFile,isPrevNodeInFile,allLocationsInFile);
-            addFileLocation(firstLocationInFile,allLocationsInFile);
+            iterateFromEndToStart(nodeLoopStartIdx, nodeLoopEndIdx, resultsNodes, isCurrNodeInFile, isPrevNodeInFile, allLocationsInFile);
+            addFileLocation(firstLocationInFile, allLocationsInFile);
 
 
-        }catch (Exception e){
-            logger.warn("Could not highlight locations for vulnerability: "+ result.getQuery().getName() + " on file: "+file.absolutePath());
+        } catch (Exception e) {
+            logger.warn("Could not highlight locations for vulnerability: " + result.getQuery().getName() + " on file: " + file.absolutePath());
             logger.warn("due to exception: " + e.getMessage());
         }
 
         return allLocationsInFile;
     }
 
-    private void addFileLocation(DefaultIssueLocation firstLocationInFile,List<NewIssueLocation> allLocationsInFile){
+    private void addFileLocation(DefaultIssueLocation firstLocationInFile, List<NewIssueLocation> allLocationsInFile) {
         if (firstLocationInFile != null) {
             allLocationsInFile.add(firstLocationInFile);
         }
     }
 
-    private void iterateFromEndToStart(int nodeLoopStartIdx,int nodeLoopEndIdx,List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes,boolean isCurrNodeInFile,boolean isPrevNodeInFile,List<NewIssueLocation> allLocationsInFile){
+    private void iterateFromEndToStart(int nodeLoopStartIdx, int nodeLoopEndIdx, List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes, boolean isCurrNodeInFile, boolean isPrevNodeInFile, List<NewIssueLocation> allLocationsInFile) {
         boolean isNextNodeInFile;
         for (int i = nodeLoopStartIdx; i >= nodeLoopEndIdx; --i) {
             //set isNextNodeInFile as true in last node to stay within legal index in resultsNodes
@@ -117,9 +117,9 @@ class FileIssueLocationsCreator {
         }
     }
 
-    DefaultIssueLocation createIssueLocation(CxResultToSonarResult result){
+    DefaultIssueLocation createIssueLocation(CxResultToSonarResult result) {
         CodeHighlightsUtil.Highlight highlightLine = CodeHighlightsUtil.getHighlightForPathNode(file, result.getNodeToMarkOnFile());
-        if(highlightLine == null){
+        if (highlightLine == null) {
             highlightLine = new CodeHighlightsUtil.Highlight(1, -1, -1);
         }
         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
@@ -129,16 +129,16 @@ class FileIssueLocationsCreator {
                 .message("Checkmarx Vulnerability : " + result.getQuery().getName());
     }
 
-    private DefaultIssueLocation createLocationFromPathNode(CxXMLResults.Query.Result.Path.PathNode node){
+    private DefaultIssueLocation createLocationFromPathNode(CxXMLResults.Query.Result.Path.PathNode node) {
         CodeHighlightsUtil.Highlight highlight = CodeHighlightsUtil.getHighlightForPathNode(file, node);
-        if(highlight == null){
+        if (highlight == null) {
             return null;
         }
-        logger.debug("File "+ file.absolutePath() +", "+ highlight.toString());
+        logger.debug("File " + file.toString() + ", " + highlight.toString());
         DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
 
-        if(highlight.getStart() == -1){
-            if(highlight.getLine() <= 1){
+        if (highlight.getStart() == -1) {
+            if (highlight.getLine() <= 1) {
                 return defaultIssueLocation.on(file);
             }
             return defaultIssueLocation.on(file)

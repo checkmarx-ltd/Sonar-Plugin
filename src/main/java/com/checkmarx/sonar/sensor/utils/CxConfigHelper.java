@@ -230,6 +230,7 @@ public class CxConfigHelper {
                 String authHeader = "Basic " + auth;
                 retRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
+                log.debug("Executing Sonar auth-request, URL: " + propertyHttpURL);
                 retResponse = client.execute(retRequest);
                 if (isOk(retResponse)) {
                     return createStringFromResponse(retResponse);
@@ -237,7 +238,6 @@ public class CxConfigHelper {
             }
             return "";
         } catch (IOException e) {
-            log.error("");
             return null;
         } finally {
             if (response != null) {
@@ -248,9 +248,11 @@ public class CxConfigHelper {
 
     private boolean isOk(HttpResponse response) {
         try {
-            if (response.getStatusLine().getStatusCode() != 200) {
+            int code = response.getStatusLine().getStatusCode();
+            if (code != 200) {
                 HttpEntity entity = response.getEntity();
-                String responseString = EntityUtils.toString(entity, "UTF-8");
+                String resStr = EntityUtils.toString(entity, "UTF-8");
+                log.debug("Failed request, Code: '" + code + "', Body: '" + resStr + "'.");
                 return false;
             }
         } catch (IOException e) {
