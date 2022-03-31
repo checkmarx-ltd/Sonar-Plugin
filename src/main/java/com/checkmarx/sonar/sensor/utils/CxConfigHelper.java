@@ -38,6 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static com.checkmarx.sonar.web.HttpHelper.SONAR_URL_PARAM;
+
 public class CxConfigHelper {
 
     public static final String SONAR_HOST_URL = "sonar.host.url";
@@ -345,7 +347,7 @@ public class CxConfigHelper {
         String result = null;
         try {
             result = String.format("%s/%s?keys=%s&component=%s",
-                    sonarBaseUrl,
+                    resolveSonarUrl(sonarBaseUrl),
                     SETTINGS_API_RESET_PATH,
                     URLEncoder.encode(propertyName, ENCODING),
                     URLEncoder.encode(componentKey, ENCODING));
@@ -358,13 +360,20 @@ public class CxConfigHelper {
         String result = null;
         try {
             result = String.format("%s/%s?keys=%s&component=%s",
-                    sonarBaseUrl,
+                    resolveSonarUrl(sonarBaseUrl),
                     SETTINGS_API_GET_PATH,
                     URLEncoder.encode(propertyName, ENCODING),
                     URLEncoder.encode(componentKey, ENCODING));
         } catch (UnsupportedEncodingException ignored) {
         }
         return result;
+    }
+
+    private static String resolveSonarUrl(String sonarBaseUrl) {
+        String url = StringUtils.isNotEmpty(System.getenv(SONAR_URL_PARAM)) ?
+                System.getenv(SONAR_URL_PARAM) : System.getProperty(SONAR_URL_PARAM);
+
+        return StringUtils.isNotEmpty(url) ? url.trim() : sonarBaseUrl;
     }
 
     public static String encrypt(String plaintext) throws IOException {

@@ -9,6 +9,8 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class HttpHelper {
 
+    public static final String SONAR_URL_PARAM = "cx.sonarUrl";
+
     public static final String CX_PROXY_BYPASS = System.getProperty("cx.proxyBypass");
     public static final String CX_HTTP_HOST = System.getProperty("cx.proxyHost");
     public static final String CX_HTTP_PORT = System.getProperty("cx.proxyPort");

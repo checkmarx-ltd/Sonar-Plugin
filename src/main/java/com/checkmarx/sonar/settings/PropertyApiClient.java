@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -19,14 +20,19 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.sonar.api.batch.sensor.SensorContext;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import static com.checkmarx.sonar.web.HttpHelper.SONAR_URL_PARAM;
 
 /**
  * Performs operations on Sonar properties using HTTP calls.
@@ -60,7 +66,7 @@ public class PropertyApiClient {
         String value = null;
         try {
             HttpResponse response = getResponse(request);
-            msgVal = IOUtils.toString(response.getEntity().getContent());
+            msgVal = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
 
             root = objectMapper.readTree(msgVal);
             value = root.at("/settings/0/value").textValue();
@@ -70,8 +76,15 @@ public class PropertyApiClient {
         return value;
     }
 
+    private String getSonarUrl() {
+        String url = StringUtils.isNotEmpty(System.getenv(SONAR_URL_PARAM)) ?
+                System.getenv(SONAR_URL_PARAM) : System.getProperty(SONAR_URL_PARAM);
+
+        return StringUtils.isNotEmpty(url) ? url.trim() : getSonarBaseUrl();
+    }
+
     public void setProperty(String name, String value) throws IOException {
-        String requestUrl = String.format("%s/%s", getSonarBaseUrl(), CxConfigHelper.SETTINGS_API_SET_PATH);
+        String requestUrl = String.format("%s/%s", getSonarUrl(), CxConfigHelper.SETTINGS_API_SET_PATH);
         logger.info("Setting property: {} at {}", name, requestUrl);
 
         HttpPost request = new HttpPost(requestUrl);
@@ -148,8 +161,21 @@ public class PropertyApiClient {
                 }
             } else {
                 if (endpointContext != null) {
+                    String host = getSonarUrl();
+                    try {
+                        if (StringUtils.isNotEmpty(host)) {
+                            host = new URL(getSonarUrl()).getHost();
+                        }
+                    } catch (Exception e) {
+                        logger.error("Fail to set cookies host for override URL: " + host, e);
+                    }
+
                     request.setHeaders(endpointContext.getRequiredHeaders());
                     for (Cookie cookie : endpointContext.getRequiredCookies()) {
+                        if (StringUtils.isNotEmpty(host)) {
+                            ((BasicClientCookie) cookie).setDomain(host);
+                            logger.info("Updated cookie domain to: " + host);
+                        }
                         cookieStore.addCookie(cookie);
                     }
                 }
