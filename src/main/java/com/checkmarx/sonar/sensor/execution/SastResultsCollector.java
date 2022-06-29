@@ -1,5 +1,6 @@
 package com.checkmarx.sonar.sensor.execution;
 
+import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.Query;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -21,6 +22,7 @@ import org.sonar.api.measures.Metric;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.checkmarx.sonar.measures.SastMetrics.*;
@@ -72,12 +74,15 @@ public class SastResultsCollector {
 
                     List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
                     DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
+                    HashMap <String,String> states = getMappingStates();
+                    rule.setFile(result.getQuery.getstatement());
                     context.newIssue()
                             .forRule(rule.ruleKey())
                             .overrideSeverity(sastSeverity.getSonarSeverity())
                             .gap(remediationEffortPerVulnerability)
                             .at(issueLocation)
                             .addFlow(flowLocationsInFile)
+                            .newLocation(states)
                             .save();
 
                     updateCurrFileVulnerabilities(result);
@@ -293,5 +298,15 @@ public class SastResultsCollector {
         }
         context.<String>newMeasure().forMetric(SAST_SCAN_QUERIES).on(file).withValue(json).save();
         //logger.info("[CHECKMARX] Added query measure, metric: " + SAST_SCAN_QUERIES.getName() + ", File: " + ((DefaultInputFile) file).getProjectRelativePath());
+    }
+    private HashMap<String, String> getMappingStates(){
+    	HashMap<String, String> states = new HashMap<String, String>();
+    	states.put("Open", "To Verify");
+    	states.put("Resolve as fixed", "Not Exploitable");
+    	states.put("Resolve as false positive", "Confirmed");
+    	states.put("Proposed Not Exploitable", "Resolve as won'nt fix");
+    	states.put("Resolve as fixed", "Urgent");
+    	return states;
+    	
     }
 }
