@@ -1,5 +1,6 @@
 package com.checkmarx.sonar.sensor.execution;
 
+import com.checkmarx.sonar.cxportalservice.sast.model.CxXMLResults.Query;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -74,6 +75,7 @@ public class SastResultsCollector {
                     List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
                     DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
                     HashMap <String,String> states = getMappingStates();
+                    rule.setFile(result.getQuery.getstatement());
                     context.newIssue()
                             .forRule(rule.ruleKey())
                             .overrideSeverity(sastSeverity.getSonarSeverity())
