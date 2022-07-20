@@ -1,5 +1,27 @@
 package com.checkmarx.sonar.sensor.execution;
 
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_HIGH_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_LOW_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_MEDIUM_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_HIGH_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_LOW_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_MEDIUM_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_QUERIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_TOTAL_NEW_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_TOTAL_VULNERABILITIES;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.rule.ActiveRule;
+import org.sonar.api.batch.rule.ActiveRules;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.measures.Metric;
+
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -10,20 +32,6 @@ import com.checkmarx.sonar.settings.CxProperties;
 import com.cx.restclient.sast.dto.CxXMLResults;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.rule.ActiveRule;
-import org.sonar.api.batch.rule.ActiveRules;
-import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.batch.sensor.issue.NewIssueLocation;
-import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
-import org.sonar.api.measures.Metric;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static com.checkmarx.sonar.measures.SastMetrics.*;
 
 /**
  * Created by: zoharby.
@@ -70,8 +78,8 @@ public class SastResultsCollector {
                         continue;
                     }
 
-                    List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result);
-                    DefaultIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result);
+                    List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result,context);
+                    NewIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result,context);
                     context.newIssue()
                             .forRule(rule.ruleKey())
                             .overrideSeverity(sastSeverity.getSonarSeverity())
