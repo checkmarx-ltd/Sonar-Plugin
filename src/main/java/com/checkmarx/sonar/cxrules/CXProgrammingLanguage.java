@@ -19,7 +19,8 @@ public enum CXProgrammingLanguage {
     VB6("VB6", "vb", 256),
     CSHARP("csharp", "cs", 1),
     VBNET("vbnet", "vbnet", 32),
-    APEX("Apex","apex", 16);
+    APEX("Apex","apex", 16),
+    KOTLIN("Kotlin", "kotlin", 524288);
 
     private String name;
     private String sonarName;

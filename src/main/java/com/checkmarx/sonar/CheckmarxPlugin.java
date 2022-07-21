@@ -49,7 +49,8 @@ public class CheckmarxPlugin implements Plugin {
                 CxPythonProfile.class,
                 CxVb6Profile.class,
                 CxVbNetProfile.class,
-                CxApexProfile.class);
+                CxApexProfile.class,
+                CxKotlinProfile.class);
     }
 
 }
