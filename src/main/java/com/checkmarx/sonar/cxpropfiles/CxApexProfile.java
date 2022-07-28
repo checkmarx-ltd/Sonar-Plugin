@@ -1,7 +1,10 @@
 package com.checkmarx.sonar.cxpropfiles;
 
+import java.util.List;
+
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.profiles.XMLProfileParser;
+import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.api.utils.ValidationMessages;
 
@@ -33,6 +36,17 @@ public class CxApexProfile implements BuiltInQualityProfilesDefinition {
                 String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
                         CXProgrammingLanguage.APEX.getName().toLowerCase()), validation);
 
-        context.createBuiltInQualityProfile(profile.getName(), profile.getLanguage());
+        NewBuiltInQualityProfile qprofile =   context.createBuiltInQualityProfile(profile.getName(), profile.getLanguage());
+        
+        List<ActiveRule> rules =  profile.getActiveRules();
+        
+        if(rules != null && rules.size() > 0) {
+        	for(ActiveRule r: rules) {
+        		qprofile.activateRule(r.getRepositoryKey(),r.getRuleKey());
+        	}        	
+        }
+        
+        qprofile.done();
+        
     }
 }

@@ -2,6 +2,7 @@ package com.checkmarx.sonar.sensor.utils;
 
 import com.checkmarx.sonar.cxrules.CxSonarConstants;
 import com.checkmarx.sonar.dto.CxFullCredentials;
+import com.checkmarx.sonar.dto.CxSensorSettings;
 import com.checkmarx.sonar.dto.RestEndpointContext;
 import com.checkmarx.sonar.sensor.dto.ProjectDetails;
 import com.checkmarx.sonar.sensor.encryption.AesUtil;
@@ -162,6 +163,17 @@ public class CxConfigHelper {
     }
 
     private String getPropertyValue(String responseJson) {
+    	
+    	CxSensorSettings settings = null;
+    	try {
+            if (StringUtils.isNotEmpty(responseJson)) {
+            	settings = objectMapper.readValue(responseJson, CxSensorSettings.class);
+            	return settings.getFirstSettingValue();
+            }    		
+    	}catch(Exception tryNextLogic) {
+    		   log.debug("Fail to retrieve property value using Json");
+    	}    	
+    	
         String value = null;
         try {
             int valueIdx = responseJson.indexOf(VALUE);
@@ -173,9 +185,13 @@ public class CxConfigHelper {
         }
         return value;
     }
-
+       
     private ProjectDetails getProjectAndTeamDetails(String cxProject, CxFullCredentials cxFullCredentials) throws IOException {
-        String teamName = cxProject.substring(cxProject.indexOf("\\") + 1, cxProject.lastIndexOf("\\") - 1);
+		
+		  String teamName =  cxProject.substring(cxProject.indexOf("\\") + 1, cxProject.lastIndexOf("\\"));
+		  teamName = "/" + teamName ;
+		 
+        log.info("Team name parsed from the projectName: "+teamName);
         ProjectDetails projectDetails = new ProjectDetails();
         projectDetails.setTeamName(teamName);
         projectDetails.setTeamId(getTeamId(teamName, cxFullCredentials));
@@ -240,6 +256,7 @@ public class CxConfigHelper {
             }
             return "";
         } catch (IOException e) {
+        	log.warn("Error occured while retrieving property value for property: "+propertyName);
             return null;
         } finally {
             if (response != null) {
@@ -271,7 +288,8 @@ public class CxConfigHelper {
         while ((line = rd.readLine()) != null) {
             result.append(line);
         }
-
+        
+        
         return result.toString();
     }
 
