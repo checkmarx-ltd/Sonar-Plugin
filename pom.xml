@@ -5,7 +5,7 @@
     <groupId>checkmarx.com</groupId>
     <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>2022.3.1</version>
+    <version>2022.3.2</version>
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
@@ -77,7 +77,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.apiVersion>6.7</sonar.apiVersion>
+        <sonar.apiVersion>8.0</sonar.apiVersion>
         <jdk.min.version>1.8</jdk.min.version>
         <!-- Exclude generated classes from Sonar analyzes -->
         <sonar.exclusions>com/checkmarx/soap/client/**</sonar.exclusions>

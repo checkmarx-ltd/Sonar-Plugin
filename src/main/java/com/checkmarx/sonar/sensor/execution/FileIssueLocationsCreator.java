@@ -1,14 +1,16 @@
 package com.checkmarx.sonar.sensor.execution;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.issue.NewIssue;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxResultToSonarResult;
 import com.cx.restclient.sast.dto.CxXMLResults;
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.sensor.issue.NewIssueLocation;
-import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by: zoharby.
@@ -28,11 +30,11 @@ class FileIssueLocationsCreator {
         this.file = file;
     }
 
-    List<NewIssueLocation> createFlowLocations(CxResultToSonarResult result) {
+    List<NewIssueLocation> createFlowLocations(CxResultToSonarResult result,SensorContext context) {
         List<NewIssueLocation> allLocationsInFile = new LinkedList<>();
 
         try {
-            DefaultIssueLocation firstLocationInFile = null;
+            NewIssueLocation firstLocationInFile = null;
             List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes = result.getResultData().getPath().getPathNode();
 
             //locations iteration will be from end to start because sonar inserts the list in that order
@@ -47,7 +49,7 @@ class FileIssueLocationsCreator {
                 //find the first node that do appear in the file, create location for it, and add to it the above message
                 for (CxXMLResults.Query.Result.Path.PathNode node : result.getResultData().getPath().getPathNode()) {
                     if (CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(node.getFileName(), file.absolutePath())) {
-                        firstLocationInFile = createLocationFromPathNode(node);
+                        firstLocationInFile = createLocationFromPathNode(node,context);
                         if (firstLocationInFile == null) {
                             continue;
                         }
@@ -71,7 +73,7 @@ class FileIssueLocationsCreator {
             boolean isCurrNodeInFile = CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(nodeLoopStartIdx).getFileName(), file.absolutePath());
 
             //iteration from end to start because sonar inserts the list in that order
-            iterateFromEndToStart(nodeLoopStartIdx, nodeLoopEndIdx, resultsNodes, isCurrNodeInFile, isPrevNodeInFile, allLocationsInFile);
+            iterateFromEndToStart(nodeLoopStartIdx, nodeLoopEndIdx, resultsNodes, isCurrNodeInFile, isPrevNodeInFile, allLocationsInFile,context);
             addFileLocation(firstLocationInFile, allLocationsInFile);
 
 
@@ -83,20 +85,20 @@ class FileIssueLocationsCreator {
         return allLocationsInFile;
     }
 
-    private void addFileLocation(DefaultIssueLocation firstLocationInFile, List<NewIssueLocation> allLocationsInFile) {
+    private void addFileLocation(NewIssueLocation firstLocationInFile, List<NewIssueLocation> allLocationsInFile) {
         if (firstLocationInFile != null) {
             allLocationsInFile.add(firstLocationInFile);
         }
     }
 
-    private void iterateFromEndToStart(int nodeLoopStartIdx, int nodeLoopEndIdx, List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes, boolean isCurrNodeInFile, boolean isPrevNodeInFile, List<NewIssueLocation> allLocationsInFile) {
+    private void iterateFromEndToStart(int nodeLoopStartIdx, int nodeLoopEndIdx, List<CxXMLResults.Query.Result.Path.PathNode> resultsNodes, boolean isCurrNodeInFile, boolean isPrevNodeInFile, List<NewIssueLocation> allLocationsInFile,SensorContext context) {
         boolean isNextNodeInFile;
         for (int i = nodeLoopStartIdx; i >= nodeLoopEndIdx; --i) {
             //set isNextNodeInFile as true in last node to stay within legal index in resultsNodes
             isNextNodeInFile = i <= 0 || CxSonarFilePathUtil.isCxPathAndSonarPathTheSame(resultsNodes.get(i - 1).getFileName(), file.absolutePath());
             CxXMLResults.Query.Result.Path.PathNode currNode = resultsNodes.get(i);
             if (isCurrNodeInFile) {
-                DefaultIssueLocation defaultIssueLocation = createLocationFromPathNode(currNode);
+                NewIssueLocation defaultIssueLocation = createLocationFromPathNode(currNode,context);
                 if (defaultIssueLocation == null) {
                     isCurrNodeInFile = isNextNodeInFile;
                     continue;
@@ -117,34 +119,34 @@ class FileIssueLocationsCreator {
         }
     }
 
-    DefaultIssueLocation createIssueLocation(CxResultToSonarResult result) {
+    NewIssueLocation createIssueLocation(CxResultToSonarResult result,SensorContext context) {
         CodeHighlightsUtil.Highlight highlightLine = CodeHighlightsUtil.getHighlightForPathNode(file, result.getNodeToMarkOnFile());
         if (highlightLine == null) {
             highlightLine = new CodeHighlightsUtil.Highlight(1, -1, -1);
         }
-        DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
+        NewIssue defaultIssueLocation = context.newIssue();
 
-        return defaultIssueLocation.on(file)
+        return defaultIssueLocation.newLocation().on(file)
                 .at(file.selectLine(highlightLine.getLine()))
                 .message("Checkmarx Vulnerability : " + result.getQuery().getName());
     }
 
-    private DefaultIssueLocation createLocationFromPathNode(CxXMLResults.Query.Result.Path.PathNode node) {
+    private NewIssueLocation createLocationFromPathNode(CxXMLResults.Query.Result.Path.PathNode node,SensorContext context) {
         CodeHighlightsUtil.Highlight highlight = CodeHighlightsUtil.getHighlightForPathNode(file, node);
         if (highlight == null) {
             return null;
         }
         logger.debug("File " + file.toString() + ", " + highlight.toString());
-        DefaultIssueLocation defaultIssueLocation = new DefaultIssueLocation();
+        NewIssue defaultIssueLocation = context.newIssue();
 
         if (highlight.getStart() == -1) {
             if (highlight.getLine() <= 1) {
-                return defaultIssueLocation.on(file);
+                return defaultIssueLocation.newLocation().on(file);
             }
-            return defaultIssueLocation.on(file)
+            return defaultIssueLocation.newLocation().on(file)
                     .at(file.selectLine(highlight.getLine()));
         }
-        return defaultIssueLocation.on(file)
+        return defaultIssueLocation.newLocation().on(file)
                 .at(file.newRange(file.newPointer(highlight.getLine(), highlight.getStart()),
                         file.newPointer(highlight.getLine(), highlight.getEnd())));
     }

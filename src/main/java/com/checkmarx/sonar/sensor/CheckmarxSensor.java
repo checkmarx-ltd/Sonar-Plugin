@@ -1,5 +1,22 @@
 package com.checkmarx.sonar.sensor;
 
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
+import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_RESULTS;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.xml.bind.JAXBException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.SensorDescriptor;
+
 import com.checkmarx.sonar.cxportalservice.sast.exception.CxRestLoginException;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -19,22 +36,6 @@ import com.cx.restclient.sast.dto.SASTResults;
 import com.cx.restclient.sast.utils.SASTUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.DefaultInputFile;
-import org.sonar.api.batch.sensor.Sensor;
-import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.batch.sensor.SensorDescriptor;
-
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
-import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_RESULTS;
 
 /**
  * Created by: Zoharby.
@@ -117,10 +118,10 @@ public class CheckmarxSensor implements Sensor {
         Iterable<InputFile> mainfiles = getMainFiles(context);
         for (InputFile file : mainfiles) {
             context.<Integer>newMeasure().on(file).forMetric(SONAR_PROJECT_HAVE_SAST_RESULTS).withValue(1).save();
-            String prjPath = ((DefaultInputFile) file).getProjectRelativePath();
+            /*String prjPath = ((DefaultInputFile) file).getProjectRelativePath();
             String mdlPath = ((DefaultInputFile) file).getModuleRelativePath();
             String absPath = ((DefaultInputFile) file).absolutePath();
-            logger.info("Sonar project have SAST results metric on file:\nProject path: " + prjPath + "\nModule path: " + mdlPath + "\nAbsolute path: " + absPath);
+            logger.info("Sonar project have SAST results metric on file:\nProject path: " + prjPath + "\nModule path: " + mdlPath + "\nAbsolute path: " + absPath);*/
         }
     }
 
