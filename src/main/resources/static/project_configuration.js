@@ -35,6 +35,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
     script.onload = init;
     document.body.appendChild(script);
 
+    var fstdropdown_script = document.createElement("script");
+    fstdropdown_script.type = "text/javascript";
+    fstdropdown_script.src = staticUrl + '/fstdropdown.min.js';
+    document.body.appendChild(fstdropdown_script);
+
     var configurationPage;
 
 
@@ -85,7 +90,14 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         fileRef.rel = "stylesheet";
         fileRef.type = "text/css";
         fileRef.href = staticUrl + '/project_config_style.css';
-        document.getElementsByTagName("head")[0].appendChild(fileRef)
+        document.getElementsByTagName("head")[0].appendChild(fileRef);
+
+        var fstdropdown_css =  document.createElement("link");
+        fstdropdown_css.id = "fstdropdownCss";
+        fstdropdown_css.rel = "stylesheet";
+        fstdropdown_css.type = "text/css";
+        fstdropdown_css.href = staticUrl + '/fstdropdown.min.css';
+        document.getElementsByTagName("head")[0].appendChild(fstdropdown_css);
     }
 
     function getConnectingSpinner() {
@@ -276,6 +288,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
             projectsIn = "";
             var select = document.getElementById('projectSelect');
             select.innerHTML = createOptions();
+            setFstDropdown();
         } catch (ignored) {
         }
         try {
@@ -307,6 +320,7 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
             var select = document.getElementById('projectSelect');
             select.innerHTML = createOptions();
+            setFstDropdown();
         })
     }
 
@@ -326,7 +340,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
         form.appendChild(label);
         var select = document.createElement("SELECT");
         select.id = 'projectSelect';
+        var className = "fstdropdown-select";
+        if (!select.classList.contains(className)) {
+            select.classList.add(className);
+        }
         select.innerHTML = createOptions();
+        setFstDropdown();
         form.appendChild(select);
         var errSpan = createErrSpan(form.id);
         paragraph.appendChild(form);
