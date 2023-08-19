@@ -2,6 +2,11 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     // let's create a flag telling if the static is still displayed
     var isDisplayed = true;
+    if(!options.component.analysisDate){
+
+    options.component.analysisDate = new Date();
+
+    }
 
     var isCxConnectionSuccessful;
     var projectsIn;
