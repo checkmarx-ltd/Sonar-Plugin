@@ -1,13 +1,11 @@
 window.registerExtension('checkmarx/project_configuration', function (options) {
 
     // let's create a flag telling if the static is still displayed
-    var isDisplayed = true;
     if(!options.component.analysisDate){
+            options.component.analysisDate = new Date();
+     }
 
-    options.component.analysisDate = new Date();
-
-    }
-
+    var isDisplayed = true;
     var isCxConnectionSuccessful;
     var projectsIn;
     var projectListNoServerConnectionMsg = "Unable to connect to server. Make sure URL and Credentials are valid to see project list.";

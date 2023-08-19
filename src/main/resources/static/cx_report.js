@@ -1,6 +1,11 @@
 window.registerExtension('checkmarx/cx_report', function (options) {
  
   // let's create a flag telling if the static is still displayed
+
+  if(!options.component.analysisDate){
+          options.component.analysisDate = new Date();
+          }
+
   var isDisplayed = true;
   var staticUrl = window.baseUrl +'/static/checkmarx';
     var spanSpinner;
