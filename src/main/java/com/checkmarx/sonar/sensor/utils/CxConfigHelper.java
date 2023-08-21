@@ -185,17 +185,18 @@ public class CxConfigHelper {
         }
         return value;
     }
-       
+
     private ProjectDetails getProjectAndTeamDetails(String cxProject, CxFullCredentials cxFullCredentials) throws IOException {
-		
-		  String teamName =  cxProject.substring(cxProject.indexOf("\\") + 1, cxProject.lastIndexOf("\\"));
-		  teamName = "/" + teamName ;
-		 
-        log.info("Team name parsed from the projectName: "+teamName);
+        log.info("Team/Project path: " + cxProject);
+
+        int lastIndex = Math.max(cxProject.lastIndexOf("\\"), cxProject.lastIndexOf("/"));
+        String teamName = cxProject.substring(1, lastIndex);
+        teamName = "/" + teamName;
+
         ProjectDetails projectDetails = new ProjectDetails();
         projectDetails.setTeamName(teamName);
         projectDetails.setTeamId(getTeamId(teamName, cxFullCredentials));
-        projectDetails.setProjectName(cxProject.substring(cxProject.lastIndexOf("\\") + 1));
+        projectDetails.setProjectName(cxProject.substring(lastIndex + 1));
         return projectDetails;
     }
 
@@ -288,8 +289,8 @@ public class CxConfigHelper {
         while ((line = rd.readLine()) != null) {
             result.append(line);
         }
-        
-        
+
+
         return result.toString();
     }
 
