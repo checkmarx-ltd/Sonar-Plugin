@@ -257,7 +257,7 @@ public class CxConfigHelper {
             }
             return "";
         } catch (IOException e) {
-        	log.warn("Error occured while retrieving property value for property: "+propertyName);
+            log.warn("Error occured while retrieving property value for property: " + propertyName);
             return null;
         } finally {
             if (response != null) {
