@@ -2,6 +2,12 @@ window.registerExtension('checkmarx/project_configuration', function (options) {
 
     // let's create a flag telling if the static is still displayed
     var isDisplayed = true;
+    //Setting analysis date to resolve continuous page refresh issue.
+    //It is observeed that until a sonar analysis is done for a project, all the pages keeps on reloading.
+    //By setting analysisDate for the project resolves the issue for checkmarx pages without having to run sonar scan on the project.
+    if(!options.component.analysisDate){
+        options.component.analysisDate = new Date();
+    }
 
     var isCxConnectionSuccessful;
     var projectsIn;
