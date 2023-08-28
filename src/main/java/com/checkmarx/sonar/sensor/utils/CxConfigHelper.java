@@ -47,6 +47,7 @@ public class CxConfigHelper {
     public static final String SONAR_PROJECT_KEY = "sonar.projectKey";
     public static final String SONAR_LOGIN_KEY = "sonar.login";
     public static final String SONAR_PASSWORD_KEY = "sonar.password";
+    public static final String SONAR_TOKEN_KEY = "sonar.token";
 
     private static final String VALUE = "value";
 
@@ -229,7 +230,13 @@ public class CxConfigHelper {
                 String token;
                 String user;
                 String pass;
-                if (config.get(SONAR_LOGIN_KEY).isPresent() &&
+                //adding below condition for new versions of sonarqube including 10.1
+                if (config.get(SONAR_TOKEN_KEY).isPresent()) {
+                	log.info("sonar.token present");
+                    token = config.get(SONAR_TOKEN_KEY).get();
+                    auth = token + ":";
+                    auth = new String(Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1)));
+                }else if (config.get(SONAR_LOGIN_KEY).isPresent() &&
                         !config.get(SONAR_PASSWORD_KEY).isPresent()) {
                     token = config.get(SONAR_LOGIN_KEY).get();
                     auth = token + ":";

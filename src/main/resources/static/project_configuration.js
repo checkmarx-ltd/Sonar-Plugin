@@ -2,12 +2,13 @@ window.registerExtension('checkmarx/project_configuration', function (options)
 {
  // let's create a flag telling if the static is still displayed
    var isDisplayed = true;
- //Setting analysis date to resolve continuous page refresh issue.
- //It is observeed that until a sonar analysis is done for a project, all the pages keeps on reloading.
- //By setting analysisDate for the project resolves the issue for checkmarx pages without having to run sonar scan on the project.
-    if(!options.component.analysisDate){
-        options.component.analysisDate = new Date();
-     }
+ 	//Setting analysis date to resolve continuous page refresh issue.
+ 	//It is observeed that until a sonar analysis is done for a project, all the pages keeps on reloading.
+ 	//By setting analysisDate for the project resolves the issue for checkmarx pages without having to run sonar scan on the project.
+    if(!options.component.analysisDate)
+    {
+		options.component.analysisDate = 'tempAnalysisDate';
+	}
     var isCxConnectionSuccessful;
     var projectsIn;
     var projectListNoServerConnectionMsg = "Unable to connect to server. Make sure URL and Credentials are valid to see project list.";
@@ -121,6 +122,8 @@ window.registerExtension('checkmarx/project_configuration', function (options)
     /******************************************Build UI ****************************************************/
 
     function loadUI() {
+		//clear page in case where the page was loaded, redirected and then redirected back
+        options.el.textContent = ''; //this is to avoid showing duplicate fields on UI.
         return new Promise(function () {
             var div = document.createElement('div');
             div.className = "configurationDiv";
@@ -134,6 +137,7 @@ window.registerExtension('checkmarx/project_configuration', function (options)
             createProjectOptionsForm();
             createRemediationEffort();
             createSaveButton();
+            setFstDropdown();
         })
     }
 
@@ -292,8 +296,9 @@ window.registerExtension('checkmarx/project_configuration', function (options)
         try {
             projectsIn = "";
             var select = document.getElementById('projectSelect');
-            select.innerHTML = createOptions();
-            setFstDropdown();
+            select.innerHTML = createOptions();            
+            setFstDropdown();   
+            select.fstdropdown.rebind();         
         } catch (ignored) {
         }
         try {
@@ -326,6 +331,7 @@ window.registerExtension('checkmarx/project_configuration', function (options)
             var select = document.getElementById('projectSelect');
             select.innerHTML = createOptions();
             setFstDropdown();
+            select.fstdropdown.rebind();            
         })
     }
 
@@ -348,14 +354,13 @@ window.registerExtension('checkmarx/project_configuration', function (options)
         var className = "fstdropdown-select";
         if (!select.classList.contains(className)) {
             select.classList.add(className);
-        }
-        select.innerHTML = createOptions();
-        setFstDropdown();
+        }        
+        select.innerHTML = createOptions();        
         form.appendChild(select);
         var errSpan = createErrSpan(form.id);
         paragraph.appendChild(form);
         paragraph.appendChild(errSpan);
-        configurationPage.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);                
     }
 
 
@@ -767,6 +772,12 @@ window.registerExtension('checkmarx/project_configuration', function (options)
 
     //Sonar documentation says this runs when the page closes, but as of 6.3 this has no effect
     return function () {
+		//This is to reset value of analysisDate and reload the component and other pages will keep on refreshing as expected
+		if(options.component.analysisDate === 'tempAnalysisDate')
+        {
+			options.component.analysisDate = undefined;
+    		location.reload();
+		}
         isDisplayed = false;
     };
 
