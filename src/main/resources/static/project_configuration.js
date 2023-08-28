@@ -137,6 +137,7 @@ window.registerExtension('checkmarx/project_configuration', function (options)
             createProjectOptionsForm();
             createRemediationEffort();
             createSaveButton();
+            setFstDropdown();
         })
     }
 
@@ -295,8 +296,9 @@ window.registerExtension('checkmarx/project_configuration', function (options)
         try {
             projectsIn = "";
             var select = document.getElementById('projectSelect');
-            select.innerHTML = createOptions();
-            setFstDropdown();
+            select.innerHTML = createOptions();            
+            setFstDropdown();   
+            select.fstdropdown.rebind();         
         } catch (ignored) {
         }
         try {
@@ -329,6 +331,7 @@ window.registerExtension('checkmarx/project_configuration', function (options)
             var select = document.getElementById('projectSelect');
             select.innerHTML = createOptions();
             setFstDropdown();
+            select.fstdropdown.rebind();            
         })
     }
 
@@ -351,14 +354,13 @@ window.registerExtension('checkmarx/project_configuration', function (options)
         var className = "fstdropdown-select";
         if (!select.classList.contains(className)) {
             select.classList.add(className);
-        }
-        select.innerHTML = createOptions();
-        setFstDropdown();
+        }        
+        select.innerHTML = createOptions();        
         form.appendChild(select);
         var errSpan = createErrSpan(form.id);
         paragraph.appendChild(form);
         paragraph.appendChild(errSpan);
-        configurationPage.appendChild(paragraph);
+        configurationPage.appendChild(paragraph);                
     }
 
 
