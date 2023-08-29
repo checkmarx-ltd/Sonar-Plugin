@@ -36,7 +36,7 @@ window.registerExtension('checkmarx/project_configuration', function (options)
 
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = staticUrl + '/jquery-3.5.1.min.js';
+    script.src = staticUrl + '/jquery-3.7.1.min.js';
     // Perform the rest of the init process after jQuery loads.
     script.onload = init;
     document.body.appendChild(script);
