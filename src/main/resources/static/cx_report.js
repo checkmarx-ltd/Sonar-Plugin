@@ -2,7 +2,14 @@ window.registerExtension('checkmarx/cx_report', function (options) {
  
   // let's create a flag telling if the static is still displayed
   var isDisplayed = true;
-  var staticUrl = window.baseUrl +'/static/checkmarx';
+   //Setting analysis date to resolve continuous page refresh issue.
+   //It is observeed that until a sonar analysis is done for a project, all the pages keeps on reloading.
+   //By setting analysisDate for the project resolves the issue for checkmarx pages without having to run sonar scan on the project.
+   if(!options.component.analysisDate)
+   {
+		options.component.analysisDate = 'tempAnalysisDate';
+	}
+   var staticUrl = window.baseUrl +'/static/checkmarx';
     var spanSpinner;
 
     //-------------------------- sast vars --------------------------------------
@@ -1531,6 +1538,12 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
 
           return function () {
+		//This is to reset value of analysisDate and reload the component and other pages will keep on refreshing as expected
+		if(options.component.analysisDate === 'tempAnalysisDate')
+        {
+			options.component.analysisDate = undefined;
+    		location.reload();
+		}
 
     // we unset the `isDisplayed` flag to ignore to Web API calls finished after the static is closed
     isDisplayed = false;
