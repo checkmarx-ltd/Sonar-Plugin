@@ -4,9 +4,11 @@ import com.checkmarx.sonar.cxrules.CxSonarConstants;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.dto.RestEndpointContext;
 import com.checkmarx.sonar.sensor.utils.CxConfigHelper;
-import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.exception.CxClientException;
+import com.cx.restclient.CxSASTClient;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.sast.dto.Project;
+import com.cx.restclient.configuration.CxScanConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.conn.ssl.TrustAllStrategy;
@@ -55,9 +57,9 @@ public class CxConfigRestEndPoint implements WebService {
     private static final String ERROR_MESSAGE = "errorMsg";
 
     private Logger logger = LoggerFactory.getLogger(CxConfigRestEndPoint.class);
-
-    private CxShragaClient shraga;
-
+    
+    private CxSASTClient shraga;
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String PROJECTS = "projects";
     private static final String PROJECT_PATH = "/project";
@@ -99,16 +101,24 @@ public class CxConfigRestEndPoint implements WebService {
                                 ((HttpsURLConnection) urlConn).setHostnameVerifier(getHostnameVerifier());
                             }
 
+                            CxScanConfig config = new CxScanConfig(cxFullCredentials.getCxServerUrl().trim(),
+                                    cxFullCredentials.getCxUsername(),
+                                    cxFullCredentials.getCxPassword(),
+                                    CxSonarConstants.CX_SONAR_ORIGIN,
+                                    true);
+
                             ProxyParams proxyParam = HttpHelper.getProxyParam();
-                            if (proxyParam == null) {
-                                shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
-                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, false, logger);
-                            } else {
-                                shraga = new CxShragaClient(cxFullCredentials.getCxServerUrl().trim(), cxFullCredentials.getCxUsername(),
-                                        cxFullCredentials.getCxPassword(), CxSonarConstants.CX_SONAR_ORIGIN, true, logger, true,
-                                        proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd());
+                            if (proxyParam != null) {
+                                String proxyHost = proxyParam.getHost();
+                                ProxyConfig proxyConfig = new ProxyConfig(
+                                        proxyHost,
+                                        proxyParam.getPort(),
+                                        proxyParam.getUser(),
+                                        proxyParam.getPssd(),
+                                        proxyHost.toLowerCase().startsWith("https"));
+                                config.setProxyConfig(proxyConfig);
                             }
-                            //  final String cxVersion = shraga.getCxVersion();
+                            shraga = new CxSASTClient(config, logger);
 
                             shraga.login();
                             urlConn.connect();

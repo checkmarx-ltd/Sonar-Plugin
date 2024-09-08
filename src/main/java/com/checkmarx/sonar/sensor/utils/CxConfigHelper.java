@@ -13,9 +13,10 @@ import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.settings.PropertyApiClient;
 import com.checkmarx.sonar.web.HttpHelper;
 import com.checkmarx.sonar.web.ProxyParams;
-import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.exception.CxClientException;
+import com.cx.restclient.CxSASTClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.config.Configuration;
@@ -143,7 +145,6 @@ public class CxConfigHelper {
         CxScanConfig scanConfig = new CxScanConfig();
         scanConfig.setCxOrigin(CxSonarConstants.CX_SONAR_ORIGIN);
         scanConfig.setSastEnabled(true);
-        scanConfig.setOsaEnabled(false);
         scanConfig.setSynchronous(true);
         scanConfig.setDisableCertificateValidation(true);
         scanConfig.setUrl(cxFullCredentials.getCxServerUrl());
@@ -303,32 +304,29 @@ public class CxConfigHelper {
 
     private String getTeamId(String teamName, CxFullCredentials cxFullCredentials) throws IOException {
         String teamId;
+        Logger logger = LoggerFactory.getLogger(CxConfigHelper.class);
+        CxScanConfig config = new CxScanConfig(cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true);
+
         try {
-            CxShragaClient shraga;
+            CxSASTClient shraga;
             ProxyParams proxyParam = HttpHelper.getProxyParam();
-            if (proxyParam == null) {
-                shraga = new CxShragaClient(
-                        cxFullCredentials.getCxServerUrl().trim(),
-                        cxFullCredentials.getCxUsername(),
-                        cxFullCredentials.getCxPassword(),
-                        CxSonarConstants.CX_SONAR_ORIGIN,
-                        true,
-                        false,
-                        log);
-            } else {
-                shraga = new CxShragaClient(
-                        cxFullCredentials.getCxServerUrl().trim(),
-                        cxFullCredentials.getCxUsername(),
-                        cxFullCredentials.getCxPassword(),
-                        CxSonarConstants.CX_SONAR_ORIGIN,
-                        true,
-                        log,
-                        true,
-                        proxyParam.getHost(),
+            if (proxyParam != null) {
+            String proxyHost = proxyParam.getHost();
+            ProxyConfig proxyConfig = new ProxyConfig(
+                    proxyHost,
                         proxyParam.getPort(),
                         proxyParam.getUser(),
-                        proxyParam.getPssd());
-            }
+                        proxyParam.getPssd(),
+                        proxyHost.toLowerCase().startsWith("https"));
+
+                
+                    config.setProxyConfig(proxyConfig);
+                }
+                shraga = new CxSASTClient(config, logger);
 
             shraga.login();
 
