@@ -1,6 +1,12 @@
 package com.checkmarx.sonar.sensor.dto;
 
-import org.sonar.api.batch.rule.Severity;
+//import org.sonar.api.batch.rule.Severity;
+import org.sonar.api.*;
+//import org.sonar.api.issue.impact.Severity;
+
+import com.cx.restclient.dto.scansummary.Severity;
+//import org.sonar.api.issue.impact.Severity;
+//import org.sonar.api.issue.impact.Severity;
 
 /**
  * Created by: zoharby.
@@ -9,9 +15,9 @@ import org.sonar.api.batch.rule.Severity;
 public enum SastSeverity {
 
     SAST_HIGH(3, "High", Severity.CRITICAL),
-    SAST_MEDIUM(2, "Medium", Severity.MAJOR),
-    SAST_LOW(1, "Low", Severity.MINOR),
-    SAST_INFO(0, "Info", Severity.INFO);
+    SAST_MEDIUM(2, "Medium", Severity.MEDIUM),
+    SAST_LOW(1, "Low", Severity.LOW),
+    SAST_INFO(0, "Info", Severity.NONE);
 
     int value;
     String cxName;

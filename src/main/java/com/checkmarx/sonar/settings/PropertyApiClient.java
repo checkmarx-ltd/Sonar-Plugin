@@ -23,6 +23,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
+import org.sonar.api.*;
+//import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorContext;
 
 import javax.ws.rs.core.Response;

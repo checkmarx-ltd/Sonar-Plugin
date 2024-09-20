@@ -1,10 +1,17 @@
 package com.checkmarx.sonar.measures;
 
+import org.sonar.api.*;
+//import org.sonar.api.ce.measure.MeasureComputer;
+import org.sonar.api.measures.Metric;
+import org.sonar.api.ce.measure.Measure;
+import org.sonar.api.ce.measure.MeasureComputer;
+import org.sonar.api.ce.measure.Component;
+/*
 import org.sonar.api.ce.measure.Component;
 import org.sonar.api.ce.measure.Measure;
 import org.sonar.api.ce.measure.MeasureComputer;
 import org.sonar.api.measures.Metric;
-
+*/
 import static com.checkmarx.sonar.measures.SastMetrics.*;
 
 /**

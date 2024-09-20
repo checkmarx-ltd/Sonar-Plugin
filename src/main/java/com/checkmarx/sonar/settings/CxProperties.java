@@ -1,9 +1,14 @@
 package com.checkmarx.sonar.settings;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.sonar.api.*;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
 
+/*
+import org.sonar.api.config.PropertyDefinition;
+import org.sonar.api.resources.Qualifiers;
+*/
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;

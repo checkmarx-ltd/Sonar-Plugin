@@ -1,10 +1,16 @@
 package com.checkmarx.sonar.web;
 
+import org.sonar.api.*;
 import org.sonar.api.web.page.Context;
 import org.sonar.api.web.page.Page;
 import org.sonar.api.web.page.Page.Scope;
 import org.sonar.api.web.page.PageDefinition;
-
+/*
+import org.sonar.api.web.page.Context;
+import org.sonar.api.web.page.Page;
+import org.sonar.api.web.page.Page.Scope;
+import org.sonar.api.web.page.PageDefinition;
+*/
 public class CxPluginPageDefinition implements PageDefinition {
 
   @Override
@@ -18,4 +24,6 @@ public class CxPluginPageDefinition implements PageDefinition {
         .setName("Checkmarx Report")
         .setScope(Scope.COMPONENT).build());
   }
+
+
 }

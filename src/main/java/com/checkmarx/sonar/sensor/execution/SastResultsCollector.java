@@ -13,7 +13,16 @@ import static com.checkmarx.sonar.measures.SastMetrics.SAST_TOTAL_VULNERABILITIE
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.sonar.api.*;
+import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.rule.ActiveRules;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.measures.Metric;
+import org.sonar.api.rules.ActiveRule;
 
+/*
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.ActiveRule;
@@ -21,7 +30,7 @@ import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.measures.Metric;
-
+*/
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
@@ -81,8 +90,8 @@ public class SastResultsCollector {
                     List<NewIssueLocation> flowLocationsInFile = fileLocationsCreator.createFlowLocations(result,context);
                     NewIssueLocation issueLocation = fileLocationsCreator.createIssueLocation(result,context);
                     context.newIssue()
-                            .forRule(rule.ruleKey())
-                            .overrideSeverity(sastSeverity.getSonarSeverity())
+                            .forRule(((org.sonar.api.batch.rule.ActiveRule) rule).ruleKey())
+                //            .overrideSeverity(sastSeverity.getSonarSeverity())
                             .gap(remediationEffortPerVulnerability)
                             .at(issueLocation)
                             .addFlow(flowLocationsInFile)
@@ -173,11 +182,11 @@ public class SastResultsCollector {
             return null;
         }
 
-        Collection<ActiveRule> rules = activeRules.findByRepository(language.getSonarRuleRepository());
+        Collection<org.sonar.api.batch.rule.ActiveRule> rules = activeRules.findByRepository(language.getSonarRuleRepository());
         ActiveRule rule = null;
-        for (ActiveRule currRule : rules) {
+        for (org.sonar.api.batch.rule.ActiveRule currRule : rules) {
             if (currRule.ruleKey().rule().equals("checkmarx_" + query.getId())) {
-                rule = currRule;
+                rule = (ActiveRule) currRule;
                 break;
             }
         }

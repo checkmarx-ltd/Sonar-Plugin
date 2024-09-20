@@ -4,6 +4,7 @@ import static com.checkmarx.sonar.measures.SastMetrics.SAST_SCAN_DETAILS;
 import static com.checkmarx.sonar.measures.SastMetrics.SONAR_PROJECT_HAVE_SAST_RESULTS;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
@@ -11,13 +12,21 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.InputFile;
+//import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.SensorDescriptor;
+
+/*
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
-
+*/
 import com.checkmarx.sonar.cxportalservice.sast.exception.CxRestLoginException;
+import com.checkmarx.sonar.cxrules.CxSonarConstants;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.CxReportToSonarReport;
 import com.checkmarx.sonar.sensor.dto.SastReportData;
@@ -36,7 +45,6 @@ import com.cx.restclient.sast.dto.SASTResults;
 import com.cx.restclient.sast.utils.SASTUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.checkmarx.sonar.cxrules.CxSonarConstants;
 
 /**
  * Created by: Zoharby.
@@ -134,12 +142,12 @@ public class CheckmarxSensor implements Sensor {
     }
 
     private Iterable<InputFile> getMainFiles(SensorContext context) {
-        FileSystem fs = context.fileSystem();
+        FileSystem fs = (FileSystem) context.fileSystem();
         if (fs == null) {
             return new ArrayList<>();
         }
 
-        Iterable<InputFile> mainFiles = fs.inputFiles(fs.predicates().hasType(InputFile.Type.MAIN));
+        Iterable<InputFile> mainFiles = ((org.sonar.api.batch.fs.FileSystem) fs).inputFiles(((org.sonar.api.batch.fs.FileSystem) fs).predicates().hasType(InputFile.Type.MAIN));
         if (mainFiles == null) {
             return new ArrayList<>();
         }

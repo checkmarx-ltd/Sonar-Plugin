@@ -1,5 +1,31 @@
 package com.checkmarx.sonar.sensor.utils;
 
+import static com.checkmarx.sonar.web.HttpHelper.SONAR_URL_PARAM;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import javax.crypto.SecretKey;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.config.Configuration;
+
 import com.checkmarx.sonar.cxrules.CxSonarConstants;
 import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.dto.CxSensorSettings;
@@ -13,35 +39,11 @@ import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.settings.PropertyApiClient;
 import com.checkmarx.sonar.web.HttpHelper;
 import com.checkmarx.sonar.web.ProxyParams;
+import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.exception.CxClientException;
-import com.cx.restclient.CxSASTClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.config.Configuration;
-
-import javax.crypto.SecretKey;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
-import static com.checkmarx.sonar.web.HttpHelper.SONAR_URL_PARAM;
 
 public class CxConfigHelper {
 

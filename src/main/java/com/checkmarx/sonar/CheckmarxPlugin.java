@@ -19,6 +19,7 @@
  */
 package com.checkmarx.sonar;
 
+import org.sonar.api.*;
 import com.checkmarx.sonar.cxpropfiles.*;
 import com.checkmarx.sonar.cxrules.CxRulesDefinition;
 import com.checkmarx.sonar.measures.ComputeSastMeasures;
@@ -27,7 +28,7 @@ import com.checkmarx.sonar.sensor.CheckmarxSensor;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.web.CxConfigRestEndPoint;
 import com.checkmarx.sonar.web.CxPluginPageDefinition;
-import org.sonar.api.Plugin;
+
 
 public class CheckmarxPlugin implements Plugin {
 

@@ -1,7 +1,10 @@
 package com.checkmarx.sonar.logger;
 
+//import org.apache.logging.log4j.Logger;
+import org.sonar.api.*;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
+
 
 /**
  * Created by: zoharby.

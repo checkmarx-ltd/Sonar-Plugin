@@ -6,11 +6,18 @@ import com.checkmarx.sonar.dto.CxFullCredentials;
 import com.checkmarx.sonar.sensor.dto.OsaReportData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.*;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.measures.Metric;
+
+/*
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
-
+*/
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,7 +36,7 @@ public class OsaResultsCollector {
     private OsaScanClient osaScanClient;
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Logger logger = Loggers.get(OsaResultsCollector.class);
+    private Logger logger = LoggerFactory.getLogger(OsaResultsCollector.class);
 
     public void collectOsaVulnerabilitiesAndSaveToMetrics(SensorContext context, CxFullCredentials cxFullCredentials, long projectId){
         logger.info("Extracting Checkmarx Osa results.");

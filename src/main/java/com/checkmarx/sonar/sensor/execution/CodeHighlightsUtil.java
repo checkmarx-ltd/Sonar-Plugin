@@ -2,8 +2,9 @@ package com.checkmarx.sonar.sensor.execution;
 
 import com.cx.restclient.sast.dto.CxXMLResults;
 import org.apache.commons.lang.StringUtils;
+//import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.*;
 import org.sonar.api.batch.fs.InputFile;
-
 /**
  * Created by: zoharby.
  * Date: 06/08/2017.
