@@ -17,6 +17,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
   var sastScanResultsLink;
 
   //counts
+  var criticalCount;
   var highCount;
   var medCount;
   var lowCount;
@@ -55,6 +56,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     var queryPagesCounter = 0;
 
     //query lists
+  var criticalCveList = [];
   var highCveList = [];
   var medCveList = [];
   var lowCveList = [];
@@ -82,9 +84,11 @@ window.registerExtension('checkmarx/cx_report', function (options) {
   var osaLowCveList = hardcodedCve.Low;*/
 
   var SEVERITY = {
-    HIGH: {value: 0, name: "high"},
-    MED: {value: 1, name: "medium"},
-    LOW: {value: 2, name: "low"},
+    CRITICAL: {value: 0, name: "critical"},
+    HIGH: {value: 1, name: "high"},
+    MED: {value: 2, name: "medium"},
+    LOW: {value: 3, name: "low"},
+    
     OSA_HIGH: {value: 3, name: "high"},
     OSA_MED: {value: 4, name: "medium"},
     OSA_LOW: {value: 5, name: "low"}
@@ -126,6 +130,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
     }
 
   function initDataAndLoadUi() {
+       
        return metricRequest('cx.sast.result.high').then(function (responseHigh) {
            highCount = getValue(responseHigh);
            return metricRequest('cx.sast.result.medium')
@@ -134,6 +139,9 @@ window.registerExtension('checkmarx/cx_report', function (options) {
            return metricRequest('cx.sast.result.low')
        }).then(function (responseLow) {
            lowCount = getValue(responseLow);
+           return metricRequest('cx.sast.result.critical')
+       }).then(function (responseCritical) {
+           criticalCount = getValue(responseCritical);
            return metricRequest('cx.sast.result.details')
        }).then(function (responseDetails) {
            var details = getValue(responseDetails);
@@ -218,6 +226,9 @@ window.registerExtension('checkmarx/cx_report', function (options) {
         })}
 
     function addQueriesToSummery(queriesJson) {
+        if(queriesJson.criticalVulnerabilityQueries.length > 0){
+            addQueriesToArray(queriesJson.criticalVulnerabilityQueries, criticalCveList);
+        }		
         if(queriesJson.highVulnerabilityQueries.length > 0){
             addQueriesToArray(queriesJson.highVulnerabilityQueries, highCveList);
         }
@@ -256,12 +267,14 @@ window.registerExtension('checkmarx/cx_report', function (options) {
             document.getElementById("sast-code-viewer-link").setAttribute("href", sastScanResultsLink);
 
             //set bars height and count
+            document.getElementById("bar-count-critical").innerHTML = criticalCount;
             document.getElementById("bar-count-high").innerHTML = highCount;
             document.getElementById("bar-count-med").innerHTML = medCount;
             document.getElementById("bar-count-low").innerHTML = lowCount;
 
-            var maxCount = Math.max(highCount, medCount, lowCount);
+            var maxCount = Math.max(criticalCount ,highCount, medCount, lowCount);
             var maxHeight = maxCount * 100 / 90;
+            document.getElementById("bar-critical").setAttribute("style", "height:" + criticalCount * 100 / maxHeight + "%");
             document.getElementById("bar-high").setAttribute("style", "height:" + highCount * 100 / maxHeight + "%");
             document.getElementById("bar-med").setAttribute("style", "height:" + medCount * 100 / maxHeight + "%");
             document.getElementById("bar-low").setAttribute("style", "height:" + lowCount * 100 / maxHeight + "%");
@@ -339,9 +352,12 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
             try {
                 //generate full reports
-                if (highCount == 0 && medCount == 0 && lowCount == 0) {
+                if (criticalCount == 0 && highCount == 0 && medCount == 0 && lowCount == 0) {
                     document.getElementById("sast-full").setAttribute("style", "display: none");
                 } else {
+					if (criticalCount > 0) {
+                        generateCveTable(SEVERITY.CRITICAL);
+                    }
                     if (highCount > 0) {
                         generateCveTable(SEVERITY.HIGH);
                     }
@@ -410,22 +426,24 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                 var severityNameTtl;
                 var severityCountTtl;
 
-                var svgHighIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="19" viewBox="0 0 16 19"><title>Med</title><defs><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-5.323 11.27-5.323 11.27-.374.403-1.12.73-1.686.73H7.01c-.558 0-1.308-.333-1.675-.76C5.335 18.24 0 12.516 0 8c0-3.172 1-7 1-7z" id="a"/><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-5.323 11.27-5.323 11.27-.374.403-1.12.73-1.686.73H7.01c-.558 0-1.308-.333-1.675-.76C5.335 18.24 0 12.516 0 8c0-3.172 1-7 1-7z" id="c"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#D82D49" xlink:href="#a"/><path stroke="#BB1A34" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.52-.966 5.112-2.582 7.62-.57.884-1.18 1.694-1.79 2.41-.214.252-.41.472-.588.66-.104.113-.178.188-.215.224-.296.32-.91.586-1.334.586H7.01c-.42 0-1.028-.274-1.296-.585-.052-.056-.127-.14-.233-.26-.178-.202-.378-.436-.593-.697-.615-.747-1.23-1.564-1.804-2.422C2.097 13.06 1.34 11.62.906 10.284.64 9.462.5 8.697.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#BB1A34" mask="url(#b)" d="M8 0h8v20H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#BB1A34" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.52-.966 5.112-2.582 7.62-.57.884-1.18 1.694-1.79 2.41-.214.252-.41.472-.588.66-.104.113-.178.188-.215.224-.296.32-.91.586-1.334.586H7.01c-.42 0-1.028-.274-1.296-.585-.052-.056-.127-.14-.233-.26-.178-.202-.378-.436-.593-.697-.615-.747-1.23-1.564-1.804-2.422C2.097 13.06 1.34 11.62.906 10.284.64 9.462.5 8.697.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#FFF" mask="url(#d)" d="M5 12h2V9.5h2V12h2V5H9v2.5H7V5H5"/></g></svg>';
-                var svgMedIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="20" viewBox="0 0 16 20"><title>Low</title><defs><path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z" id="a"/><path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z" id="c"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#FFAC00" xlink:href="#a"/><path stroke="#E49B16" d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/><path fill="#D79201" mask="url(#b)" d="M8 0h8v20H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#D49100" d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/><path fill="#472F00" mask="url(#d)" d="M4.28 12.632h1.9v-4.21l1.78 2.862H8L9.79 8.4v4.232h1.93v-7.37H9.67L8 8.117 6.33 5.263H4.28"/></g></svg>';
+                var svgCriticalIcon = '<svg width=\"16\" height=\"19\" viewBox=\"0 0 16 19\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 10V4.31302C0 2.19129 1.0015 0.184893 3.11764 0.030931C3.39036 0.0110888 3.68409 0 4 0H11.5C12.0072 0 12.462 0.0210035 12.8688 0.0569225C14.9823 0.243543 16 2.19129 16 4.31302V10C16 12.3957 12.4926 16.7045 11.0796 18.3432C10.7135 18.7678 10.1808 19 9.6202 19H6.3798C5.81919 19 5.28652 18.7678 4.92042 18.3432C3.50742 16.7045 0 12.3957 0 10Z\" fill=\"#F8788F\"/><path d=\"M0 10V4.31302C0 2.19129 1.0015 0.184893 3.11764 0.030931C3.39036 0.0110888 3.68409 0 4 0H11.5C12.0072 0 12.462 0.0210035 12.8688 0.0569225C14.9823 0.243543 16 2.19129 16 4.31302V10C16 12.3957 12.4926 16.7045 11.0796 18.3432C10.7135 18.7678 10.1808 19 9.6202 19H6.3798C5.81919 19 5.28652 18.7678 4.92042 18.3432C3.50742 16.7045 0 12.3957 0 10Z\" fill=\"#A00909\" fill-opacity=\"0.5\"/><path d=\"M8 0L14.186 0.883717C14.659 0.951285 15.0181 1.34399 15.0432 1.82111L15.5 10.5L11 18L8 19V0Z\" fill=\"#F8788F\"/><path d=\"M8 0L14.186 0.883717C14.659 0.951285 15.0181 1.34399 15.0432 1.82111L15.5 10.5L11 18L8 19V0Z\" fill=\"#A00909\" fill-opacity=\"0.9\"/><path d=\"M0.5 10V4.31302C0.5 3.32304 0.734816 2.39306 1.18352 1.70803C1.62289 1.03727 2.2683 0.594047 3.15392 0.529613C3.41417 0.510678 3.69579 0.5 4 0.5H11.5C11.9935 0.5 12.4335 0.520434 12.8248 0.554985C13.718 0.633851 14.3695 1.07659 14.8113 1.73726C15.2621 2.41124 15.5 3.32511 15.5 4.31302V10C15.5 10.4919 15.3156 11.1324 14.9753 11.8757C14.6393 12.6095 14.1721 13.3998 13.6535 14.1783C12.6167 15.7348 11.4018 17.2038 10.7009 18.0167C10.4345 18.3257 10.0427 18.5 9.6202 18.5H6.3798C5.95733 18.5 5.56554 18.3257 5.29909 18.0167C4.59817 17.2038 3.38331 15.7348 2.34646 14.1783C1.82787 13.3998 1.36066 12.6095 1.02473 11.8757C0.684403 11.1324 0.5 10.4919 0.5 10Z\" stroke=\"#F8788F\" stroke-linecap=\"round\"/><path d=\"M0.5 10V4.31302C0.5 3.32304 0.734816 2.39306 1.18352 1.70803C1.62289 1.03727 2.2683 0.594047 3.15392 0.529613C3.41417 0.510678 3.69579 0.5 4 0.5H11.5C11.9935 0.5 12.4335 0.520434 12.8248 0.554985C13.718 0.633851 14.3695 1.07659 14.8113 1.73726C15.2621 2.41124 15.5 3.32511 15.5 4.31302V10C15.5 10.4919 15.3156 11.1324 14.9753 11.8757C14.6393 12.6095 14.1721 13.3998 13.6535 14.1783C12.6167 15.7348 11.4018 17.2038 10.7009 18.0167C10.4345 18.3257 10.0427 18.5 9.6202 18.5H6.3798C5.95733 18.5 5.56554 18.3257 5.29909 18.0167C4.59817 17.2038 3.38331 15.7348 2.34646 14.1783C1.82787 13.3998 1.36066 12.6095 1.02473 11.8757C0.684403 11.1324 0.5 10.4919 0.5 10Z\" stroke=\"#A00909\" stroke-opacity=\"0.9\" stroke-linecap=\"round\"/><path d=\"M8.15998 12.1381C7.43365 12.1381 6.80889 11.9843 6.28569 11.6765C5.76557 11.3656 5.36547 10.9348 5.0854 10.3839C4.80842 9.83298 4.66992 9.19898 4.66992 8.48189C4.66992 7.75556 4.80996 7.11849 5.09002 6.57067C5.37317 6.01977 5.7748 5.59044 6.29492 5.28267C6.81505 4.97183 7.43365 4.81641 8.15075 4.81641C8.76935 4.81641 9.31102 4.92874 9.77575 5.15341C10.2405 5.37808 10.6083 5.69354 10.8791 6.09979C11.1499 6.50604 11.2992 6.98307 11.3269 7.53089H9.47106C9.41874 7.17696 9.28024 6.89228 9.05558 6.67685C8.83398 6.45833 8.54315 6.34908 8.18306 6.34908C7.87837 6.34908 7.61216 6.43217 7.38441 6.59837C7.15974 6.76148 6.98432 7 6.85813 7.31392C6.73195 7.62784 6.66886 8.00793 6.66886 8.45419C6.66886 8.9066 6.73041 9.29131 6.85352 9.60831C6.9797 9.92531 7.15666 10.1669 7.38441 10.3331C7.61216 10.4993 7.87837 10.5824 8.18306 10.5824C8.40773 10.5824 8.60932 10.5362 8.78782 10.4439C8.9694 10.3516 9.11867 10.2177 9.23562 10.0423C9.35565 9.86375 9.43413 9.64986 9.47106 9.40057H11.3269C11.2961 9.94223 11.1484 10.4193 10.8837 10.8317C10.6221 11.241 10.2605 11.5611 9.79883 11.7919C9.33718 12.0227 8.7909 12.1381 8.15998 12.1381Z\" fill=\"white\"/></svg>';
+                var svgHighIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="19" viewBox="0 0 16 19"><title>High</title><defs><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-5.323 11.27-5.323 11.27-.374.403-1.12.73-1.686.73H7.01c-.558 0-1.308-.333-1.675-.76C5.335 18.24 0 12.516 0 8c0-3.172 1-7 1-7z" id="a"/><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-5.323 11.27-5.323 11.27-.374.403-1.12.73-1.686.73H7.01c-.558 0-1.308-.333-1.675-.76C5.335 18.24 0 12.516 0 8c0-3.172 1-7 1-7z" id="c"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#D82D49" xlink:href="#a"/><path stroke="#BB1A34" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.52-.966 5.112-2.582 7.62-.57.884-1.18 1.694-1.79 2.41-.214.252-.41.472-.588.66-.104.113-.178.188-.215.224-.296.32-.91.586-1.334.586H7.01c-.42 0-1.028-.274-1.296-.585-.052-.056-.127-.14-.233-.26-.178-.202-.378-.436-.593-.697-.615-.747-1.23-1.564-1.804-2.422C2.097 13.06 1.34 11.62.906 10.284.64 9.462.5 8.697.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#BB1A34" mask="url(#b)" d="M8 0h8v20H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#BB1A34" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.52-.966 5.112-2.582 7.62-.57.884-1.18 1.694-1.79 2.41-.214.252-.41.472-.588.66-.104.113-.178.188-.215.224-.296.32-.91.586-1.334.586H7.01c-.42 0-1.028-.274-1.296-.585-.052-.056-.127-.14-.233-.26-.178-.202-.378-.436-.593-.697-.615-.747-1.23-1.564-1.804-2.422C2.097 13.06 1.34 11.62.906 10.284.64 9.462.5 8.697.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#FFF" mask="url(#d)" d="M5 12h2V9.5h2V12h2V5H9v2.5H7V5H5"/></g></svg>';
+                var svgMedIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="20" viewBox="0 0 16 20"><title>Medium</title><defs><path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z" id="a"/><path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z" id="c"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#FFAC00" xlink:href="#a"/><path stroke="#E49B16" d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/><path fill="#D79201" mask="url(#b)" d="M8 0h8v20H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#D49100" d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/><path fill="#472F00" mask="url(#d)" d="M4.28 12.632h1.9v-4.21l1.78 2.862H8L9.79 8.4v4.232h1.93v-7.37H9.67L8 8.117 6.33 5.263H4.28"/></g></svg>';
                 var svgLowIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="19" viewBox="0 0 16 19"><title>Low</title><defs><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z" id="a"/><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z" id="c"/></defs><g fill="none" fill-rule="evenodd"><path d="M7.96 17.32L8 .015l-6.5 1s-.96 4.5-.96 8.75c1.272 4.602 5.968 9.25 5.968 9.25h.163l1.29-1.695z" fill="#EDEFF5"/><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#FFEB3B" xlink:href="#a"/><path stroke="#E4D200" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.34.48 2.68.488 3.923V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38.078-1.02.23-2.11.436-3.22.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#DDCE00" mask="url(#b)" d="M8-8h10v32H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#E4D200" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.34.48 2.68.488 3.923V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38.078-1.02.23-2.11.436-3.22.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#605900" mask="url(#d)" d="M5.54 12h5.33v-1.7H7.48V5H5.54"/></g></svg>';
 
                 switch (severity) {
+                      case SEVERITY.CRITICAL:
+                            svgIcon = svgCriticalIcon;
+                            severityNameTtl = "Critical";
+                            severityCountTtl = criticalCount;                            
+                            break;
+                         
                       case SEVERITY.HIGH:
                             svgIcon = svgHighIcon;
                             severityNameTtl = "High";
                             severityCountTtl = highCount;
                             break;
 
-                      case SEVERITY.OSA_HIGH:
-                            svgIcon = svgHighIcon;
-                            severityNameTtl = "High";
-                            severityCountTtl = osaHighCount;
-                            break;
 
                       case SEVERITY.MED:
                             svgIcon = svgMedIcon;
@@ -433,11 +451,6 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                             severityCountTtl = medCount;
                             break;
 
-                      case SEVERITY.OSA_MED:
-                            svgIcon = svgMedIcon;
-                            severityNameTtl = "Medium";
-                            severityCountTtl = osaMedCount;
-                            break;
 
                       case SEVERITY.LOW:
                             svgIcon = svgLowIcon;
@@ -445,11 +458,6 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                             severityCountTtl = lowCount;
                             break;
 
-                      case SEVERITY.OSA_LOW:
-                            svgIcon = svgLowIcon;
-                            severityNameTtl = "Low";
-                            severityCountTtl = osaLowCount;
-                            break;
                 }
 
                 return '' +
@@ -469,6 +477,13 @@ window.registerExtension('checkmarx/cx_report', function (options) {
         var tableElementId = "";
 
         switch (severity) {
+			
+          case SEVERITY.CRITICAL:
+            severityCount = criticalCount;
+            severityCveList = hashedObjArrayToJsonArray(criticalCveList);
+            tableElementId = "sast-cve-table-critical";
+            break;
+            			
           case SEVERITY.HIGH:
             severityCount = highCount;
             severityCveList = hashedObjArrayToJsonArray(highCveList);
@@ -619,6 +634,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
 
       function generateCveTable(severity) {
         switch (severity) {
+          case SEVERITY.CRITICAL:
           case SEVERITY.HIGH:
           case SEVERITY.MED:
           case SEVERITY.LOW:
@@ -744,6 +760,28 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                    <div class=\"threshold-exceeded-compliance\" id=\"threshold-exceeded-compliance\"><\/div>"+
                   "                    <ul class=\"chart\">"+
                   ""+
+                  "                        <!--critical-->"+
+                  "                        <li>"+
+                  "                                <span class=\"bar-1\" id=\"bar-critical\">"+
+                  "                                    <div id=\"tooltip-critical\"><\/div>"+
+                  "                                <\/span>"+
+                  "                            <div class=\"bar-title-container\">"+
+                  "                                <div class=\"bar-title-icon\">"+
+				  " 							<svg width=\"16\" height=\"19\" viewBox=\"0 0 16 19\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">" +
+				  "								<path d=\"M0 10V4.31302C0 2.19129 1.0015 0.184893 3.11764 0.030931C3.39036 0.0110888 3.68409 0 4 0H11.5C12.0072 0 12.462 0.0210035 12.8688 0.0569225C14.9823 0.243543 16 2.19129 16 4.31302V10C16 12.3957 12.4926 16.7045 11.0796 18.3432C10.7135 18.7678 10.1808 19 9.6202 19H6.3798C5.81919 19 5.28652 18.7678 4.92042 18.3432C3.50742 16.7045 0 12.3957 0 10Z\" fill=\"#F8788F\"/>" +
+				  "								<path d=\"M0 10V4.31302C0 2.19129 1.0015 0.184893 3.11764 0.030931C3.39036 0.0110888 3.68409 0 4 0H11.5C12.0072 0 12.462 0.0210035 12.8688 0.0569225C14.9823 0.243543 16 2.19129 16 4.31302V10C16 12.3957 12.4926 16.7045 11.0796 18.3432C10.7135 18.7678 10.1808 19 9.6202 19H6.3798C5.81919 19 5.28652 18.7678 4.92042 18.3432C3.50742 16.7045 0 12.3957 0 10Z\" fill=\"#A00909\" fill-opacity=\"0.5\"/>" +
+				  "								<path d=\"M8 0L14.186 0.883717C14.659 0.951285 15.0181 1.34399 15.0432 1.82111L15.5 10.5L11 18L8 19V0Z\" fill=\"#F8788F\"/>" +
+				  "								<path d=\"M8 0L14.186 0.883717C14.659 0.951285 15.0181 1.34399 15.0432 1.82111L15.5 10.5L11 18L8 19V0Z\" fill=\"#A00909\" fill-opacity=\"0.9\"/>" +
+				  "								<path d=\"M0.5 10V4.31302C0.5 3.32304 0.734816 2.39306 1.18352 1.70803C1.62289 1.03727 2.2683 0.594047 3.15392 0.529613C3.41417 0.510678 3.69579 0.5 4 0.5H11.5C11.9935 0.5 12.4335 0.520434 12.8248 0.554985C13.718 0.633851 14.3695 1.07659 14.8113 1.73726C15.2621 2.41124 15.5 3.32511 15.5 4.31302V10C15.5 10.4919 15.3156 11.1324 14.9753 11.8757C14.6393 12.6095 14.1721 13.3998 13.6535 14.1783C12.6167 15.7348 11.4018 17.2038 10.7009 18.0167C10.4345 18.3257 10.0427 18.5 9.6202 18.5H6.3798C5.95733 18.5 5.56554 18.3257 5.29909 18.0167C4.59817 17.2038 3.38331 15.7348 2.34646 14.1783C1.82787 13.3998 1.36066 12.6095 1.02473 11.8757C0.684403 11.1324 0.5 10.4919 0.5 10Z\" stroke=\"#F8788F\" stroke-linecap=\"round\"/>" +
+				  "							    <path d=\"M0.5 10V4.31302C0.5 3.32304 0.734816 2.39306 1.18352 1.70803C1.62289 1.03727 2.2683 0.594047 3.15392 0.529613C3.41417 0.510678 3.69579 0.5 4 0.5H11.5C11.9935 0.5 12.4335 0.520434 12.8248 0.554985C13.718 0.633851 14.3695 1.07659 14.8113 1.73726C15.2621 2.41124 15.5 3.32511 15.5 4.31302V10C15.5 10.4919 15.3156 11.1324 14.9753 11.8757C14.6393 12.6095 14.1721 13.3998 13.6535 14.1783C12.6167 15.7348 11.4018 17.2038 10.7009 18.0167C10.4345 18.3257 10.0427 18.5 9.6202 18.5H6.3798C5.95733 18.5 5.56554 18.3257 5.29909 18.0167C4.59817 17.2038 3.38331 15.7348 2.34646 14.1783C1.82787 13.3998 1.36066 12.6095 1.02473 11.8757C0.684403 11.1324 0.5 10.4919 0.5 10Z\" stroke=\"#A00909\" stroke-opacity=\"0.9\" stroke-linecap=\"round\"/>" +
+				  "								<path d=\"M8.15998 12.1381C7.43365 12.1381 6.80889 11.9843 6.28569 11.6765C5.76557 11.3656 5.36547 10.9348 5.0854 10.3839C4.80842 9.83298 4.66992 9.19898 4.66992 8.48189C4.66992 7.75556 4.80996 7.11849 5.09002 6.57067C5.37317 6.01977 5.7748 5.59044 6.29492 5.28267C6.81505 4.97183 7.43365 4.81641 8.15075 4.81641C8.76935 4.81641 9.31102 4.92874 9.77575 5.15341C10.2405 5.37808 10.6083 5.69354 10.8791 6.09979C11.1499 6.50604 11.2992 6.98307 11.3269 7.53089H9.47106C9.41874 7.17696 9.28024 6.89228 9.05558 6.67685C8.83398 6.45833 8.54315 6.34908 8.18306 6.34908C7.87837 6.34908 7.61216 6.43217 7.38441 6.59837C7.15974 6.76148 6.98432 7 6.85813 7.31392C6.73195 7.62784 6.66886 8.00793 6.66886 8.45419C6.66886 8.9066 6.73041 9.29131 6.85352 9.60831C6.9797 9.92531 7.15666 10.1669 7.38441 10.3331C7.61216 10.4993 7.87837 10.5824 8.18306 10.5824C8.40773 10.5824 8.60932 10.5362 8.78782 10.4439C8.9694 10.3516 9.11867 10.2177 9.23562 10.0423C9.35565 9.86375 9.43413 9.64986 9.47106 9.40057H11.3269C11.2961 9.94223 11.1484 10.4193 10.8837 10.8317C10.6221 11.241 10.2605 11.5611 9.79883 11.7919C9.33718 12.0227 8.7909 12.1381 8.15998 12.1381Z\" fill=\"white\"/>" +
+				  "							       </svg>"+
+                  "                                <\/div>"+
+                  "                                <div class=\"bar-title\">Critical -<\/div>"+
+                  "                                <div class=\"bar-count\" id=\"bar-count-critical\"><\/div>"+
+                  "                            <\/div>"+
+                  "                        <\/li>"+
+                  ""+
                   "                        <!--high-->"+
                   "                        <li>"+
                   "                                <span class=\"bar-1\" id=\"bar-high\">"+
@@ -794,7 +832,7 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                                <div class=\"bar-count\" id=\"bar-count-high\"><\/div>"+
                   "                            <\/div>"+
                   "                        <\/li>"+
-                  ""+
+                  ""+                  
                   "                        <!--medium-->"+
                   "                        <li>"+
                   "                                <span class=\"bar-2\" id=\"bar-med\">"+
@@ -1342,6 +1380,9 @@ window.registerExtension('checkmarx/cx_report', function (options) {
                   "                            <\/div>"+
                   "                        <\/div>"+
                   "                    <\/div>"+
+                  "                    <div id=\"sast-cve-table-critical-container\">"+
+                  ""+
+                  "                    <\/div>"+                  
                   "                    <div id=\"sast-cve-table-high-container\">"+
                   ""+
                   "                    <\/div>"+

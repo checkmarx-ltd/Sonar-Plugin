@@ -1,8 +1,10 @@
 package com.checkmarx.sonar.sensor.execution;
 
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_CRITICAL_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_HIGH_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_LOW_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_MEDIUM_VULNERABILITIES;
+import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_CRITICAL_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_HIGH_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_LOW_VULNERABILITIES;
 import static com.checkmarx.sonar.measures.SastMetrics.SAST_NEW_MEDIUM_VULNERABILITIES;
@@ -197,6 +199,9 @@ public class SastResultsCollector {
             return;
         }
         switch (severity) {
+        	case SAST_CRITICAL:
+        		currFileQueriesCollector.addCriticalQuery(nonIssueResult.getQuery().getName());
+        		break;
             case SAST_HIGH:
                 currFileQueriesCollector.addHighQuery(nonIssueResult.getQuery().getName());
                 break;
@@ -220,6 +225,12 @@ public class SastResultsCollector {
         boolean isNew = "New".equals(result.getResultData().getStatus());
 
         switch (severity) {
+        	case SAST_CRITICAL:
+            currFileSumVulnerabilityCounter.incrementCritical();
+            if (isNew) {
+                currFileNewVulnerabilityCounter.incrementCritical();
+            }
+            break;        
             case SAST_HIGH:
                 currFileSumVulnerabilityCounter.incrementHigh();
                 if (isNew) {
@@ -258,6 +269,9 @@ public class SastResultsCollector {
     private void addSumVulnerabilitiesMetrics(SensorContext context, InputFile file) {
         if (currFileSumVulnerabilityCounter.getSumVulnerabilities() > 0) {
             addMetric(context, file, SAST_TOTAL_VULNERABILITIES, currFileSumVulnerabilityCounter.getSumVulnerabilities());
+            if (currFileSumVulnerabilityCounter.getCritical() != 0) {
+                addMetric(context, file, SAST_CRITICAL_VULNERABILITIES, currFileSumVulnerabilityCounter.getCritical());
+            }
             if (currFileSumVulnerabilityCounter.getHigh() != 0) {
                 addMetric(context, file, SAST_HIGH_VULNERABILITIES, currFileSumVulnerabilityCounter.getHigh());
             }
@@ -273,6 +287,9 @@ public class SastResultsCollector {
     private void addNewVulnerabilitiesMetrics(SensorContext context, InputFile file) {
         if (currFileNewVulnerabilityCounter.getSumVulnerabilities() != 0) {
             addMetric(context, file, SAST_TOTAL_NEW_VULNERABILITIES, currFileNewVulnerabilityCounter.getSumVulnerabilities());
+            if (currFileNewVulnerabilityCounter.getCritical() != 0) {
+                addMetric(context, file, SAST_NEW_CRITICAL_VULNERABILITIES, currFileNewVulnerabilityCounter.getCritical());
+            }
             if (currFileNewVulnerabilityCounter.getHigh() != 0) {
                 addMetric(context, file, SAST_NEW_HIGH_VULNERABILITIES, currFileNewVulnerabilityCounter.getHigh());
             }

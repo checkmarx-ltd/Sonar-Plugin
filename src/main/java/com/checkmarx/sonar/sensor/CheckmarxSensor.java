@@ -94,6 +94,8 @@ public class CheckmarxSensor implements Sensor {
 
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestScanResults().getSastResults();
+            logger.info("Checkmarx Critical vulnerabilities: " + latestSASTResults.getCritical());
+            logger.info("Checkmarx New-Critical vulnerabilities: " + latestSASTResults.getNewCritical());
             logger.info("Checkmarx High vulnerabilities: " + latestSASTResults.getHigh());
             logger.info("Checkmarx New-High vulnerabilities: " + latestSASTResults.getNewHigh());
             logger.info("Checkmarx Medium vulnerabilities: " + latestSASTResults.getMedium());

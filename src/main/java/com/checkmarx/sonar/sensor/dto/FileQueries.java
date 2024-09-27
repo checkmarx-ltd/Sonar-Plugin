@@ -10,7 +10,9 @@ import java.util.List;
  */
 public class FileQueries {
 
-    @JsonProperty("highVulnerabilityQueries")
+	@JsonProperty("criticalVulnerabilityQueries")
+    private List<QueryData> criticalVulnerabilityQueries;    
+	@JsonProperty("highVulnerabilityQueries")
     private List<QueryData> highVulnerabilityQueries;
     @JsonProperty("mediumVulnerabilityQuries")
     private List<QueryData> mediumVulnerabilityQuries;
@@ -20,12 +22,21 @@ public class FileQueries {
     public FileQueries() {
     }
 
-    public FileQueries(List<QueryData> highVulnerabilityNonIssues, List<QueryData> mediumVulnerabilityNonIssues, List<QueryData> lowVulnerabilityNonIssues) {
-        this.highVulnerabilityQueries = highVulnerabilityNonIssues;
+    public FileQueries(List<QueryData> criticalVulnerabilityNonIssues,List<QueryData> highVulnerabilityNonIssues, List<QueryData> mediumVulnerabilityNonIssues, List<QueryData> lowVulnerabilityNonIssues) {
+    	this.criticalVulnerabilityQueries = criticalVulnerabilityNonIssues;
+    	this.highVulnerabilityQueries = highVulnerabilityNonIssues;
         this.mediumVulnerabilityQuries = mediumVulnerabilityNonIssues;
         this.lowVulnerabilityQueries = lowVulnerabilityNonIssues;
     }
 
+    public List<QueryData> getCriticalVulnerabilityQueries() {
+        return criticalVulnerabilityQueries;
+    }
+
+    public void setCriticalVulnerabilityQueries(List<QueryData> criticalVulnerabilityQueries) {
+        this.criticalVulnerabilityQueries = criticalVulnerabilityQueries;
+    }
+    
     public List<QueryData> getHighVulnerabilityQueries() {
         return highVulnerabilityQueries;
     }
