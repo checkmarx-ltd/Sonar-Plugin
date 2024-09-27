@@ -186,26 +186,10 @@ public class PropertyApiClient {
                     }
                 }
             }
-            Map<String, String> userAgentHeader = getUserAgentHeader();
-            for (Map.Entry<String, String> entry : userAgentHeader.entrySet()) {
-                request.setHeader(entry.getKey(), entry.getValue());
-            }
-            
         } catch (Exception e) {
             logger.error("Fail to add authentication headers", e);
         }
     }
-    
-    private String getUserAgentValue() {
-    	   return "plugin_name=" + cxOrigin + ";plugin_version=" + cxVersion.getVersion();
-    	}
-    	private Map<String, String> getUserAgentHeader() {
-    	   Map<String, String> headers = new HashMap<>();
-    	   if (this.cxOrigin != null && !this.cxOrigin.isEmpty() && this.cxVersion != null) {
-    	       headers.put("User-Agent", getUserAgentValue());
-    	   }
-    	   return headers;
-    	}
 
     private void throwOnFailure(HttpResponse response, String propertyName) throws IOException {
         int statusCode = response.getStatusLine().getStatusCode();
