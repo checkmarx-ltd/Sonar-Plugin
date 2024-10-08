@@ -5,7 +5,7 @@
     <groupId>checkmarx.com</groupId>
     <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>2023.3.4</version>
+    <version>2024.3.1</version>
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
@@ -266,7 +266,7 @@
         <dependency>
             <groupId>com.checkmarx</groupId>
             <artifactId>cx-client-common</artifactId>
-            <version>1.1.1</version>
+            <version>2024.3.28</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>
