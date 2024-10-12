@@ -64,7 +64,7 @@ public class CheckmarxSensor implements Sensor {
     public void execute(SensorContext context) {
         logger.info(versionProvider.appendVersionToMsg("Retrieving Checkmarx scan results for current module"));
         logger.info("Getting Checkmarx configuration data from sonar Database.");
-
+        Double version = 9.0;
         try {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
             String cxProject = configHelper.getSonarProperty(context, CxProperties.CXPROJECT_KEY);
@@ -94,8 +94,14 @@ public class CheckmarxSensor implements Sensor {
 
             shraga.init();
             SASTResults latestSASTResults = shraga.getLatestScanResults().getSastResults();
-            logger.info("Checkmarx Critical vulnerabilities: " + latestSASTResults.getCritical());
-            logger.info("Checkmarx New-Critical vulnerabilities: " + latestSASTResults.getNewCritical());
+			if (config.getCxVersion() != null && config.getCxVersion().getVersion() != null) {
+				String[] sastVersionSplit = config.getCxVersion().getVersion().split("\\.");
+				version = Double.parseDouble(sastVersionSplit[0] + "." + sastVersionSplit[1]);
+				if (version >= 9.7) {
+					logger.info("Checkmarx Critical vulnerabilities: " + latestSASTResults.getCritical());
+					logger.info("Checkmarx New-Critical vulnerabilities: " + latestSASTResults.getNewCritical());
+				}
+			}
             logger.info("Checkmarx High vulnerabilities: " + latestSASTResults.getHigh());
             logger.info("Checkmarx New-High vulnerabilities: " + latestSASTResults.getNewHigh());
             logger.info("Checkmarx Medium vulnerabilities: " + latestSASTResults.getMedium());
