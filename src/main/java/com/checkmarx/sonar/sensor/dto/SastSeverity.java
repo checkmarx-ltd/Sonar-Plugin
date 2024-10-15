@@ -8,7 +8,8 @@ import org.sonar.api.batch.rule.Severity;
  */
 public enum SastSeverity {
 
-    SAST_HIGH(3, "High", Severity.CRITICAL),
+    SAST_CRITICAL(4, "Critical",Severity.BLOCKER),
+	SAST_HIGH(3, "High", Severity.CRITICAL),
     SAST_MEDIUM(2, "Medium", Severity.MAJOR),
     SAST_LOW(1, "Low", Severity.MINOR),
     SAST_INFO(0, "Info", Severity.INFO);
