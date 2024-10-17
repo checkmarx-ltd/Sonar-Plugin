@@ -14,11 +14,18 @@ import java.util.Map;
  */
 public class FileQueriesCollector {
 
-    private HashMap<String, Integer> highVulnerabilityQueries = new HashMap<>();
+	private HashMap<String, Integer> criticalVulnerabilityQueries = new HashMap<>();
+	private HashMap<String, Integer> highVulnerabilityQueries = new HashMap<>();
     private HashMap<String, Integer> mediumVulnerabilityQueries = new HashMap<>();
     private HashMap<String, Integer> lowVulnerabilityQueries = new HashMap<>();
 
-
+    void addCriticalQuery(String queryName){
+        if(criticalVulnerabilityQueries.get(queryName) != null){
+        	criticalVulnerabilityQueries.put(queryName, criticalVulnerabilityQueries.get(queryName) + 1);
+        }else {
+        	criticalVulnerabilityQueries.put(queryName, 1);
+        }
+    }
     void addHighQuery(String queryName){
         if(highVulnerabilityQueries.get(queryName) != null){
             highVulnerabilityQueries.put(queryName, highVulnerabilityQueries.get(queryName) + 1);
@@ -43,6 +50,10 @@ public class FileQueriesCollector {
         }
     }
 
+    public HashMap<String, Integer> getCriticalVulnerabilityQueries() {
+        return criticalVulnerabilityQueries;
+    }
+    
     public HashMap<String, Integer> getHighVulnerabilityQueries() {
         return highVulnerabilityQueries;
     }
@@ -56,7 +67,7 @@ public class FileQueriesCollector {
     }
 
     FileQueries getAsFileQueriesObject(){
-        return new FileQueries(getAsQueryDataList(highVulnerabilityQueries), getAsQueryDataList(mediumVulnerabilityQueries), getAsQueryDataList(lowVulnerabilityQueries));
+        return new FileQueries(getAsQueryDataList(criticalVulnerabilityQueries),getAsQueryDataList(highVulnerabilityQueries), getAsQueryDataList(mediumVulnerabilityQueries), getAsQueryDataList(lowVulnerabilityQueries));
     }
 
     //changing from hashmap to querydata list to improve json readability in ui

@@ -6,6 +6,7 @@ package com.checkmarx.sonar.sensor.execution;
  */
 class FileMetricsCounter {
 
+	private int critical = 0;
     private int high = 0;
     private int medium = 0;
     private int low = 0;
@@ -14,6 +15,11 @@ class FileMetricsCounter {
     FileMetricsCounter() {
     }
 
+    void incrementCritical() {
+        ++ this.critical;
+        incrementSum();
+    }
+    
     void incrementHigh() {
         ++ this.high;
         incrementSum();
@@ -33,6 +39,10 @@ class FileMetricsCounter {
         ++ this.sumVulnerabilities;
     }
 
+    public int getCritical() {
+        return critical;
+    }
+    
     public int getHigh() {
         return high;
     }

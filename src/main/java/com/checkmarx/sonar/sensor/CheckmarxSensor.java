@@ -28,7 +28,7 @@ import com.checkmarx.sonar.sensor.version.PluginVersionProvider;
 import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.web.HttpHelper;
 import com.checkmarx.sonar.web.ProxyParams;
-import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sast.dto.CxXMLResults;
@@ -36,6 +36,7 @@ import com.cx.restclient.sast.dto.SASTResults;
 import com.cx.restclient.sast.utils.SASTUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.checkmarx.sonar.cxrules.CxSonarConstants;
 
 /**
  * Created by: Zoharby.
@@ -47,8 +48,9 @@ public class CheckmarxSensor implements Sensor {
     private PluginVersionProvider versionProvider = new PluginVersionProvider();
     private ObjectMapper mapper = new ObjectMapper();
     private SastResultsCollector sastResultsCollector = new SastResultsCollector();
-    private CxShragaClient shraga = null;
 
+    private CxClientDelegator shraga = null;
+    
     static {
         System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
     }
@@ -62,7 +64,7 @@ public class CheckmarxSensor implements Sensor {
     public void execute(SensorContext context) {
         logger.info(versionProvider.appendVersionToMsg("Retrieving Checkmarx scan results for current module"));
         logger.info("Getting Checkmarx configuration data from sonar Database.");
-
+        Double version = 9.0;
         try {
             CxConfigHelper configHelper = new CxConfigHelper(logger);
             String cxProject = configHelper.getSonarProperty(context, CxProperties.CXPROJECT_KEY);
@@ -79,13 +81,27 @@ public class CheckmarxSensor implements Sensor {
             logger.info("Connecting to {}", config.getUrl());
             ProxyParams proxyParam = HttpHelper.getProxyParam();
             if (proxyParam == null) {
-                shraga = new CxShragaClient(config, false, logger);
+            	shraga = new CxClientDelegator(config, logger);
             } else {
-                shraga = new CxShragaClient(config, logger, proxyParam.getHost(), proxyParam.getPort(), proxyParam.getUser(), proxyParam.getPssd(), true);
+            	shraga = new CxClientDelegator(
+                        proxyParam.getHost() + ":" + proxyParam.getPort(),
+                        proxyParam.getUser(),
+                        proxyParam.getPssd(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true,
+                        logger);
             }
 
             shraga.init();
-            SASTResults latestSASTResults = shraga.getLatestSASTResults();
+            SASTResults latestSASTResults = shraga.getLatestScanResults().getSastResults();
+			if (config.getCxVersion() != null && config.getCxVersion().getVersion() != null) {
+				String[] sastVersionSplit = config.getCxVersion().getVersion().split("\\.");
+				version = Double.parseDouble(sastVersionSplit[0] + "." + sastVersionSplit[1]);
+				if (version >= 9.7) {
+					logger.info("Checkmarx Critical vulnerabilities: " + latestSASTResults.getCritical());
+					logger.info("Checkmarx New-Critical vulnerabilities: " + latestSASTResults.getNewCritical());
+				}
+			}
             logger.info("Checkmarx High vulnerabilities: " + latestSASTResults.getHigh());
             logger.info("Checkmarx New-High vulnerabilities: " + latestSASTResults.getNewHigh());
             logger.info("Checkmarx Medium vulnerabilities: " + latestSASTResults.getMedium());

@@ -19,56 +19,70 @@ public class SastMetrics implements Metrics {
     public static String SAST_BASE_KEY = "cx.sast.result";
     public static String NON_COMMENTIOG_LINES_OF_CODE = "Non commenting lines of code";
 
-    public static final Metric<Integer> SAST_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".high", "Checkmarx - 1. High Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_CRITICAL_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".critical", "Checkmarx - 1. Critical Vulnerabilities", Metric.ValueType.INT)
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
+            .setDirection(Metric.DIRECTION_WORST)
+            .setQualitative(false)
+            .setDomain(CX_SAST_DOMAIN)
+            .create();    
+    
+    public static final Metric<Integer> SAST_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".high", "Checkmarx - 2. High Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".medium", "Checkmarx - 2. Medium Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".medium", "Checkmarx - 3. Medium Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".low", "Checkmarx - 3. Low Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".low", "Checkmarx - 4. Low Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_TOTAL_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".total", "Checkmarx - 4. Total Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_TOTAL_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".total", "Checkmarx - 5. Total Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_NEW_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.high", "Checkmarx - 5. New High Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_NEW_CRITICAL_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.critical", "Checkmarx - 6. New Critical Vulnerabilities", Metric.ValueType.INT)
+            .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
+            .setDirection(Metric.DIRECTION_WORST)
+            .setQualitative(false)
+            .setDomain(CX_SAST_DOMAIN)
+            .create();
+    
+    public static final Metric<Integer> SAST_NEW_HIGH_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.high", "Checkmarx - 7. New High Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_NEW_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.medium", "Checkmarx - 6. New Medium Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_NEW_MEDIUM_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.medium", "Checkmarx - 8. New Medium Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_NEW_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.low", "Checkmarx - 7. New Low Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_NEW_LOW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + "new.low", "Checkmarx - 9. New Low Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
             .setDomain(CX_SAST_DOMAIN)
             .create();
 
-    public static final Metric<Integer> SAST_TOTAL_NEW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".new.total", "Checkmarx - 8. Total New Vulnerabilities", Metric.ValueType.INT)
+    public static final Metric<Integer> SAST_TOTAL_NEW_VULNERABILITIES = new Metric.Builder(SAST_BASE_KEY + ".new.total", "Checkmarx - 10. Total New Vulnerabilities", Metric.ValueType.INT)
             .setDescription(NON_COMMENTIOG_LINES_OF_CODE)
             .setDirection(Metric.DIRECTION_WORST)
             .setQualitative(false)
@@ -98,9 +112,10 @@ public class SastMetrics implements Metrics {
 
     @Override
     public List<Metric> getMetrics() {
-        return asList(SAST_HIGH_VULNERABILITIES, SAST_MEDIUM_VULNERABILITIES, SAST_LOW_VULNERABILITIES, SAST_TOTAL_VULNERABILITIES,
-                SAST_NEW_HIGH_VULNERABILITIES, SAST_NEW_MEDIUM_VULNERABILITIES, SAST_NEW_LOW_VULNERABILITIES, SAST_TOTAL_NEW_VULNERABILITIES,
-                SONAR_PROJECT_HAVE_SAST_RESULTS, SAST_SCAN_DETAILS, SAST_SCAN_QUERIES);
+		return asList(SAST_CRITICAL_VULNERABILITIES, SAST_HIGH_VULNERABILITIES, SAST_MEDIUM_VULNERABILITIES,
+				SAST_LOW_VULNERABILITIES, SAST_TOTAL_VULNERABILITIES, SAST_NEW_CRITICAL_VULNERABILITIES,
+				SAST_NEW_HIGH_VULNERABILITIES, SAST_NEW_MEDIUM_VULNERABILITIES, SAST_NEW_LOW_VULNERABILITIES,
+				SAST_TOTAL_NEW_VULNERABILITIES, SONAR_PROJECT_HAVE_SAST_RESULTS, SAST_SCAN_DETAILS, SAST_SCAN_QUERIES);
     }
 
 }

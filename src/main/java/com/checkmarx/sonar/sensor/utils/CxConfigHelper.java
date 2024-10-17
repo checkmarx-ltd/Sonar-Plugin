@@ -13,9 +13,10 @@ import com.checkmarx.sonar.settings.CxProperties;
 import com.checkmarx.sonar.settings.PropertyApiClient;
 import com.checkmarx.sonar.web.HttpHelper;
 import com.checkmarx.sonar.web.ProxyParams;
-import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.exception.CxClientException;
+import com.cx.restclient.CxSASTClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -27,9 +28,20 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.config.Configuration;
+import java.io.InputStream;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import java.io.File;
+import java.io.IOException;
+import org.w3c.dom.Element;
 
 import javax.crypto.SecretKey;
 import java.io.BufferedReader;
@@ -143,7 +155,6 @@ public class CxConfigHelper {
         CxScanConfig scanConfig = new CxScanConfig();
         scanConfig.setCxOrigin(CxSonarConstants.CX_SONAR_ORIGIN);
         scanConfig.setSastEnabled(true);
-        scanConfig.setOsaEnabled(false);
         scanConfig.setSynchronous(true);
         scanConfig.setDisableCertificateValidation(true);
         scanConfig.setUrl(cxFullCredentials.getCxServerUrl());
@@ -151,6 +162,13 @@ public class CxConfigHelper {
         scanConfig.setPassword(cxFullCredentials.getCxPassword());
         scanConfig.setPresetId(1);
         String cxProject = getSonarProperty(context, CxProperties.CXPROJECT_KEY);
+        
+        //String pomFilePath = "../pom.xml";
+        
+        String pluginVersion = getPluginVersion();
+        log.info("plugin Version: {}", pluginVersion);
+        scanConfig.setPluginVersion(pluginVersion);
+        
         try {
             ProjectDetails projectDetails = getProjectAndTeamDetails(cxProject, cxFullCredentials);
             scanConfig.setProjectName(projectDetails.getProjectName());
@@ -161,6 +179,34 @@ public class CxConfigHelper {
             return scanConfig;
         }
         return scanConfig;
+    }
+    
+    private String getPluginVersion() {
+        String version = null;
+        try {
+            // Load the pom.xml from the classpath
+            InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/maven/checkmarx.com/com.checkmarx.sonar.cxplugin/pom.xml");
+            
+            if (is != null) {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(is);
+                doc.getDocumentElement().normalize();
+                
+                NodeList versionList = doc.getElementsByTagName("version");
+                log.info("version List: {}", versionList.getLength());
+                if (versionList.getLength() > 0) {
+                    Element versionElement = (Element) versionList.item(0);
+                    version = versionElement.getTextContent();
+                    log.info("version Element: {}", version);
+                }
+            } else {
+                log.error("pom.xml not found in the classpath");
+            }
+        } catch (Exception e) {
+            log.error("Error while reading plugin version", e);
+        }
+        return version;
     }
 
     private String getPropertyValue(String responseJson) {
@@ -303,32 +349,29 @@ public class CxConfigHelper {
 
     private String getTeamId(String teamName, CxFullCredentials cxFullCredentials) throws IOException {
         String teamId;
+        Logger logger = LoggerFactory.getLogger(CxConfigHelper.class);
+        CxScanConfig config = new CxScanConfig(cxFullCredentials.getCxServerUrl().trim(),
+                        cxFullCredentials.getCxUsername(),
+                        cxFullCredentials.getCxPassword(),
+                        CxSonarConstants.CX_SONAR_ORIGIN,
+                        true);
+
         try {
-            CxShragaClient shraga;
+            CxSASTClient shraga;
             ProxyParams proxyParam = HttpHelper.getProxyParam();
-            if (proxyParam == null) {
-                shraga = new CxShragaClient(
-                        cxFullCredentials.getCxServerUrl().trim(),
-                        cxFullCredentials.getCxUsername(),
-                        cxFullCredentials.getCxPassword(),
-                        CxSonarConstants.CX_SONAR_ORIGIN,
-                        true,
-                        false,
-                        log);
-            } else {
-                shraga = new CxShragaClient(
-                        cxFullCredentials.getCxServerUrl().trim(),
-                        cxFullCredentials.getCxUsername(),
-                        cxFullCredentials.getCxPassword(),
-                        CxSonarConstants.CX_SONAR_ORIGIN,
-                        true,
-                        log,
-                        true,
-                        proxyParam.getHost(),
+            if (proxyParam != null) {
+            String proxyHost = proxyParam.getHost();
+            ProxyConfig proxyConfig = new ProxyConfig(
+                    proxyHost,
                         proxyParam.getPort(),
                         proxyParam.getUser(),
-                        proxyParam.getPssd());
-            }
+                        proxyParam.getPssd(),
+                        proxyHost.toLowerCase().startsWith("https"));
+
+                
+                    config.setProxyConfig(proxyConfig);
+                }
+                shraga = new CxSASTClient(config, logger);
 
             shraga.login();
 
