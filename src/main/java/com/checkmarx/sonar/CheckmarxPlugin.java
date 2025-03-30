@@ -34,23 +34,25 @@ public class CheckmarxPlugin implements Plugin {
     @Override
     public void define(Context context) {
         context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CheckmarxSensor.class,
-                CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class, CxRulesDefinition.class);
+                CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class,
+                CxRulesDefinition.class);
 
         context.addExtensions(CxCppProfile.class,
-                CxCsharpProfile.class,
-                CxGoProfile.class,
-                CxGroovyProfile.class,
-                CxJavaProfile.class,
-                CxJavaScriptProfile.class,
-                CxObjcProfile.class,
-                CxPerlProfile.class,
-                CxPhpProfile.class,
-                CxPlSqlProfile.class,
-                CxPythonProfile.class,
-                CxVb6Profile.class,
-                CxVbNetProfile.class,
-                CxApexProfile.class,
-                CxKotlinProfile.class);
+                // CxCsharpProfile.class,
+                // CxGoProfile.class,
+                // CxGroovyProfile.class,
+                CxJavaProfile.class
+        // CxJavaScriptProfile.class,
+        // CxObjcProfile.class,
+        // CxPerlProfile.class,
+        // CxPhpProfile.class,
+        // CxPlSqlProfile.class,
+        // CxPythonProfile.class,
+        // CxVb6Profile.class,
+        // CxVbNetProfile.class,
+        // CxApexProfile.class,
+        // CxKotlinProfile.class
+        );
     }
 
 }

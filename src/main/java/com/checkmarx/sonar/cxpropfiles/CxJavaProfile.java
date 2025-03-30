@@ -1,15 +1,13 @@
 package com.checkmarx.sonar.cxpropfiles;
 
-import java.util.List;
-
-import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.profiles.XMLProfileParser;
-import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
-import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.NewBuiltInQualityProfile;
-import org.sonar.api.utils.ValidationMessages;
+import java.io.InputStream;
 
+import com.checkmarx.sonar.cxpropfilesUtil.cxProfileData;
+import com.checkmarx.sonar.cxpropfilesUtil.cxProfileParserUtil;
+import com.checkmarx.sonar.cxpropfilesUtil.cxRuleData;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
+import com.checkmarx.sonar.logger.CxLogger;
 
 /**
  * Created by: zoharby.
@@ -17,29 +15,32 @@ import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
  */
 public class CxJavaProfile implements BuiltInQualityProfilesDefinition {
 
-    private final XMLProfileParser xmlProfileParser;
-
-    public CxJavaProfile(XMLProfileParser xmlProfileParser) {
-        this.xmlProfileParser = xmlProfileParser;
-    }
+    private CxLogger logger = new CxLogger(CxJavaProfile.class);
 
     @Override
     public void define(Context context) {
-        ValidationMessages validation = ValidationMessages.create();
-        RulesProfile profile = xmlProfileParser.parseResource(getClass().getClassLoader(),
-                String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
-                        CXProgrammingLanguage.JAVA.getName().toLowerCase()), validation);
 
-        NewBuiltInQualityProfile qprofile =   context.createBuiltInQualityProfile(profile.getName(), profile.getLanguage());
-        
-        List<ActiveRule> rules =  profile.getActiveRules();
-        
-        if(rules != null && rules.size() > 0) {
-        	for(ActiveRule r: rules) {
-        		qprofile.activateRule(r.getRepositoryKey(),r.getRuleKey());
-        	}        	
+        String profilePath = String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
+                CXProgrammingLanguage.JAVA.getName().toLowerCase());
+
+        try (InputStream profileFile = getClass().getClassLoader().getResourceAsStream(profilePath)) {
+            if (profileFile == null) {
+                logger.warn("Profile file not found: " + profilePath);
+                return;
+            }
+            // Parse the XML using our utility
+            cxProfileData profileData = cxProfileParserUtil.parseProfile(profileFile);
+            NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
+                    profileData.getLanguage());
+
+            // Activate each rule
+            for (cxRuleData rule : profileData.getRules()) {
+                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            }
+            profile.done();
+        } catch (Exception e) {
+            logger.error("Failed to define built-in quality profile: " + profilePath);
+            e.printStackTrace();
         }
-        
-        qprofile.done();
     }
 }
