@@ -38,21 +38,21 @@ public class CheckmarxPlugin implements Plugin {
                 CxRulesDefinition.class);
 
         context.addExtensions(CxCppProfile.class,
-                // CxCsharpProfile.class,
-                // CxGoProfile.class,
-                // CxGroovyProfile.class,
-                CxJavaProfile.class
-        // CxJavaScriptProfile.class,
-        // CxObjcProfile.class,
-        // CxPerlProfile.class,
-        // CxPhpProfile.class,
-        // CxPlSqlProfile.class,
-        // CxPythonProfile.class,
-        // CxVb6Profile.class,
-        // CxVbNetProfile.class,
-        // CxApexProfile.class,
-        // CxKotlinProfile.class
-        );
+                CxCsharpProfile.class,
+                CxGoProfile.class,
+                CxGroovyProfile.class,
+                CxJavaProfile.class,
+                CxJavaScriptProfile.class,
+                CxObjcProfile.class,
+                CxPerlProfile.class,
+                CxPhpProfile.class,
+                CxPlSqlProfile.class,
+                CxPythonProfile.class,
+                CxVb6Profile.class,
+                CxVbNetProfile.class,
+                CxApexProfile.class,
+                CxKotlinProfile.class);
+
     }
 
 }

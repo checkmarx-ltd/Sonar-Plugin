@@ -1,16 +1,13 @@
 package com.checkmarx.sonar.cxpropfiles;
 
+import com.checkmarx.sonar.cxpropfilesUtil.cxProfileData;
+import com.checkmarx.sonar.cxpropfilesUtil.cxProfileParserUtil;
+import com.checkmarx.sonar.cxpropfilesUtil.cxRuleData;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
+import com.checkmarx.sonar.logger.CxLogger;
 
-import java.util.List;
-
-import org.sonar.api.profiles.ProfileDefinition;
-import org.sonar.api.profiles.RulesProfile;
-import org.sonar.api.profiles.XMLProfileParser;
-import org.sonar.api.rules.ActiveRule;
+import java.io.InputStream;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
-import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.NewBuiltInQualityProfile;
-import org.sonar.api.utils.ValidationMessages;
 
 /**
  * Created by: zoharby.
@@ -18,39 +15,32 @@ import org.sonar.api.utils.ValidationMessages;
  */
 public class CxKotlinProfile implements BuiltInQualityProfilesDefinition {
 
-    private final XMLProfileParser xmlProfileParser;
-
-    public CxKotlinProfile(XMLProfileParser xmlProfileParser) {
-        this.xmlProfileParser = xmlProfileParser;
-    }
-
-//    @Override
-//    public RulesProfile createProfile(ValidationMessages validation) {
-//        return xmlProfileParser.parseResource(getClass().getClassLoader(),
-//                String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
-//                        CXProgrammingLanguage.KOTLIN.getName().toLowerCase()), validation);
-//    }
+    private CxLogger logger = new CxLogger(CxKotlinProfile.class);
 
 	@Override
 	public void define(Context context) {
-		ValidationMessages validation = ValidationMessages.create();
-		RulesProfile profile = xmlProfileParser.parseResource(getClass().getClassLoader(),
-				String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
-						CXProgrammingLanguage.KOTLIN.getName().toLowerCase()),
-				validation);
+        String profilePath = String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
+                CXProgrammingLanguage.KOTLIN.getName().toLowerCase());
 
-		NewBuiltInQualityProfile qprofile = context.createBuiltInQualityProfile(profile.getName(),
-				profile.getLanguage());
+        try (InputStream profileFile = getClass().getClassLoader().getResourceAsStream(profilePath)) {
+            if (profileFile == null) {
+                logger.warn("Profile file not found: " + profilePath);
+                return;
+            }
+            // Parse the XML using our utility
+            cxProfileData profileData = cxProfileParserUtil.parseProfile(profileFile);
+            NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
+                    profileData.getLanguage());
 
-		List<ActiveRule> rules = profile.getActiveRules();
-
-		if (rules != null && rules.size() > 0) {
-			for (ActiveRule r : rules) {
-				qprofile.activateRule(r.getRepositoryKey(), r.getRuleKey());
-			}
-		}
-
-		qprofile.done();
+            // Activate each rule
+            for (cxRuleData rule : profileData.getRules()) {
+                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            }
+            profile.done();
+        } catch (Exception e) {
+            logger.error("Failed to define built-in quality profile: " + profilePath);
+            e.printStackTrace();
+        }
 
 	}
     
