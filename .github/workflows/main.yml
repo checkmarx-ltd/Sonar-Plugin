@@ -30,7 +30,7 @@ jobs:
 
       - name: Check version and authenticate
         run: |
-          cx version
+          ./cx version
           # cx auth login --tenant ${{ secrets.CHECKMARX_TENANT }} --client-id ${{ secrets.CHECKMARX_CLIENT_ID }} --client-secret ${{ secrets.CHECKMARX_CLIENT_SECRET }}
           
       # - name: Run Checkmarx One scan
