@@ -17,7 +17,7 @@ jobs:
           mkdir -p cx-cli
           
           # Download the CLI archive
-          curl -L https://github.com/Checkmarx/ast-cli/releases/download/2.3.18/ast-cli_linux_arm64.tar.gz -o cx-cli/ast-cli.tar.gz
+          curl -L https://github.com/Checkmarx/ast-cli/releases/download/2.3.18/ast-cli_linux_x64.tar.gz -o cx-cli/ast-cli.tar.gz
           
           # Extract the archive
           tar -xzf cx-cli/ast-cli.tar.gz -C cx-cli
@@ -30,7 +30,7 @@ jobs:
 
       - name: Check version and authenticate
         run: |
-          ./cx version
+          cx version
           # cx auth login --tenant ${{ secrets.CHECKMARX_TENANT }} --client-id ${{ secrets.CHECKMARX_CLIENT_ID }} --client-secret ${{ secrets.CHECKMARX_CLIENT_SECRET }}
           
       # - name: Run Checkmarx One scan
