@@ -2,7 +2,7 @@ name: Checkmarx One Scan
 
 on:
   push:
-    branches: [sonarCxScanAction]
+    branches: [sq-10.8]
 
 jobs:
   CxOneScan:
@@ -20,54 +20,3 @@ jobs:
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
           source_dir: "."
           additional_params: --report-format sarif --output-path . --scan-types sast,sca
-
-      # - name: Download and install Checkmarx AST CLI
-      #   run: |
-      #     # Create directory for CLI
-      #     mkdir -p cx-cli
-
-      #     # Download the CLI archive
-      #     curl -L https://github.com/Checkmarx/ast-cli/releases/download/2.3.18/ast-cli_linux_x64.tar.gz -o cx-cli/ast-cli.tar.gz
-
-      #     # Extract the archive
-      #     tar -xzf cx-cli/ast-cli.tar.gz -C cx-cli
-
-      #     # Make the CLI executable
-      #     chmod +x cx-cli/cx
-
-      #     # Add to PATH
-      #     echo "$(pwd)/cx-cli" >> $GITHUB_PATH
-
-      # - name: Configure Checkmarx One CLI
-      #   env:
-      #     CX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
-      #     CX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
-      #     CX_TENANT: ${{ secrets.CX_TENANT }}
-      #     CX_BASE_URI: ${{ secrets.CX_BASE_URI }}
-      #     CX_BASE_AUTH_URI: ${{ secrets.CX_BASE_AUTH_URI }}
-      #   run: |
-      #     cx configure set --prop-name cx_client_id --prop-value "$CX_CLIENT_ID"
-      #     cx configure set --prop-name cx_client_secret --prop-value "$CX_CLIENT_SECRET"
-      #     cx configure set --prop-name cx_tenant --prop-value "$CX_TENANT"
-      #     cx configure set --prop-name cx_base_uri --prop-value "$CX_BASE_URI"
-      #     cx configure set --prop-name cx_base_auth_uri --prop-value "$CX_BASE_AUTH_URI"
-
-      # - name: Check version and authenticate
-      #   run: |
-      #     cx version
-      #     cx auth validate
-
-      # - name: Set Branch Name
-      #   id: vars
-      #   run: |
-      #     echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}" >> "$GITHUB_OUTPUT"
-        
-      # - name: Run Checkmarx One scan
-      #   run: |
-      #     cx scan create --project-name "${{ github.repository }}" \
-      #       --branch "${{ steps.vars.outputs.BRANCH_NAME }}" \
-      #       -s "." \
-      #       --scan-types "sast,sca" \
-      #       --report-format sarif \
-      #       --output-path ./cx-results/
-
