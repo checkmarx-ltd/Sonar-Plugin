@@ -47,10 +47,15 @@ jobs:
           cx version
           cx auth validate
 
+      - name: Set Branch Name
+        id: vars
+        run: |
+          echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}" >> "$GITHUB_OUTPUT"
+        
       - name: Run Checkmarx One scan
         run: |
           cx scan create --project-name "${{ github.repository }}" \
-            --branch "${{ github.head_ref }}" \
+            --branch "${{ steps.vars.outputs.BRANCH_NAME }}" \
             -s "." \
             --scan-types "sast,sca" \
             --report-format sarif \
