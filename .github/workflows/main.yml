@@ -47,17 +47,17 @@ jobs:
           cx version
           cx auth validate
 
-      # - name: Run Checkmarx One scan
-      #   run: |
-      #     cx scan create --project-name "${{ github.repository }}" \
-      #       --branch "${{ github.head_ref }}" \
-      #       --source "." \
-      #       --scan-types "sast" \
-      #       --report-format sarif \
-      #       --output-path ./cx-results/
+      - name: Run Checkmarx One scan
+        run: |
+          cx scan create --project-name "${{ github.repository }}" \
+            --branch "${{ github.head_ref }}" \
+            --source "." \
+            --scan-types "sast,sca" \
+            --report-format sarif \
+            --output-path ./cx-results/
 
-      # - name: Upload SARIF file to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: cx-results/cx_result.sarif
-      #     category: checkmarx
+      - name: Upload SARIF file to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: cx-results/cx_result.sarif
+          category: checkmarx
