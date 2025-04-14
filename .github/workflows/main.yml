@@ -51,7 +51,7 @@ jobs:
         run: |
           cx scan create --project-name "${{ github.repository }}" \
             --branch "${{ github.head_ref }}" \
-            --source "." \
+            -s "." \
             --scan-types "sast,sca" \
             --report-format sarif \
             --output-path ./cx-results/
