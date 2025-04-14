@@ -36,15 +36,28 @@ jobs:
           CX_BASE_URI: ${{ secrets.CX_BASE_URI }}
           CX_BASE_AUTH_URI: ${{ secrets.CX_BASE_AUTH_URI }}
         run: |
-          cx configure set \
-            --base-uri "$CX_BASE_URI" \
-            --base-auth-uri "$CX_BASE_AUTH_URI" \
-            --tenant "$CX_TENANT" \
-            --client-id "$CX_CLIENT_ID" \
-            --client-secret "$CX_CLIENT_SECRET" \
-            --profile "default"
+          cx configure set --prop-name cx_client_id --prop-value "$CX_CLIENT_ID"
+          cx configure set --prop-name cx_client_secret --prop-value "$CX_CLIENT_SECRET"
+          cx configure set --prop-name cx_tenant --prop-value "$CX_TENANT"
+          cx configure set --prop-name cx_base_uri --prop-value "$CX_BASE_URI"
+          cx configure set --prop-name cx_base_auth_uri --prop-value "$CX_BASE_AUTH_URI"
 
       - name: Check version and authenticate
         run: |
           cx version
           cx auth validate
+
+      # - name: Run Checkmarx One scan
+      #   run: |
+      #     cx scan create --project-name "${{ github.repository }}" \
+      #       --branch "${{ github.head_ref }}" \
+      #       --source "." \
+      #       --scan-types "sast" \
+      #       --report-format sarif \
+      #       --output-path ./cx-results/
+
+      # - name: Upload SARIF file to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: cx-results/cx_result.sarif
+      #     category: checkmarx
