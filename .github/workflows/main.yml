@@ -61,8 +61,14 @@ jobs:
             --report-format sarif \
             --output-path ./cx-results/
 
-      - name: Upload SARIF file to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+      # - name: Upload SARIF file to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: cx-results/cx_result.sarif
+      #     category: checkmarx
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@404b712ccd1b4eeea961470c9187609bd64e5db4 #v2
         with:
+          # Path to SARIF file relative to the root of the repository
           sarif_file: cx-results/cx_result.sarif
-          category: checkmarx
