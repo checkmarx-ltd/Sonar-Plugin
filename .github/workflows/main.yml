@@ -5,7 +5,7 @@ on:
     branches: [sonarCxScanAction]
 
 jobs:
-  SonarQube-version:
+  CxOneScan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,95 +15,36 @@ jobs:
         run: |
           # Create directory for CLI
           mkdir -p cx-cli
-          
+
           # Download the CLI archive
           curl -L https://github.com/Checkmarx/ast-cli/releases/download/2.3.18/ast-cli_linux_x64.tar.gz -o cx-cli/ast-cli.tar.gz
-          
+
           # Extract the archive
           tar -xzf cx-cli/ast-cli.tar.gz -C cx-cli
-          
+
           # Make the CLI executable
           chmod +x cx-cli/cx
-          
+
           # Add to PATH
           echo "$(pwd)/cx-cli" >> $GITHUB_PATH
+
+      - name: Configure Checkmarx One CLI
+        env:
+          CX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
+          CX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
+          CX_TENANT: ${{ secrets.CX_TENANT }}
+          CX_BASE_URI: ${{ secrets.CX_BASE_URI }}
+          CX_BASE_AUTH_URI: ${{ secrets.CX_BASE_AUTH_URI }}
+        run: |
+          cx configure set \
+            --base-uri "$CX_BASE_URI" \
+            --base-auth-uri "$CX_BASE_AUTH_URI" \
+            --tenant "$CX_TENANT" \
+            --client-id "$CX_CLIENT_ID" \
+            --client-secret "$CX_CLIENT_SECRET" \
+            --profile "default"
 
       - name: Check version and authenticate
         run: |
           cx version
-          # cx auth login --tenant ${{ secrets.CHECKMARX_TENANT }} --client-id ${{ secrets.CHECKMARX_CLIENT_ID }} --client-secret ${{ secrets.CHECKMARX_CLIENT_SECRET }}
-          
-      # - name: Run Checkmarx One scan
-      #   run: |
-      #     # Create output directory
-      #     mkdir -p cx-results
-          
-      #     # Run the scan and generate SARIF report
-      #     cx scan create --project-name "${{ github.repository }}" \
-      #       --branch "${{ github.head_ref }}" \
-      #       --source "." \
-      #       --scan-types "sast" \
-      #       --report-format sarif \
-      #       --output-path ./cx-results/
-          
-      #     # Rename the output file if needed (depends on cx cli behavior)
-      #     if [ -f "./cx-results/report.sarif" ]; then
-      #       mv ./cx-results/report.sarif ./cx-results/cx_result.sarif
-      #     fi
-      
-      # - name: Upload SARIF file to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: cx-results/cx_result.sarif
-      #     category: checkmarx
-          
-      # - name: Prepare Teams message
-      #   id: prepare-teams-message
-      #   run: |
-      #     HIGH_VULNS=$(grep -c '"level":"error"' cx-results/cx_result.sarif || echo "0")
-      #     MEDIUM_VULNS=$(grep -c '"level":"warning"' cx-results/cx_result.sarif || echo "0")
-      #     LOW_VULNS=$(grep -c '"level":"note"' cx-results/cx_result.sarif || echo "0")
-          
-      #     echo "high_vulns=$HIGH_VULNS" >> $GITHUB_OUTPUT
-      #     echo "medium_vulns=$MEDIUM_VULNS" >> $GITHUB_OUTPUT
-      #     echo "low_vulns=$LOW_VULNS" >> $GITHUB_OUTPUT
-
-      # - name: Send Teams notification
-        # uses: aliencube/microsoft-teams-actions@v0.8.0
-        # with:
-        #   webhook_uri: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        #   title: "Checkmarx Scan Results for PR #${{ github.event.pull_request.number }}"
-        #   summary: "Security scan results for PR in ${{ github.repository }}"
-        #   theme_color: "#ff0000"
-        #   sections: |
-        #     [{
-        #       "activityTitle": "Checkmarx One Security Scan",
-        #       "activitySubtitle": "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}",
-        #       "facts": [
-        #         {
-        #           "name": "Repository",
-        #           "value": "${{ github.repository }}"
-        #         },
-        #         { 
-        #           "name": "High Severity Vulnerabilities",
-        #           "value": "${{ steps.prepare-teams-message.outputs.high_vulns }}"
-        #         },
-        #         {
-        #           "name": "Medium Severity Vulnerabilities",
-        #           "value": "${{ steps.prepare-teams-message.outputs.medium_vulns }}"
-        #         },
-        #         {
-        #           "name": "Low Severity Vulnerabilities",
-        #           "value": "${{ steps.prepare-teams-message.outputs.low_vulns }}"
-        #         }
-        #       ],
-        #       "potentialAction": [
-        #         {
-        #           "@type": "OpenUri",
-        #           "name": "View Pull Request",
-        #           "targets": [
-        #             { "os": "default", "uri": "${{ github.event.pull_request.html_url }}" }
-        #           ]
-        #         }
-        #       ]
-        #     }]
+          cx auth validate
