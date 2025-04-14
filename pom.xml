@@ -5,7 +5,7 @@
     <groupId>checkmarx.com</groupId>
     <artifactId>com.checkmarx.sonar.cxplugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>2024.3.3</version>
+    <version>2025.2.1</version>
     <name>Checkmarx plugin</name>
     <description>Checkmarx plugin</description>
 
@@ -173,7 +173,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20230618</version>
+            <version>20231013</version>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>com.sun.xml.ws</groupId>-->
@@ -261,7 +261,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>com.checkmarx</groupId>
