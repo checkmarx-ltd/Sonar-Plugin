@@ -7,9 +7,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class cxProfileParserUtil {
+public class CxProfileParserUtil {
 
-    public static cxProfileData parseProfile(InputStream inputStream) throws Exception {
+    public static CxProfileData parseProfile(InputStream inputStream) throws Exception {
         // Initialize DocumentBuilder with desired settings
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringComments(true);
@@ -27,7 +27,7 @@ public class cxProfileParserUtil {
             throw new Exception("Mandatory fields missing: <name> or <language>.");
         }
 
-        cxProfileData profileData = new cxProfileData(profileName, language);
+        CxProfileData profileData = new CxProfileData(profileName, language);
 
         // Extract rules
         NodeList ruleNodes = document.getElementsByTagName("rule");
@@ -36,7 +36,7 @@ public class cxProfileParserUtil {
             String repositoryKey = getTagValue(ruleElement, "repositoryKey");
             String ruleKey = getTagValue(ruleElement, "key");
             // Optionally, extract priority and parameters if defined.
-            cxRuleData ruleData = new cxRuleData(repositoryKey, ruleKey);
+            CxRuleData ruleData = new CxRuleData(repositoryKey, ruleKey);
             profileData.addRule(ruleData);
         }
         return profileData;

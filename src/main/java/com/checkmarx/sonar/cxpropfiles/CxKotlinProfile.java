@@ -1,8 +1,8 @@
 package com.checkmarx.sonar.cxpropfiles;
 
-import com.checkmarx.sonar.cxpropfilesUtil.cxProfileData;
-import com.checkmarx.sonar.cxpropfilesUtil.cxProfileParserUtil;
-import com.checkmarx.sonar.cxpropfilesUtil.cxRuleData;
+import com.checkmarx.sonar.cxpropfilesUtil.CxProfileData;
+import com.checkmarx.sonar.cxpropfilesUtil.CxProfileParserUtil;
+import com.checkmarx.sonar.cxpropfilesUtil.CxRuleData;
 import com.checkmarx.sonar.cxrules.CXProgrammingLanguage;
 import com.checkmarx.sonar.logger.CxLogger;
 
@@ -28,12 +28,12 @@ public class CxKotlinProfile implements BuiltInQualityProfilesDefinition {
                 return;
             }
             // Parse the XML using our utility
-            cxProfileData profileData = cxProfileParserUtil.parseProfile(profileFile);
+            CxProfileData profileData = CxProfileParserUtil.parseProfile(profileFile);
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
 
             // Activate each rule
-            for (cxRuleData rule : profileData.getRules()) {
+            for (CxRuleData rule : profileData.getRules()) {
                 profile.activateRule(rule.getRepositoryKey(), rule.getKey());
             }
             profile.done();

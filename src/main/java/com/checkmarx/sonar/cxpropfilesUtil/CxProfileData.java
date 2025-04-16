@@ -3,12 +3,12 @@ package com.checkmarx.sonar.cxpropfilesUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class cxProfileData {
+public class CxProfileData {
     private String name;
     private String language;
-    private List<cxRuleData> rules = new ArrayList<>();
+    private List<CxRuleData> rules = new ArrayList<>();
 
-    public cxProfileData(String name, String language) {
+    public CxProfileData(String name, String language) {
         this.name = name;
         this.language = language;
     }
@@ -21,11 +21,11 @@ public class cxProfileData {
         return language;
     }
 
-    public List<cxRuleData> getRules() {
+    public List<CxRuleData> getRules() {
         return rules;
     }
 
-    public void addRule(cxRuleData rule) {
+    public void addRule(CxRuleData rule) {
         rules.add(rule);
     }
 }

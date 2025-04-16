@@ -1,11 +1,11 @@
 package com.checkmarx.sonar.cxpropfilesUtil;
 
-public class cxRuleData {
+public class CxRuleData {
     private String repositoryKey;
     private String key;
     // Optionally, you can add priority and parameters fields
 
-    public cxRuleData(String repositoryKey, String key) {
+    public CxRuleData(String repositoryKey, String key) {
         this.repositoryKey = repositoryKey;
         this.key = key;
     }
