@@ -35,7 +35,6 @@ public class CxProfileParserUtil {
             Element ruleElement = (Element) ruleNodes.item(i);
             String repositoryKey = getTagValue(ruleElement, "repositoryKey");
             String ruleKey = getTagValue(ruleElement, "key");
-            // Optionally, extract priority and parameters if defined.
             CxRuleData ruleData = new CxRuleData(repositoryKey, ruleKey);
             profileData.addRule(ruleData);
         }
