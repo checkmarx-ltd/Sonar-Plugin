@@ -12,7 +12,7 @@ import com.checkmarx.sonar.logger.CxLogger;
  * Created by: zoharby.
  * Date: 03/10/2017.
  */
-public class CxPerlProfile  implements BuiltInQualityProfilesDefinition {
+public class CxPerlProfile implements BuiltInQualityProfilesDefinition {
 
     private CxLogger logger = new CxLogger(CxPerlProfile.class);
 
@@ -31,9 +31,12 @@ public class CxPerlProfile  implements BuiltInQualityProfilesDefinition {
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
 
-            // Activate each rule
-            for (CxRuleData rule : profileData.getRules()) {
-                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            if (profileData.getRules().isEmpty()) {
+                logger.warn("No rules found in the profile: " + profileData.getName());
+            } else {
+                for (CxRuleData rule : profileData.getRules()) {
+                    profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                }
             }
             profile.done();
         } catch (Exception e) {

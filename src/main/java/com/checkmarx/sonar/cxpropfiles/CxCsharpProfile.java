@@ -30,10 +30,13 @@ public class CxCsharpProfile implements BuiltInQualityProfilesDefinition {
             CxProfileData profileData = CxProfileParserUtil.parseProfile(profileFile);
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
-
-            // Activate each rule
-            for (CxRuleData rule : profileData.getRules()) {
-                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                    
+            if (profileData.getRules().isEmpty()) {
+                logger.warn("No rules found in the profile: " + profileData.getName());
+            } else {
+                for (CxRuleData rule : profileData.getRules()) {
+                    profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                }
             }
             profile.done();
         } catch (Exception e) {
@@ -42,4 +45,3 @@ public class CxCsharpProfile implements BuiltInQualityProfilesDefinition {
         }
     }
 }
-

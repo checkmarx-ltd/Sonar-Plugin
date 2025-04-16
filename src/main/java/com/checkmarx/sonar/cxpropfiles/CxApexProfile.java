@@ -15,7 +15,7 @@ import com.checkmarx.sonar.logger.CxLogger;
 public class CxApexProfile implements BuiltInQualityProfilesDefinition {
 
     private CxLogger logger = new CxLogger(CxApexProfile.class);
-    
+
     @Override
     public void define(Context context) {
         String profilePath = String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
@@ -31,15 +31,18 @@ public class CxApexProfile implements BuiltInQualityProfilesDefinition {
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
 
-            // Activate each rule
-            for (CxRuleData rule : profileData.getRules()) {
-                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            if (profileData.getRules().isEmpty()) {
+                logger.warn("No rules found in the profile: " + profileData.getName());
+            } else {
+                for (CxRuleData rule : profileData.getRules()) {
+                    profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                }
             }
             profile.done();
         } catch (Exception e) {
             logger.error("Failed to define built-in quality profile: " + profilePath);
             e.printStackTrace();
         }
-        
+
     }
 }

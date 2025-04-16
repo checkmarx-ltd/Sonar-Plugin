@@ -12,8 +12,9 @@ import com.checkmarx.sonar.logger.CxLogger;
  * Created by: zoharby.
  * Date: 03/10/2017.
  */
-public class CxVb6Profile  implements BuiltInQualityProfilesDefinition {
+public class CxVb6Profile implements BuiltInQualityProfilesDefinition {
     private CxLogger logger = new CxLogger(CxVb6Profile.class);
+
     @Override
     public void define(Context context) {
         String profilePath = String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
@@ -29,9 +30,12 @@ public class CxVb6Profile  implements BuiltInQualityProfilesDefinition {
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
 
-            // Activate each rule
-            for (CxRuleData rule : profileData.getRules()) {
-                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            if (profileData.getRules().isEmpty()) {
+                logger.warn("No rules found in the profile: " + profileData.getName());
+            } else {
+                for (CxRuleData rule : profileData.getRules()) {
+                    profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                }
             }
             profile.done();
         } catch (Exception e) {

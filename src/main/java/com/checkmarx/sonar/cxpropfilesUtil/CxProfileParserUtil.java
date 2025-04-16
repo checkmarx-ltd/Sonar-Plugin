@@ -24,7 +24,7 @@ public class CxProfileParserUtil {
 
         if (profileName == null || profileName.isEmpty() ||
             language == null || language.isEmpty()) {
-            throw new Exception("Mandatory fields missing: <name> or <language>.");
+            throw new Exception("Mandatory fields missing in Profile: <name> or <language>.");
         }
 
         CxProfileData profileData = new CxProfileData(profileName, language);

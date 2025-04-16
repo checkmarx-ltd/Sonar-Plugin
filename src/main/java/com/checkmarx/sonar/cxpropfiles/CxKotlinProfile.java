@@ -17,8 +17,8 @@ public class CxKotlinProfile implements BuiltInQualityProfilesDefinition {
 
     private CxLogger logger = new CxLogger(CxKotlinProfile.class);
 
-	@Override
-	public void define(Context context) {
+    @Override
+    public void define(Context context) {
         String profilePath = String.format(CxProfilesConstants.PROFILE_PATH_TEMPLATE,
                 CXProgrammingLanguage.KOTLIN.getName().toLowerCase());
 
@@ -32,9 +32,12 @@ public class CxKotlinProfile implements BuiltInQualityProfilesDefinition {
             NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(profileData.getName(),
                     profileData.getLanguage());
 
-            // Activate each rule
-            for (CxRuleData rule : profileData.getRules()) {
-                profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+            if (profileData.getRules().isEmpty()) {
+                logger.warn("No rules found in the profile: " + profileData.getName());
+            } else {
+                for (CxRuleData rule : profileData.getRules()) {
+                    profile.activateRule(rule.getRepositoryKey(), rule.getKey());
+                }
             }
             profile.done();
         } catch (Exception e) {
@@ -42,9 +45,6 @@ public class CxKotlinProfile implements BuiltInQualityProfilesDefinition {
             e.printStackTrace();
         }
 
-	}
-    
-    
-    
-    
+    }
+
 }
