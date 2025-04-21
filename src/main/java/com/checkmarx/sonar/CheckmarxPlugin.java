@@ -34,7 +34,8 @@ public class CheckmarxPlugin implements Plugin {
     @Override
     public void define(Context context) {
         context.addExtensions(SastMetrics.class, ComputeSastMeasures.class, CheckmarxSensor.class,
-                CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class, CxRulesDefinition.class);
+                CxProperties.getProperties(), CxPluginPageDefinition.class, CxConfigRestEndPoint.class,
+                CxRulesDefinition.class);
 
         context.addExtensions(CxCppProfile.class,
                 CxCsharpProfile.class,
@@ -51,6 +52,7 @@ public class CheckmarxPlugin implements Plugin {
                 CxVbNetProfile.class,
                 CxApexProfile.class,
                 CxKotlinProfile.class);
+
     }
 
 }
