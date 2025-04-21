@@ -2,7 +2,7 @@ name: Checkmarx One Scan
 
 on:
   push:
-    branches: [sq-10.8]
+    branches: [master]
 
 jobs:
   CxOneScan:
