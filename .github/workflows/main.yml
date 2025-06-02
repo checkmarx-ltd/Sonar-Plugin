@@ -1,0 +1,22 @@
+name: Checkmarx One Scan
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  CxOneScan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Checkmarx AST CLI Action
+        uses: checkmarx/ast-github-action@main
+        with:
+          base_uri: ${{ secrets.CX_BASE_URI }}
+          cx_tenant: ${{ secrets.CX_TENANT }}
+          cx_client_id: ${{ secrets.CX_CLIENT_ID }}
+          cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
+          source_dir: "."
+          additional_params: --report-format sarif --output-path . --scan-types sast,sca
